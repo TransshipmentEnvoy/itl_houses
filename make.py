@@ -3,16 +3,16 @@
 #################################
 
 # Name of NewGRF, as it appears in file names
-newgrf_name = "itl_houses"
+newgrf_name = "itl_houses_custom"
 
 # Files which should be first, in order (header, cargotable, etc)
-header_stuff = ["header", "graphics", "functions", "switches"]
+header_stuff = ["header", "graphics", "graphics_ttrs", "functions", "switches"]
 
 # Files to place in alphabetical order below
-unordered_stuff = ["residential", "commercial", "landmarks", "tropic", "arctic"]
+unordered_stuff = ["residential", "commercial", "landmarks", "tropic", "arctic", "ttrs"]
 
 # Do you want to copy the completed NewGRF to your OpenTTD folder? (True/False)
-copy_bool = True
+copy_bool = False
 
 # What is the path of your OpenTTD folder?
 openttd_path = "C:/Users/tyler/Documents/OpenTTD/newgrf"

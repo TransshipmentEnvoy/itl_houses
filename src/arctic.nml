@@ -427,6 +427,33 @@ item (FEAT_HOUSES, item_arctic_offices_54, 118) {
 	}
 }
 
+item(FEAT_HOUSES, item_arctic_74_tall_office_block, 129, HOUSE_SIZE_2X1) {
+	property {
+		substitute: 74;
+		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_ARCTIC, ABOVE_SNOWLINE)];
+		years_available: [1970,0xFFFF];
+		population: 255;
+		minimum_lifetime: 15;
+		building_class: 3;
+	}
+	/* Don't accept Passengers if Industries of the Caribbean is loaded */
+	if (grf_future_status("TT20")) {
+		property {
+			accepted_cargos: [[MAIL, 8]];
+		}
+	} else {
+		property {
+			accepted_cargos: [[PASS, 8],[MAIL, 8],[FOOD, 8],[GOOD, 8]];
+		}
+	}
+	graphics {
+		graphics_north: sprite_tall_office_block_74_N;
+		graphics_west: sprite_tall_office_block_74_W;
+		colour: RecolourByLandValue();
+		construction_check: switch_arctic_offices;
+	}
+}
+
 item (FEAT_HOUSES, item_arctic_offices_museum, 128) {
 	property {
 		substitute: 19;
@@ -582,5 +609,55 @@ item(FEAT_HOUSES, item_arctic_statue, 127) {
 	graphics {
 		default: sprite_statue;
 		construction_check: switch_arctic_fountain;
+	}
+}
+
+/* Old stadium requires a population of at least 500. Substitute shopping centre to avoid inheriting stadium flag. */
+item(FEAT_HOUSES, item_arctic_old_stadium, 131, HOUSE_SIZE_2X2){
+	property {
+		substitute: 20;
+		name: TTD_STR_TOWN_BUILDING_NAME_STADIUM_1;
+		building_flags: bitmask(HOUSE_FLAG_PROTECTED);
+		population: 65;
+		mail_multiplier: 0;
+		accepted_cargos: [[PASS, 8],[FOOD, 8],[BEER, 8]];
+		local_authority_impact: 300;
+		removal_cost_multiplier: 250;
+		probability: 4;
+		years_available: [1800,0xFFFF];
+		minimum_lifetime: 10;
+		availability_mask: [ALL_TOWNZONES & ~bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_ARCTIC)];
+	}
+	graphics {
+		graphics_north: sprite_old_stadium_N;
+		graphics_east: sprite_old_stadium_E;
+		graphics_west: sprite_old_stadium_W;
+		graphics_south: sprite_old_stadium_S;
+		construction_check: switch_population_500;
+	}
+}
+
+/* Modern stadium requires a population of at least 10,000. Substitute shopping centre to avoid inheriting stadium flag. */
+item(FEAT_HOUSES, item_arctic_new_stadium, 135, HOUSE_SIZE_2X2){
+	property {
+		substitute: 40;
+		name: TTD_STR_TOWN_BUILDING_NAME_STADIUM_1;
+		building_flags: bitmask(HOUSE_FLAG_PROTECTED);
+		population: 255;
+		mail_multiplier: 0;
+		accepted_cargos: [[PASS, 8],[FOOD, 8],[BEER, 8]];
+		local_authority_impact: 300;
+		removal_cost_multiplier: 250;
+		probability: 4;
+		years_available: [1958,0xFFFF];
+		minimum_lifetime: 20;
+		availability_mask: [ALL_TOWNZONES & ~bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_ARCTIC)];
+	}
+	graphics {
+		graphics_north: sprite_new_stadium_N;
+		graphics_east: sprite_new_stadium_E;
+		graphics_west: sprite_new_stadium_W;
+		graphics_south: sprite_new_stadium_S;
+		construction_check: switch_population_10k;
 	}
 }

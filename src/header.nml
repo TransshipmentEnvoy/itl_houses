@@ -5,7 +5,7 @@
 */
 
 grf {
-	grfid: "TT\03\01";
+	grfid: "TT\03\0C";
 	name: string(STR_GRF_NAME);
 	desc: string(STR_GRF_DESC);
 	version: 27;
