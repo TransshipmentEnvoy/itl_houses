@@ -2,3 +2,8 @@
 *.grf
 itl_houses.nml
 itl_houses_custom.nml
+tmp/
+bkp/
+__pycache__/
+*.pyc
+/.vscode
