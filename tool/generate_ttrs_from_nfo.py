@@ -270,6 +270,11 @@ def collect_house_set_pairs(house_lines: list[str]) -> dict[int, tuple[int, int]
       bit 31 = 1 → sprite from Action1 set index; 0 → base-game sprite
       bit 15 = 1 → enable recolouring
       bits 0-13  → sprite number / Action1 set index
+
+    Note: TTRS reuses low set IDs (0, 1, 3) for per-climate variants within the
+    same house block.  The FIRST occurrence (temperate) is kept; later climate
+    overrides (tropic reuses the same IDs) are silently ignored so that the
+    default/temperate sprite is always preferred.
     """
     pairs: dict[int, tuple[int, int]] = {}
     for line in house_lines:
@@ -277,6 +282,9 @@ def collect_house_set_pairs(house_lines: list[str]) -> dict[int, tuple[int, int]
         if not match:
             continue
         set_id = int(match.group(1), 16)
+        # First-wins: keep the temperate (first) definition for each set ID.
+        if set_id in pairs:
+            continue
         payload = match.group(2)
         raw = re.findall(r"\b[0-9A-Fa-f]{2}\b", payload)
         if len(raw) < 8:
@@ -289,21 +297,95 @@ def collect_house_set_pairs(house_lines: list[str]) -> dict[int, tuple[int, int]
     return pairs
 
 
+def split_climate_set_pairs(
+    set_pairs: dict[int, tuple[int, int]],
+) -> tuple[dict[int, tuple[int, int]], dict[int, tuple[int, int]]]:
+    """Split a raw set_pairs dict into no-snow and snow sub-dicts.
+
+    Two TTRS snow patterns are supported:
+
+    Pattern A — full snow copy at IDs 0x10-0x1F (offset +0x10 from 0x00-0x0F):
+      temp_pairs: IDs 0x00-0x0F (construction + completed, no-snow)
+      arct_pairs: IDs 0x10-0x1F remapped back by -0x10
+
+    Pattern B — only completed stage has a snow variant at ID 0x31
+    (construction stages 0x00-0x02 are shared; 0x30 = completed no-snow):
+      temp_pairs: construction IDs (0x00-0x0F) + { 0x30: set_pairs[0x30] }
+      arct_pairs: same construction IDs      + { 0x30: set_pairs[0x31] }
+
+    If arct_pairs is empty the house has no separate snow variant.
+    """
+    has_pattern_a = any(0x10 <= sid <= 0x1F for sid in set_pairs)
+    has_pattern_b = 0x30 in set_pairs and not has_pattern_a
+    # Pattern C: only type-00 entries at 0x0A (no-snow) and/or 0x0B (snow),
+    # with no constr IDs (0x00-0x02), no Pattern-A/B keys.  Found in the
+    # later TTRS additions (houses 0x90-0xA1 etc.) that are permanent tiles
+    # with no construction scaffolding.
+    has_pattern_c = (
+        not has_pattern_a
+        and not has_pattern_b
+        and 0x0A in set_pairs
+        and not any(0x00 <= sid <= 0x09 for sid in set_pairs)
+    )
+
+    temp_pairs: dict[int, tuple[int, int]] = {}
+    arct_pairs: dict[int, tuple[int, int]] = {}
+
+    if has_pattern_a:
+        for sid, val in set_pairs.items():
+            if 0x10 <= sid <= 0x1F:
+                arct_pairs[sid - 0x10] = val
+            else:
+                temp_pairs[sid] = val
+
+    elif has_pattern_b:
+        # Construction stages are shared between both climate variants.
+        constr = {sid: val for sid, val in set_pairs.items() if sid < 0x20}
+        temp_pairs = dict(constr)
+        temp_pairs[0x30] = set_pairs[0x30]
+        if 0x31 in set_pairs:
+            arct_pairs = dict(constr)
+            arct_pairs[0x30] = set_pairs[0x31]  # remap snow-completed to same key
+
+    elif has_pattern_c:
+        # Remap 0x0A → completed no-snow (key 0x30), 0x0B → snow (key 0x30 in
+        # arct_pairs) so the existing Case 1 path in _emit_climate_blocks handles
+        # them without any further changes.
+        temp_pairs[0x30] = set_pairs[0x0A]
+        if 0x0B in set_pairs:
+            arct_pairs[0x30] = set_pairs[0x0B]
+
+    else:
+        temp_pairs = dict(set_pairs)
+
+    return temp_pairs, arct_pairs
+
+
 def classify_sets(
     set_pairs: dict[int, tuple[int, int]],
     has_animation: bool,
-) -> tuple[list[int], list[int]]:
-    """Split set IDs into construction-stage IDs and animation-frame IDs.
+) -> tuple[list[int], list[int], list[int]]:
+    """Split set IDs into (constr_ids, completed_ids, anim_ids).
 
-    Construction stages use low IDs (0x00-0x03); animation frames use all the rest.
-    When has_animation is False every set is treated as a construction stage (up to 4).
+    After split_climate_set_pairs has been applied, each climate variant's
+    set_pairs uses these conventions:
+
+      constr_ids   : IDs 0x00-0x02 — construction scaffolding stages 0, 1, 2.
+      completed_ids: ID  0x03       — Pattern A completed stage (same climate as
+                                      construction sprites); OR
+                     ID  0x30       — Pattern B completed stage (after
+                                      split_climate_set_pairs remapped 0x31→0x30
+                                      for the snow variant).
+      anim_ids     : IDs 0x04-0x1F — only present when has_animation is True;
+                                      in practice TTRS animation frames are stored
+                                      in non-type-00 Action2, so these are usually
+                                      empty for type-00 parsed data.
     """
     all_ids = sorted(set_pairs.keys())
-    if not has_animation:
-        return all_ids[:4], []
-    constr_ids = [sid for sid in all_ids if sid <= 0x03]
-    anim_ids   = [sid for sid in all_ids if sid > 0x03]
-    return constr_ids, anim_ids
+    constr_ids    = [sid for sid in all_ids if 0x00 <= sid <= 0x02]
+    completed_ids = [sid for sid in all_ids if sid == 0x03 or sid >= 0x20]
+    anim_ids      = [sid for sid in all_ids if 0x04 <= sid <= 0x1F] if has_animation else []
+    return constr_ids, completed_ids, anim_ids
 
 
 def _pick_ground_dword(set_ids: list[int], set_pairs: dict[int, tuple[int, int]]) -> int:
@@ -329,165 +411,117 @@ def _build_layout_expr(n: int) -> str:
     if n <= 1:
         return "0"
     if n == 2:
-        return "construction_state < 3 ? construction_state : 1"
+        return "construction_state < 2 ? construction_state : 1"
     if n == 3:
         return "construction_state < 3 ? construction_state : 2"
     return "construction_state"  # n == 4: states 0-3 map 1:1
 
 
-def emit_sprite_blocks(
+def _ground_expr_for_set(
+    sid: int,
+    name_prefix: str,
+    set_pairs: dict[int, tuple[int, int]],
+    sprite_table: dict[int, SpriteCoord],
+    pcx_path: str,
+    out: list[str],
+) -> Optional[str]:
+    """Compute the NML ground-sprite expression for a given type-00 set.
+
+    Emits a one-sprite spriteset with the unique name ``name_prefix`` when the
+    ground comes from Action1; otherwise returns a plain integer literal.
+    Returns None when the Action1 sprite is missing from the table.
+    """
+    gd = set_pairs[sid][0]
+    if gd & SPRITE_ACTION1_FLAG:
+        gidx = gd & SPRITE_INDEX_MASK
+        sp = sprite_table.get(gidx)
+        if sp is None:
+            return None
+        out.append(f"spriteset({name_prefix}, \"{pcx_path}\") {{ {sprite_literal(sp)} }}")
+        return f"{name_prefix}(0)"
+    return str(gd & SPRITE_INDEX_MASK)
+
+
+def _emit_climate_blocks(
     house_id_hex: str,
-    props: dict[str, object],
+    climate_suffix: str,
+    has_animation: bool,
     set_pairs: dict[int, tuple[int, int]],
     sprite_table: dict[int, SpriteCoord],
     pcx_path: str,
 ) -> tuple[list[str], str]:
-    """Emit spriteset(s), spritelayout(s), and optional anim switch for one house tile.
+    """Emit spritesets + layouts for a single climate variant of one house tile.
 
-    Returns (lines, layout_entry_name) where layout_entry_name is the identifier
-    to put in the item's  ``default:``  (always named ``sl_ttrs_{house_id_hex}``).
+    ``climate_suffix`` is appended to every identifier for this variant,
+    e.g. "" (no arctic variant), "_nosnow", or "_snow".
 
-    For non-animated houses ``sl_ttrs_XX`` is a plain spritelayout.
-    For animated houses it is a switch on construction_state that routes to
-    the construction layout or the animation layout.
+    Grounds are computed directly from each stage's type-00 entry so that
+    construction and completed stages can use different terrain tiles.
 
-    Emit order (guarantees ≤ 2 extra concurrent switch IDs at any time):
-        spriteset(s) → spritelayout(s) → [switch sl_ttrs_XX]
-    The item block that immediately follows closes every per-house switch.
+    Returns (lines, top_level_name) where top_level_name is the NML identifier
+    the caller should reference for this climate path.
     """
     out: list[str] = []
-    entry_name = f"sl_ttrs_{house_id_hex}"
+    base   = f"sl_ttrs_{house_id_hex}{climate_suffix}"
+    ss_base = f"ss_ttrs_{house_id_hex}{climate_suffix}"
 
-    if not set_pairs:
-        out.append(f"/* WARN 0x{house_id_hex}: no Action2 type-00 sets found — skipping sprite blocks */")
+    constr_ids, completed_ids, anim_ids = classify_sets(set_pairs, has_animation)
+
+    # ====================================================================
+    # Fallback: no usable sets at all
+    # ====================================================================
+    if not constr_ids and not completed_ids and not anim_ids:
+        out.append(f"/* WARN 0x{house_id_hex}{climate_suffix}: no valid sets after classification */")
         out.append("")
-        return out, entry_name
-
-    # --- Detect animation -----------------------------------------------
-    anim_info_raw = props.get("1A")
-    anim_info_val = token_to_int(anim_info_raw) if isinstance(anim_info_raw, str) else None
-    low_raw  = props.get("09")
-    high_raw = props.get("19")
-    low_val  = token_to_int(low_raw)  if isinstance(low_raw,  str) else 0
-    high_val = token_to_int(high_raw) if isinstance(high_raw, str) else 0
-    building_flags_mask = (low_val or 0) + ((high_val or 0) << 8)
-    has_animation = bool(
-        (building_flags_mask & (1 << 5))   # HOUSE_FLAG_ANIMATE bit
-        and anim_info_val is not None
-    )
-    num_anim_frames = 0
-    if has_animation and anim_info_val is not None:
-        _, num_anim_frames = decode_animation_info(anim_info_val)
-
-    constr_ids, anim_ids = classify_sets(set_pairs, has_animation)
-
-    # Require at least construction OR animation sets
-    if not constr_ids and not anim_ids:
-        out.append(f"/* WARN 0x{house_id_hex}: set classification yielded no usable sets */")
-        out.append("")
-        return out, entry_name
-
-    # --- Ground sprite --------------------------------------------------
-    all_ids_for_ground = constr_ids + anim_ids if (constr_ids or anim_ids) else list(set_pairs.keys())
-    ground_dword = _pick_ground_dword(all_ids_for_ground, set_pairs)
-    ground_is_action1 = bool(ground_dword & SPRITE_ACTION1_FLAG)
-    ground_index = ground_dword & SPRITE_INDEX_MASK
-    ground_pcx: Optional[SpriteCoord] = None
-
-    if ground_is_action1:
-        ground_pcx = sprite_table.get(ground_index)
-        if ground_pcx is None:
-            out.append(f"/* WARN 0x{house_id_hex}: missing Action1 ground index 0x{ground_index:02X} */")
-            out.append("")
-            return out, entry_name
-    # base-game ground (literal sprite number) needs no spriteset
-
-    def ground_sprite_expr() -> str:
-        if ground_is_action1:
-            return f"ss_ttrs_{house_id_hex}_g(0)"
-        return str(ground_index)
-
-    # --- Emit ground spriteset (if Action1) -----------------------------
-    if ground_is_action1 and ground_pcx is not None:
-        out.append(
-            f"spriteset(ss_ttrs_{house_id_hex}_g, \"{pcx_path}\") "
-            f"{{ {sprite_literal(ground_pcx)} }}"
-        )
+        return out, base
 
     # ====================================================================
-    # NON-ANIMATED house
+    # Resolve construction building + ground sprites
     # ====================================================================
-    if not has_animation or not anim_ids:
-        # Collect unique building sprites in construction-stage order
-        ids_to_use = constr_ids if constr_ids else list(sorted(set_pairs.keys()))[:4]
-        bldg_sprites: list[SpriteCoord] = []
-        seen_indices: list[int] = []
-        has_recolour = False
-        for sid in ids_to_use:
-            bd = set_pairs[sid][1]
-            if not (bd & SPRITE_ACTION1_FLAG):
-                continue
-            bidx = bd & SPRITE_INDEX_MASK
-            if bd & SPRITE_RECOLOUR_FLAG:
-                has_recolour = True
-            if bidx not in seen_indices:
-                sp = sprite_table.get(bidx)
-                if sp is not None:
-                    bldg_sprites.append(sp)
-                    seen_indices.append(bidx)
-
-        if not bldg_sprites:
-            out.append(f"/* WARN 0x{house_id_hex}: no valid building sprites (non-animated) */")
-            out.append("")
-            return out, entry_name
-
-        out.append(f"spriteset(ss_ttrs_{house_id_hex}_b, \"{pcx_path}\") {{")
-        for i, sp in enumerate(bldg_sprites):
-            suffix = "completed" if i == len(bldg_sprites) - 1 else f"constr {i}"
-            out.append(f"\t{sprite_literal(sp)}  /* {suffix} */")
-        out.append("}")
-
-        recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if has_recolour else ""
-        out.append(f"spritelayout {entry_name} {{")
-        out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
-        out.append(
-            f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_b"
-            f"({_build_layout_expr(len(bldg_sprites))});{recolour} }}"
-        )
-        out.append("}")
-        out.append("")
-        return out, entry_name
-
-    # ====================================================================
-    # ANIMATED house
-    # ====================================================================
-
-    # --- Construction-stage spriteset (optional) ------------------------
     constr_sprites: list[SpriteCoord] = []
     constr_has_recolour = False
     if constr_ids:
         seen_constr: list[int] = []
         for sid in constr_ids:
             bd = set_pairs[sid][1]
-            if not (bd & SPRITE_ACTION1_FLAG):
-                continue
+            if bd & SPRITE_ACTION1_FLAG:
+                bidx = bd & SPRITE_INDEX_MASK
+                if bd & SPRITE_RECOLOUR_FLAG:
+                    constr_has_recolour = True
+                if bidx not in seen_constr:
+                    sp = sprite_table.get(bidx)
+                    if sp is not None:
+                        constr_sprites.append(sp)
+                        seen_constr.append(bidx)
+
+    # Construction ground: use the first constr set's ground (typically transparent).
+    constr_gexpr: Optional[str] = None
+    if constr_ids:
+        constr_gexpr = _ground_expr_for_set(
+            constr_ids[0], f"{ss_base}_gc", set_pairs, sprite_table, pcx_path, out,
+        )
+
+    # ====================================================================
+    # Resolve completed building + ground sprites
+    # ====================================================================
+    done_sprite: Optional[SpriteCoord] = None
+    done_has_recolour = False
+    done_gexpr: Optional[str] = None
+    if completed_ids:
+        cid = completed_ids[0]
+        bd = set_pairs[cid][1]
+        if bd & SPRITE_ACTION1_FLAG:
             bidx = bd & SPRITE_INDEX_MASK
             if bd & SPRITE_RECOLOUR_FLAG:
-                constr_has_recolour = True
-            if bidx not in seen_constr:
-                sp = sprite_table.get(bidx)
-                if sp is not None:
-                    constr_sprites.append(sp)
-                    seen_constr.append(bidx)
+                done_has_recolour = True
+            done_sprite = sprite_table.get(bidx)
+        done_gexpr = _ground_expr_for_set(
+            cid, f"{ss_base}_gd", set_pairs, sprite_table, pcx_path, out,
+        )
 
-        if constr_sprites:
-            out.append(f"spriteset(ss_ttrs_{house_id_hex}_c, \"{pcx_path}\") {{")
-            for i, sp in enumerate(constr_sprites):
-                suffix = f"constr {i}"
-                out.append(f"\t{sprite_literal(sp)}  /* {suffix} */")
-            out.append("}")
-
-    # --- Animation-frame spriteset -------------------------------------
+    # ====================================================================
+    # Animation-frame sprites (type-00 only; usually empty for TTRS)
+    # ====================================================================
     anim_sprites: list[SpriteCoord] = []
     anim_has_recolour = False
     for sid in anim_ids:
@@ -499,87 +533,191 @@ def emit_sprite_blocks(
             sp = sprite_table.get(bidx)
             if sp is not None:
                 anim_sprites.append(sp)
-        # If base-game building sprite in an anim set, skip (shouldn't happen)
 
-    if not anim_sprites:
-        # Fallback: treat all sets as construction stages if no anim sprite data
-        out.clear()
-        ids_to_use = sorted(set_pairs.keys())[:4]
-        bldg_sprites = []
-        seen_indices = []
-        has_recolour = False
-        if ground_is_action1 and ground_pcx is not None:
+    # ====================================================================
+    # Case 1: has completed_ids  (Pattern A id=0x03, or Pattern B id=0x30)
+    # — emit separate constr / done spritelayouts + routing switch
+    # ====================================================================
+    if completed_ids and (constr_sprites or done_sprite):
+        # --- construction spriteset ---
+        if constr_sprites:
+            recolour_c = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_has_recolour else ""
+            out.append(f"spriteset({ss_base}_c, \"{pcx_path}\") {{")
+            for i, sp in enumerate(constr_sprites):
+                out.append(f"\t{sprite_literal(sp)}  /* constr {i} */")
+            out.append("}")
+            g_c = constr_gexpr or "0"
+            out.append(f"spritelayout {base}_constr {{")
+            out.append(f"\tground   {{ sprite: {g_c}; }}")
             out.append(
-                f"spriteset(ss_ttrs_{house_id_hex}_g, \"{pcx_path}\") "
-                f"{{ {sprite_literal(ground_pcx)} }}"
+                f"\tbuilding {{ sprite: {ss_base}_c"
+                f"({_build_layout_expr(len(constr_sprites))});{recolour_c} }}"
             )
-        for sid in ids_to_use:
-            bd = set_pairs[sid][1]
-            if not (bd & SPRITE_ACTION1_FLAG):
-                continue
-            bidx = bd & SPRITE_INDEX_MASK
-            if bd & SPRITE_RECOLOUR_FLAG:
-                has_recolour = True
-            if bidx not in seen_indices:
-                sp = sprite_table.get(bidx)
-                if sp is not None:
-                    bldg_sprites.append(sp)
-                    seen_indices.append(bidx)
-        if not bldg_sprites:
-            out.append(f"/* WARN 0x{house_id_hex}: animation fallback also found no sprites */")
-            out.append("")
-            return out, entry_name
-        recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if has_recolour else ""
-        out.append(f"spriteset(ss_ttrs_{house_id_hex}_b, \"{pcx_path}\") {{")
-        for i, sp in enumerate(bldg_sprites):
-            out.append(f"\t{sprite_literal(sp)}  /* constr/anim {i} */")
-        out.append("}")
-        out.append(f"spritelayout {entry_name} {{")
-        out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
+            out.append("}")
+
+        # --- completed spriteset ---
+        if done_sprite:
+            recolour_d = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if done_has_recolour else ""
+            out.append(f"spriteset({ss_base}_done, \"{pcx_path}\") {{")
+            out.append(f"\t{sprite_literal(done_sprite)}  /* completed */")
+            out.append("}")
+            g_d = done_gexpr or constr_gexpr or "0"
+            out.append(f"spritelayout {base}_done {{")
+            out.append(f"\tground   {{ sprite: {g_d}; }}")
+            out.append(f"\tbuilding {{ sprite: {ss_base}_done(0);{recolour_d} }}")
+            out.append("}")
+        else:
+            # No completed building sprite — reuse last constr sprite
+            if constr_sprites:
+                g_d = constr_gexpr or "0"
+                out.append(f"spritelayout {base}_done {{")
+                out.append(f"\tground   {{ sprite: {g_d}; }}")
+                out.append(
+                    f"\tbuilding {{ sprite: {ss_base}_c"
+                    f"({_build_layout_expr(len(constr_sprites))});{recolour_c} }}"  # type: ignore[possibly-undefined]
+                )
+                out.append("}")
+
+        # --- construction_state routing switch ---
+        fallback = f"{base}_constr" if constr_sprites else f"{base}_done"
         out.append(
-            f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_b"
-            f"({_build_layout_expr(len(bldg_sprites))};{recolour} }}"
+            f"switch (FEAT_HOUSES, SELF, {base}, construction_state) {{"
+            f" 3: {base}_done; return {fallback}; }}"
+        )
+        out.append("")
+        return out, base
+
+    # ====================================================================
+    # Case 2: animation frames present  (has_animation + anim_ids non-empty)
+    # ====================================================================
+    if anim_sprites:
+        anim_recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if anim_has_recolour else ""
+        out.append(f"spriteset({ss_base}_anim, \"{pcx_path}\") {{")
+        for i, sp in enumerate(anim_sprites):
+            out.append(f"\t{sprite_literal(sp)}  /* frame {i} */")
+        out.append("}")
+        g_anim = constr_gexpr or "0"
+        if constr_sprites:
+            recolour_c = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_has_recolour else ""
+            out.append(f"spriteset({ss_base}_c, \"{pcx_path}\") {{")
+            for i, sp in enumerate(constr_sprites):
+                out.append(f"\t{sprite_literal(sp)}  /* constr {i} */")
+            out.append("}")
+            out.append(f"spritelayout {base}_constr {{")
+            out.append(f"\tground   {{ sprite: {g_anim}; }}")
+            out.append(
+                f"\tbuilding {{ sprite: {ss_base}_c"
+                f"({_build_layout_expr(len(constr_sprites))});{recolour_c} }}"
+            )
+            out.append("}")
+        out.append(f"spritelayout {base}_done {{")
+        out.append(f"\tground   {{ sprite: {g_anim}; }}")
+        out.append(f"\tbuilding {{ sprite: {ss_base}_anim(animation_frame);{anim_recolour} }}")
+        out.append("}")
+        fallback = f"{base}_constr" if constr_sprites else f"{base}_done"
+        out.append(
+            f"switch (FEAT_HOUSES, SELF, {base}, construction_state) {{"
+            f" 3: {base}_done; return {fallback}; }}"
+        )
+        out.append("")
+        return out, base
+
+    # ====================================================================
+    # Case 3: only construction stages, no completed, no anim
+    # (rare fallback — treat last constr stage as the "done" sprite)
+    # ====================================================================
+    if constr_sprites:
+        recolour_c = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_has_recolour else ""
+        out.append(f"spriteset({ss_base}_b, \"{pcx_path}\") {{")
+        for i, sp in enumerate(constr_sprites):
+            out.append(f"\t{sprite_literal(sp)}  /* constr/done {i} */")
+        out.append("}")
+        g_c = constr_gexpr or "0"
+        out.append(f"spritelayout {base} {{")
+        out.append(f"\tground   {{ sprite: {g_c}; }}")
+        out.append(
+            f"\tbuilding {{ sprite: {ss_base}_b"
+            f"({_build_layout_expr(len(constr_sprites))});{recolour_c} }}"
         )
         out.append("}")
         out.append("")
+        return out, base
+
+    out.append(f"/* WARN 0x{house_id_hex}{climate_suffix}: no sprites could be resolved */")
+    out.append("")
+    return out, base
+
+
+def emit_sprite_blocks(
+    house_id_hex: str,
+    props: dict[str, object],
+    set_pairs: dict[int, tuple[int, int]],
+    sprite_table: dict[int, SpriteCoord],
+    pcx_path: str,
+) -> tuple[list[str], str]:
+    """Emit spriteset(s), spritelayout(s), and routing switches for one house tile.
+
+    Internally splits set_pairs into no-snow and snow sub-dicts (Pattern A or B).
+    When arctic sets exist a terrain_type switch named ``sl_ttrs_XX`` routes to
+    the appropriate variant.  Ground sprites are computed per stage inside
+    _emit_climate_blocks.
+
+    Returns (lines, layout_entry_name) where layout_entry_name is always
+    ``sl_ttrs_{house_id_hex}`` regardless of whether arctic variants exist.
+    """
+    out: list[str] = []
+    entry_name = f"sl_ttrs_{house_id_hex}"
+
+    if not set_pairs:
+        out.append(f"/* WARN 0x{house_id_hex}: no Action2 type-00 sets found — skipping sprite blocks */")
+        out.append("")
         return out, entry_name
 
-    anim_recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if anim_has_recolour else ""
-    out.append(f"spriteset(ss_ttrs_{house_id_hex}_anim, \"{pcx_path}\") {{")
-    for i, sp in enumerate(anim_sprites):
-        out.append(f"\t{sprite_literal(sp)}  /* frame {i} */")
-    out.append("}")
+    # --- Split no-snow / snow (Pattern A or B) --------------------------
+    temp_pairs, arct_pairs = split_climate_set_pairs(set_pairs)
+    has_arctic = bool(arct_pairs)
 
-    # --- Spritelayouts --------------------------------------------------
-    # _constr: shown during construction stages 0-2
-    if constr_sprites:
-        constr_recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_has_recolour else ""
-        out.append(f"spritelayout sl_ttrs_{house_id_hex}_constr {{")
-        out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
-        out.append(
-            f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_c"
-            f"({_build_layout_expr(len(constr_sprites))});{constr_recolour} }}"
+    # --- Detect animation from house properties -------------------------
+    anim_info_raw = props.get("1A")
+    anim_info_val = token_to_int(anim_info_raw) if isinstance(anim_info_raw, str) else None
+    low_raw  = props.get("09")
+    high_raw = props.get("19")
+    low_val  = token_to_int(low_raw)  if isinstance(low_raw,  str) else 0
+    high_val = token_to_int(high_raw) if isinstance(high_raw, str) else 0
+    building_flags_mask = (low_val or 0) + ((high_val or 0) << 8)
+    has_animation = bool(
+        (building_flags_mask & (1 << 5))
+        and anim_info_val is not None
+    )
+
+    # Quick sanity check using the 3-tuple classify_sets
+    temp_constr, temp_completed, temp_anim = classify_sets(temp_pairs, has_animation)
+    if not temp_constr and not temp_completed and not temp_anim:
+        out.append(f"/* WARN 0x{house_id_hex}: set classification yielded no usable sets */")
+        out.append("")
+        return out, entry_name
+
+    # --- Emit no-snow variant -------------------------------------------
+    temp_suffix = "_nosnow" if has_arctic else ""
+    temp_lines, temp_top = _emit_climate_blocks(
+        house_id_hex, temp_suffix, has_animation, temp_pairs, sprite_table, pcx_path,
+    )
+    out.extend(temp_lines)
+
+    # --- Emit snow variant (if any) -------------------------------------
+    if has_arctic:
+        arct_lines, arct_top = _emit_climate_blocks(
+            house_id_hex, "_snow", has_animation, arct_pairs, sprite_table, pcx_path,
         )
-        out.append("}")
-    # _done: shown when construction_state == 3 (completed / animated)
-    out.append(f"spritelayout sl_ttrs_{house_id_hex}_done {{")
-    out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
-    out.append(
-        f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_anim(animation_frame);{anim_recolour} }}"
-    )
-    out.append("}")
+        out.extend(arct_lines)
 
-    # --- Routing switch (named sl_ttrs_XX — item uses this directly) ---
-    if constr_sprites:
-        fallback = f"sl_ttrs_{house_id_hex}_constr"
-    else:
-        fallback = f"sl_ttrs_{house_id_hex}_done"
+        # terrain_type routing switch — this IS the entry_name the item uses
+        out.append(
+            f"switch (FEAT_HOUSES, SELF, {entry_name}, terrain_type) {{"
+            f" TILETYPE_SNOW: {arct_top}; return {temp_top}; }}"
+        )
+        out.append("")
 
-    out.append(
-        f"switch (FEAT_HOUSES, SELF, {entry_name}, construction_state) {{"
-        f" 3: sl_ttrs_{house_id_hex}_done; return {fallback}; }}"
-    )
-    out.append("")
     return out, entry_name
 
 

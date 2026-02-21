@@ -7,3 +7,4 @@ bkp/
 __pycache__/
 *.pyc
 /.vscode
+/.github/copilot-instructions.md
