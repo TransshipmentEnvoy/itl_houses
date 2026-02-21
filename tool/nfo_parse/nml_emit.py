@@ -233,8 +233,11 @@ def _emit_climate_variant(
             f" return {prefix}_constr; }}"
         )
     else:
-        # Completely empty — emit a trivial fallback
-        out.append(f"/* WARN: no sprites resolved for {prefix} */")
+        # Completely empty — emit a ground-only fallback so the identifier is valid
+        out.append(f"/* WARN: no sprites resolved for {prefix}, using ground-only fallback */")
+        out.append(f"spritelayout {prefix} {{")
+        out.append(f"\tground {{ sprite: 0; }}")
+        out.append("}")
 
     return prefix
 
@@ -339,7 +342,10 @@ def _emit_animated_variant(
     # Pick a fallback frame (first valid layout)
     fallback_layout = next((n for n in frame_layout_names if n is not None), None)
     if fallback_layout is None:
-        out.append(f"/* WARN: no valid animation frames for {prefix} */")
+        out.append(f"/* WARN: no valid animation frames for {prefix}, using ground-only fallback */")
+        out.append(f"spritelayout {prefix} {{")
+        out.append(f"\tground {{ sprite: 0; }}")
+        out.append("}")
         return prefix
 
     # ---- Animation frame switch ----------------------------------------
@@ -419,7 +425,12 @@ def emit_house_tile_nml(
     top_snow_name: str | None = None
     top_tropic_name: str | None = None
 
-    if has_temp:
+    # When has_random=True and no terrain switch is needed, the random_switch
+    # will be the sole entry point (= entry_name).  Do NOT emit htg.temperate
+    # at the entry_name level or it will collide with the random_switch block.
+    random_replaces_base = has_random and not needs_terrain_switch
+
+    if has_temp and not random_replaces_base:
         prefix   = f"sl_ttrs_{house_id_hex}{climate_suffix_temp}"
         ss_pref  = f"ss_ttrs_{house_id_hex}{climate_suffix_temp}"
         _emit_climate_variant(prefix, ss_pref, htg.temperate, sprite_table, pcx_path, out)  # type: ignore[arg-type]
@@ -502,7 +513,7 @@ def _emit_random_switch(
 
     counts_str = " ".join(f"1: {name};" for name in variant_names)
     out.append(
-        f"random_switch (FEAT_HOUSES, SELF, {entry_name}, bitmask(RANDBIT_CASE)) {{"
+        f"random_switch (FEAT_HOUSES, SELF, {entry_name}) {{"
         f" {counts_str} }}"
     )
 
