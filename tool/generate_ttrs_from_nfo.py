@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 """
-Generate TTRS NML house items from a ttrs3wmod.nfo file.
+Generate a unified TTRS NML file (spritesets + spritelayouts + item blocks) from ttrs3wmod.nfo.
 
-This script parses the NFO to extract house properties from Action 0 entries
-and names from Action 4, then generates NML item blocks with proper property
-mappings and graphics references.
+For every house the output order is strictly:
+    spriteset(s)  →  spritelayout(s)  →  anim-switch (if animated)
+    →  tile-routing switch (if multi-tile)  →  item block
+
+This ensures no "concurrent switch" ID is ever open for more than a handful
+of lines (the 5 global availability switches are the only long-lived ones).
 
 Usage:
-    python generate_ttrs_from_nfo.py --nfo path/to/ttrs3wmod.nfo --out ttrs.nml [--start-id 200]
+    python -m tool.generate_ttrs_from_nfo \\
+        --nfo tmp/ttrs3wmod.nfo --out src/ttrs.nml \\
+        [--start-id 200] [--pcx-path src/sprites/pcx/ttrs3w.pcx]
 """
 import argparse
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -45,6 +51,29 @@ BACKSLASH_WX_RE = re.compile(r"\\wx([0-9A-Fa-f]+)")
 
 # NFO sprite line header
 SPRITE_HEADER_RE = re.compile(r"^\s*\d+\s*\*\s*\d+")
+
+# Action 1 for houses — defines sprite sets
+# Format: <sprite> * <len> 01 07 <set_count> ...
+ACTION1_HOUSE_RE = re.compile(r"^\s*\d+\s+\*\s+\d+\s+01\s+07\s+([0-9A-Fa-f]{2})\b")
+
+# Action 2 for house type-00 layouts
+# Format: <sprite> * <len> 02 07 <set_id> 00 <ground_b0 b1 b2 b3> <bldg_b0 b1 b2 b3> ...
+ACTION2_HOUSE_LAYOUT_RE = re.compile(
+    r"^\s*\d+\s+\*\s+\d+\s+02\s+07\s+([0-9A-Fa-f]{2})\s+00\s+(.*)$"
+)
+
+# NFO sprite coordinate line: index  sprites/pcx/ttrs3w.pcx  xpos ypos 01 ysize xsize xrel yrel
+SPRITE_LINE_RE = re.compile(
+    r"^\s*(\d+)\s+sprites/pcx/ttrs3w\.pcx\s+(-?\d+)\s+(-?\d+)\s+01\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)"
+)
+
+# ============================================================================
+# Sprite layout constants (GRF Action2 sprite layout DWORD encoding)
+# ============================================================================
+
+SPRITE_ACTION1_FLAG = 0x80000000   # bit 31: sprite from Action1 (not base game)
+SPRITE_RECOLOUR_FLAG = 0x00008000  # bit 15: enable recolouring
+SPRITE_INDEX_MASK = 0x00003FFF     # bits 0-13: Action1 set index / base-game sprite number
 
 # ============================================================================
 # Constants and mappings
@@ -110,6 +139,448 @@ def read_nfo_text(nfo_path: Path) -> str:
         return data.decode("utf-8")
     except UnicodeDecodeError:
         return data.decode("latin1")
+
+
+# ============================================================================
+# Sprite data structures and parsing
+# ============================================================================
+
+
+@dataclass(frozen=True)
+class SpriteCoord:
+    xpos: int
+    ypos: int
+    xsize: int
+    ysize: int
+    xrel: int
+    yrel: int
+
+
+def sprite_literal(sprite: SpriteCoord) -> str:
+    """Format sprite coordinates as NML literal."""
+    return f"[{sprite.xpos}, {sprite.ypos}, {sprite.xsize}, {sprite.ysize}, {sprite.xrel}, {sprite.yrel}]"
+
+
+def parse_house_action1_blocks(lines: list[str]) -> list[tuple[int, dict[int, SpriteCoord]]]:
+    """Parse all Action 1 blocks for houses; return (line_index, sprite_table) pairs."""
+    blocks: list[tuple[int, dict[int, SpriteCoord]]] = []
+
+    for idx, line in enumerate(lines):
+        match = ACTION1_HOUSE_RE.match(line)
+        if not match:
+            continue
+        set_count = int(match.group(1), 16)
+        if set_count <= 0:
+            continue
+
+        table: dict[int, SpriteCoord] = {}
+        set_id = 0
+        for body_line in lines[idx + 1:]:
+            body_match = SPRITE_LINE_RE.match(body_line)
+            if not body_match:
+                if set_id > 0:
+                    break
+                continue
+            xpos  = int(body_match.group(2))
+            ypos  = int(body_match.group(3))
+            ysize = int(body_match.group(4))
+            xsize = int(body_match.group(5))
+            xrel  = int(body_match.group(6))
+            yrel  = int(body_match.group(7))
+            table[set_id] = SpriteCoord(xpos, ypos, xsize, ysize, xrel, yrel)
+            set_id += 1
+            if set_id >= set_count:
+                break
+        if table:
+            blocks.append((idx, table))
+
+    return blocks
+
+
+def sprite_table_for_house(
+    house_line_index: int,
+    action1_blocks: list[tuple[int, dict[int, SpriteCoord]]],
+) -> dict[int, SpriteCoord]:
+    """Return the last Action1 block whose definition precedes the given line."""
+    chosen: dict[int, SpriteCoord] = {}
+    for block_line_index, table in action1_blocks:
+        if block_line_index <= house_line_index:
+            chosen = table
+        else:
+            break
+    return chosen
+
+
+def collect_house_sections_from_action3(
+    lines: list[str],
+) -> list[tuple[str, str, list[str], int]]:
+    """Collect per-house lines by scanning backwards from each Action 3 entry.
+
+    Returns list of (house_id_hex, label, lines, start_line_index).
+    """
+    # Build marker label map
+    markers: dict[str, tuple[str, int]] = {}
+    for idx, line in enumerate(lines):
+        m = HOUSE_MARKER_RE.match(line)
+        if m:
+            hid = m.group(1).upper()
+            if hid not in markers:
+                markers[hid] = ((m.group(2) or "").strip(), idx)
+
+    # Locate all Action 3 entries
+    action3_positions: list[tuple[str, int]] = []
+    for idx, line in enumerate(lines):
+        m = ACTION3_HOUSE_RE.match(line)
+        if m:
+            hid = m.group(1).upper()
+            action3_positions.append((hid, idx))
+
+    sections: list[tuple[str, str, list[str], int]] = []
+    seen: set[str] = set()
+
+    for house_id_hex, action3_idx in action3_positions:
+        if house_id_hex in seen:
+            continue
+        seen.add(house_id_hex)
+
+        search_start = max(0, action3_idx - 200)
+        label = ""
+        if house_id_hex in markers:
+            label, marker_idx = markers[house_id_hex]
+            search_start = max(search_start, marker_idx)
+        # Don't include lines from a previous house's Action 3 entry
+        for prev_id, prev_idx in action3_positions:
+            if prev_idx < action3_idx and prev_idx >= search_start:
+                search_start = max(search_start, prev_idx + 1)
+
+        sections.append((
+            house_id_hex,
+            label,
+            lines[search_start : action3_idx + 1],
+            search_start,
+        ))
+
+    return sections
+
+
+def collect_house_set_pairs(house_lines: list[str]) -> dict[int, tuple[int, int]]:
+    """Return {set_id: (ground_dword, building_dword)} parsed from type-00 Action2 entries.
+
+    DWORD encoding (little-endian 32-bit):
+      bit 31 = 1 → sprite from Action1 set index; 0 → base-game sprite
+      bit 15 = 1 → enable recolouring
+      bits 0-13  → sprite number / Action1 set index
+    """
+    pairs: dict[int, tuple[int, int]] = {}
+    for line in house_lines:
+        match = ACTION2_HOUSE_LAYOUT_RE.match(line)
+        if not match:
+            continue
+        set_id = int(match.group(1), 16)
+        payload = match.group(2)
+        raw = re.findall(r"\b[0-9A-Fa-f]{2}\b", payload)
+        if len(raw) < 8:
+            continue
+        ground_dword = (int(raw[0], 16) | (int(raw[1], 16) << 8)
+                        | (int(raw[2], 16) << 16) | (int(raw[3], 16) << 24))
+        bldg_dword   = (int(raw[4], 16) | (int(raw[5], 16) << 8)
+                        | (int(raw[6], 16) << 16) | (int(raw[7], 16) << 24))
+        pairs[set_id] = (ground_dword, bldg_dword)
+    return pairs
+
+
+def classify_sets(
+    set_pairs: dict[int, tuple[int, int]],
+    has_animation: bool,
+) -> tuple[list[int], list[int]]:
+    """Split set IDs into construction-stage IDs and animation-frame IDs.
+
+    Construction stages use low IDs (0x00-0x03); animation frames use all the rest.
+    When has_animation is False every set is treated as a construction stage (up to 4).
+    """
+    all_ids = sorted(set_pairs.keys())
+    if not has_animation:
+        return all_ids[:4], []
+    constr_ids = [sid for sid in all_ids if sid <= 0x03]
+    anim_ids   = [sid for sid in all_ids if sid > 0x03]
+    return constr_ids, anim_ids
+
+
+def _pick_ground_dword(set_ids: list[int], set_pairs: dict[int, tuple[int, int]]) -> int:
+    """Pick the best ground sprite DWORD from the given sets.
+
+    Prefers Action1 ground over base-game sprite; among equals prefers the last
+    set (usually the completed-stage / last animation frame).
+    """
+    for sid in reversed(set_ids):
+        gd = set_pairs[sid][0]
+        if gd & SPRITE_ACTION1_FLAG:
+            return gd
+    return set_pairs[set_ids[-1]][0]
+
+
+# ============================================================================
+# Sprite-block emitter  (produces lines that go BEFORE the item block)
+# ============================================================================
+
+
+def _build_layout_expr(n: int) -> str:
+    """NML index expression mapping construction_state → spriteset index [0, n-1]."""
+    if n <= 1:
+        return "0"
+    if n == 2:
+        return "construction_state < 3 ? construction_state : 1"
+    if n == 3:
+        return "construction_state < 3 ? construction_state : 2"
+    return "construction_state"  # n == 4: states 0-3 map 1:1
+
+
+def emit_sprite_blocks(
+    house_id_hex: str,
+    props: dict[str, object],
+    set_pairs: dict[int, tuple[int, int]],
+    sprite_table: dict[int, SpriteCoord],
+    pcx_path: str,
+) -> tuple[list[str], str]:
+    """Emit spriteset(s), spritelayout(s), and optional anim switch for one house tile.
+
+    Returns (lines, layout_entry_name) where layout_entry_name is the identifier
+    to put in the item's  ``default:``  (always named ``sl_ttrs_{house_id_hex}``).
+
+    For non-animated houses ``sl_ttrs_XX`` is a plain spritelayout.
+    For animated houses it is a switch on construction_state that routes to
+    the construction layout or the animation layout.
+
+    Emit order (guarantees ≤ 2 extra concurrent switch IDs at any time):
+        spriteset(s) → spritelayout(s) → [switch sl_ttrs_XX]
+    The item block that immediately follows closes every per-house switch.
+    """
+    out: list[str] = []
+    entry_name = f"sl_ttrs_{house_id_hex}"
+
+    if not set_pairs:
+        out.append(f"/* WARN 0x{house_id_hex}: no Action2 type-00 sets found — skipping sprite blocks */")
+        out.append("")
+        return out, entry_name
+
+    # --- Detect animation -----------------------------------------------
+    anim_info_raw = props.get("1A")
+    anim_info_val = token_to_int(anim_info_raw) if isinstance(anim_info_raw, str) else None
+    low_raw  = props.get("09")
+    high_raw = props.get("19")
+    low_val  = token_to_int(low_raw)  if isinstance(low_raw,  str) else 0
+    high_val = token_to_int(high_raw) if isinstance(high_raw, str) else 0
+    building_flags_mask = (low_val or 0) + ((high_val or 0) << 8)
+    has_animation = bool(
+        (building_flags_mask & (1 << 5))   # HOUSE_FLAG_ANIMATE bit
+        and anim_info_val is not None
+    )
+    num_anim_frames = 0
+    if has_animation and anim_info_val is not None:
+        _, num_anim_frames = decode_animation_info(anim_info_val)
+
+    constr_ids, anim_ids = classify_sets(set_pairs, has_animation)
+
+    # Require at least construction OR animation sets
+    if not constr_ids and not anim_ids:
+        out.append(f"/* WARN 0x{house_id_hex}: set classification yielded no usable sets */")
+        out.append("")
+        return out, entry_name
+
+    # --- Ground sprite --------------------------------------------------
+    all_ids_for_ground = constr_ids + anim_ids if (constr_ids or anim_ids) else list(set_pairs.keys())
+    ground_dword = _pick_ground_dword(all_ids_for_ground, set_pairs)
+    ground_is_action1 = bool(ground_dword & SPRITE_ACTION1_FLAG)
+    ground_index = ground_dword & SPRITE_INDEX_MASK
+    ground_pcx: Optional[SpriteCoord] = None
+
+    if ground_is_action1:
+        ground_pcx = sprite_table.get(ground_index)
+        if ground_pcx is None:
+            out.append(f"/* WARN 0x{house_id_hex}: missing Action1 ground index 0x{ground_index:02X} */")
+            out.append("")
+            return out, entry_name
+    # base-game ground (literal sprite number) needs no spriteset
+
+    def ground_sprite_expr() -> str:
+        if ground_is_action1:
+            return f"ss_ttrs_{house_id_hex}_g(0)"
+        return str(ground_index)
+
+    # --- Emit ground spriteset (if Action1) -----------------------------
+    if ground_is_action1 and ground_pcx is not None:
+        out.append(
+            f"spriteset(ss_ttrs_{house_id_hex}_g, \"{pcx_path}\") "
+            f"{{ {sprite_literal(ground_pcx)} }}"
+        )
+
+    # ====================================================================
+    # NON-ANIMATED house
+    # ====================================================================
+    if not has_animation or not anim_ids:
+        # Collect unique building sprites in construction-stage order
+        ids_to_use = constr_ids if constr_ids else list(sorted(set_pairs.keys()))[:4]
+        bldg_sprites: list[SpriteCoord] = []
+        seen_indices: list[int] = []
+        has_recolour = False
+        for sid in ids_to_use:
+            bd = set_pairs[sid][1]
+            if not (bd & SPRITE_ACTION1_FLAG):
+                continue
+            bidx = bd & SPRITE_INDEX_MASK
+            if bd & SPRITE_RECOLOUR_FLAG:
+                has_recolour = True
+            if bidx not in seen_indices:
+                sp = sprite_table.get(bidx)
+                if sp is not None:
+                    bldg_sprites.append(sp)
+                    seen_indices.append(bidx)
+
+        if not bldg_sprites:
+            out.append(f"/* WARN 0x{house_id_hex}: no valid building sprites (non-animated) */")
+            out.append("")
+            return out, entry_name
+
+        out.append(f"spriteset(ss_ttrs_{house_id_hex}_b, \"{pcx_path}\") {{")
+        for i, sp in enumerate(bldg_sprites):
+            suffix = "completed" if i == len(bldg_sprites) - 1 else f"constr {i}"
+            out.append(f"\t{sprite_literal(sp)}  /* {suffix} */")
+        out.append("}")
+
+        recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if has_recolour else ""
+        out.append(f"spritelayout {entry_name} {{")
+        out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
+        out.append(
+            f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_b"
+            f"({_build_layout_expr(len(bldg_sprites))});{recolour} }}"
+        )
+        out.append("}")
+        out.append("")
+        return out, entry_name
+
+    # ====================================================================
+    # ANIMATED house
+    # ====================================================================
+
+    # --- Construction-stage spriteset (optional) ------------------------
+    constr_sprites: list[SpriteCoord] = []
+    constr_has_recolour = False
+    if constr_ids:
+        seen_constr: list[int] = []
+        for sid in constr_ids:
+            bd = set_pairs[sid][1]
+            if not (bd & SPRITE_ACTION1_FLAG):
+                continue
+            bidx = bd & SPRITE_INDEX_MASK
+            if bd & SPRITE_RECOLOUR_FLAG:
+                constr_has_recolour = True
+            if bidx not in seen_constr:
+                sp = sprite_table.get(bidx)
+                if sp is not None:
+                    constr_sprites.append(sp)
+                    seen_constr.append(bidx)
+
+        if constr_sprites:
+            out.append(f"spriteset(ss_ttrs_{house_id_hex}_c, \"{pcx_path}\") {{")
+            for i, sp in enumerate(constr_sprites):
+                suffix = f"constr {i}"
+                out.append(f"\t{sprite_literal(sp)}  /* {suffix} */")
+            out.append("}")
+
+    # --- Animation-frame spriteset -------------------------------------
+    anim_sprites: list[SpriteCoord] = []
+    anim_has_recolour = False
+    for sid in anim_ids:
+        bd = set_pairs[sid][1]
+        if bd & SPRITE_RECOLOUR_FLAG:
+            anim_has_recolour = True
+        if bd & SPRITE_ACTION1_FLAG:
+            bidx = bd & SPRITE_INDEX_MASK
+            sp = sprite_table.get(bidx)
+            if sp is not None:
+                anim_sprites.append(sp)
+        # If base-game building sprite in an anim set, skip (shouldn't happen)
+
+    if not anim_sprites:
+        # Fallback: treat all sets as construction stages if no anim sprite data
+        out.clear()
+        ids_to_use = sorted(set_pairs.keys())[:4]
+        bldg_sprites = []
+        seen_indices = []
+        has_recolour = False
+        if ground_is_action1 and ground_pcx is not None:
+            out.append(
+                f"spriteset(ss_ttrs_{house_id_hex}_g, \"{pcx_path}\") "
+                f"{{ {sprite_literal(ground_pcx)} }}"
+            )
+        for sid in ids_to_use:
+            bd = set_pairs[sid][1]
+            if not (bd & SPRITE_ACTION1_FLAG):
+                continue
+            bidx = bd & SPRITE_INDEX_MASK
+            if bd & SPRITE_RECOLOUR_FLAG:
+                has_recolour = True
+            if bidx not in seen_indices:
+                sp = sprite_table.get(bidx)
+                if sp is not None:
+                    bldg_sprites.append(sp)
+                    seen_indices.append(bidx)
+        if not bldg_sprites:
+            out.append(f"/* WARN 0x{house_id_hex}: animation fallback also found no sprites */")
+            out.append("")
+            return out, entry_name
+        recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if has_recolour else ""
+        out.append(f"spriteset(ss_ttrs_{house_id_hex}_b, \"{pcx_path}\") {{")
+        for i, sp in enumerate(bldg_sprites):
+            out.append(f"\t{sprite_literal(sp)}  /* constr/anim {i} */")
+        out.append("}")
+        out.append(f"spritelayout {entry_name} {{")
+        out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
+        out.append(
+            f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_b"
+            f"({_build_layout_expr(len(bldg_sprites))};{recolour} }}"
+        )
+        out.append("}")
+        out.append("")
+        return out, entry_name
+
+    anim_recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if anim_has_recolour else ""
+    out.append(f"spriteset(ss_ttrs_{house_id_hex}_anim, \"{pcx_path}\") {{")
+    for i, sp in enumerate(anim_sprites):
+        out.append(f"\t{sprite_literal(sp)}  /* frame {i} */")
+    out.append("}")
+
+    # --- Spritelayouts --------------------------------------------------
+    # _constr: shown during construction stages 0-2
+    if constr_sprites:
+        constr_recolour = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_has_recolour else ""
+        out.append(f"spritelayout sl_ttrs_{house_id_hex}_constr {{")
+        out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
+        out.append(
+            f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_c"
+            f"({_build_layout_expr(len(constr_sprites))});{constr_recolour} }}"
+        )
+        out.append("}")
+    # _done: shown when construction_state == 3 (completed / animated)
+    out.append(f"spritelayout sl_ttrs_{house_id_hex}_done {{")
+    out.append(f"\tground   {{ sprite: {ground_sprite_expr()}; }}")
+    out.append(
+        f"\tbuilding {{ sprite: ss_ttrs_{house_id_hex}_anim(animation_frame);{anim_recolour} }}"
+    )
+    out.append("}")
+
+    # --- Routing switch (named sl_ttrs_XX — item uses this directly) ---
+    if constr_sprites:
+        fallback = f"sl_ttrs_{house_id_hex}_constr"
+    else:
+        fallback = f"sl_ttrs_{house_id_hex}_done"
+
+    out.append(
+        f"switch (FEAT_HOUSES, SELF, {entry_name}, construction_state) {{"
+        f" 3: sl_ttrs_{house_id_hex}_done; return {fallback}; }}"
+    )
+    out.append("")
+    return out, entry_name
 
 
 # ============================================================================
@@ -588,12 +1059,6 @@ def class_to_construction_switch(building_class: Optional[int]) -> str:
     return "switch_ttrs_residential"
 
 
-def default_layout_alias(house_id_hex: str) -> str:
-    # All houses should have corresponding spritelayouts generated by
-    # generate_graphics_ttrs_from_nfo.py. Return the canonical layout name.
-    return f"sl_ttrs_{house_id_hex}"
-
-
 # ============================================================================
 # NML generation
 # ============================================================================
@@ -604,10 +1069,14 @@ def build_item_block(
     item_id: int,
     display_name: str,
     props: dict[str, object],
+    layout_name: str,
     house_size: Optional[str] = None,
     tile_layouts: Optional[list[str]] = None,
 ) -> list[str]:
-    """Build NML item block for a house."""
+    """Build NML item block for a house.
+
+    ``layout_name`` is what goes in ``default:`` when tile_layouts is not given.
+    """
     ident_suffix = sanitize_identifier(display_name)
     item_ident = f"item_ttrs_{house_id_hex.lower()}_{ident_suffix}"
 
@@ -627,7 +1096,7 @@ def build_item_block(
     elif tile_layouts:
         default_graphics = tile_layouts[0]
     else:
-        default_graphics = default_layout_alias(house_id_hex)
+        default_graphics = layout_name
 
     if house_size:
         lines.append(f"item (FEAT_HOUSES, {item_ident}, {item_id}, {house_size}) {{")
@@ -806,37 +1275,53 @@ def build_item_block(
     return lines
 
 
-def generate_ttrs_nml(nfo_path: Path, output_path: Path, start_id: int = 200) -> None:
-    """Generate complete TTRS NML file from NFO source."""
+def generate_ttrs_nml(
+    nfo_path: Path,
+    output_path: Path,
+    start_id: int = 200,
+    pcx_path: str = "src/sprites/pcx/ttrs3w.pcx",
+) -> None:
+    """Generate combined sprites+items TTRS NML file from NFO source."""
     nfo_text = read_nfo_text(nfo_path)
     lines = nfo_text.splitlines()
 
-    # Extract house IDs from Action 3 (the authoritative source)
+    # Sprite data
+    action1_blocks = parse_house_action1_blocks(lines)
+    house_sections = collect_house_sections_from_action3(lines)
+    # Build a lookup: house_id_hex -> (set_pairs, sprite_table, start_line_index)
+    section_data: dict[str, tuple[dict[int, tuple[int, int]], dict[int, SpriteCoord], int]] = {}
+    for house_id_hex, _label, sec_lines, start_idx in house_sections:
+        sp = collect_house_set_pairs(sec_lines)
+        st = sprite_table_for_house(start_idx, action1_blocks)
+        section_data[house_id_hex] = (sp, st, start_idx)
+
+    # House property and name data
     action3_ids = extract_house_ids_from_action3(lines)
-
-    # Extract names from Action 4
     names = parse_names(nfo_text)
-
-    # Parse properties from Action 0
     properties = parse_action0_properties(lines)
 
     out: list[str] = []
-    out.append("/* Begin TTRS (NFO-translated, ITL integrated) */")
+    out.append("/* Begin TTRS — sprites and item definitions auto-generated from ttrs3wmod.nfo */")
+    out.append("/* Generated by tool/generate_ttrs_from_nfo.py */")
+    out.append("")
+    out.append("/* --- Global availability/construction switches (always open, 5 slots) --- */")
     out.append("switch (FEAT_HOUSES, SELF, switch_ttrs_residential, CheckValue(1,255) && IsNotDesertTile()) {return;}")
     out.append("switch (FEAT_HOUSES, SELF, switch_ttrs_flats, CheckValue(4,255) && CheckFlatsSprawl()) {return;}")
     out.append(
-        "switch (FEAT_HOUSES, SELF, switch_ttrs_offices, CheckOfficeSprawl(1000) && CheckValue(7,255) && (HasSameClassNearby(2) || IsFirstHouseOfClass())) {return;}"
+        "switch (FEAT_HOUSES, SELF, switch_ttrs_offices, "
+        "CheckOfficeSprawl(1000) && CheckValue(7,255) && (HasSameClassNearby(2) || IsFirstHouseOfClass())) {return;}"
     )
     out.append("switch (FEAT_HOUSES, SELF, switch_ttrs_landmark, CheckValue(5,255)) {return;}")
     out.append(
-        "switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}")
+        "switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}"
+    )
     out.append("")
 
-    # Build list of (house_id, props) for all houses with Action 3
-    parsed: list[tuple[int, dict[str, object]]] = []
-    for house_id in sorted(action3_ids.keys()):
-        props = properties.get(house_id, {})
-        parsed.append((house_id, props))
+    # --- Per-house blocks (strictly: sprites → layouts/switch → tile-switch → item) ---
+    parsed: list[tuple[int, dict[str, object]]] = [
+        (house_id, properties.get(house_id, {}))
+        for house_id in sorted(action3_ids.keys())
+    ]
 
     skip_ids: set[int] = set()
     for index, (house_id, props) in enumerate(parsed):
@@ -849,17 +1334,20 @@ def generate_ttrs_nml(nfo_path: Path, output_path: Path, start_id: int = 200) ->
         display_name = names.get(house_id, f"house_{house_id_hex}")
 
         if sub_val is not None and sub_val in MULTI_TILE_BASES:
-            # Primary tile of a multi-tile building.
+            # ---- Multi-tile primary  ----------------------------------------
             size_name, num_tiles = MULTI_TILE_BASES[sub_val]
-
-            # Collect sprite layouts for each tile from consecutive houses.
             tile_layouts: list[str] = []
+
             for t in range(num_tiles):
-                tile_house_id = house_id + t
-                tile_house_id_hex = f"{tile_house_id:02X}"
-                tile_layouts.append(default_layout_alias(tile_house_id_hex))
+                tile_id = house_id + t
+                tile_hex = f"{tile_id:02X}"
+                tile_props = properties.get(tile_id, {})
+                sp, st, _idx = section_data.get(tile_hex, ({}, {}, 0))
+                sprite_lines, layout_name = emit_sprite_blocks(tile_hex, tile_props, sp, st, pcx_path)
+                out.extend(sprite_lines)
+                tile_layouts.append(layout_name)
                 if t > 0:
-                    skip_ids.add(tile_house_id)
+                    skip_ids.add(tile_id)
 
             out.extend(
                 build_item_block(
@@ -867,21 +1355,30 @@ def generate_ttrs_nml(nfo_path: Path, output_path: Path, start_id: int = 200) ->
                     start_id + index,
                     display_name,
                     props,
+                    layout_name=tile_layouts[0],  # not used directly (tile_layouts takes priority)
                     house_size=size_name,
                     tile_layouts=tile_layouts,
-                ))
+                )
+            )
+
         elif sub_val is not None and sub_val in SUBSTITUTE_TO_BASE and sub_val != SUBSTITUTE_TO_BASE[sub_val]:
-            # Secondary tile that wasn't caught by skip_ids (shouldn't happen
-            # normally, but handle gracefully).
+            # Secondary tile — already handled via skip_ids, but skip gracefully
             continue
+
         else:
-            # Regular 1x1 house.
-            out.extend(build_item_block(
-                house_id_hex,
-                start_id + index,
-                display_name,
-                props,
-            ))
+            # ---- Regular 1×1 house  -----------------------------------------
+            sp, st, _idx = section_data.get(house_id_hex, ({}, {}, 0))
+            sprite_lines, layout_name = emit_sprite_blocks(house_id_hex, props, sp, st, pcx_path)
+            out.extend(sprite_lines)
+            out.extend(
+                build_item_block(
+                    house_id_hex,
+                    start_id + index,
+                    display_name,
+                    props,
+                    layout_name=layout_name,
+                )
+            )
 
     out.append("/* End TTRS */")
     output_path.write_text("\n".join(out), encoding="utf-8")
@@ -894,13 +1391,20 @@ def generate_ttrs_nml(nfo_path: Path, output_path: Path, start_id: int = 200) ->
 
 def main() -> None:
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description="Generate TTRS NML house items from ttrs3wmod.nfo")
+    parser = argparse.ArgumentParser(
+        description="Generate combined TTRS NML (sprites + items) from ttrs3wmod.nfo"
+    )
     parser.add_argument("--nfo", required=True, type=Path, help="Path to ttrs3wmod.nfo")
     parser.add_argument("--out", required=True, type=Path, help="Output .nml path")
     parser.add_argument("--start-id", type=int, default=200, help="Starting item ID (default: 200)")
+    parser.add_argument(
+        "--pcx-path",
+        default="src/sprites/pcx/ttrs3w.pcx",
+        help="PCX path written into spriteset declarations (default: src/sprites/pcx/ttrs3w.pcx)",
+    )
     args = parser.parse_args()
 
-    generate_ttrs_nml(args.nfo, args.out, args.start_id)
+    generate_ttrs_nml(args.nfo, args.out, args.start_id, args.pcx_path)
     print(f"Generated {args.out}")
 
 
