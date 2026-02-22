@@ -52,6 +52,7 @@ from .nodes import (
     ClimateGraphics,
     FrameLayout,
     HouseTileGraphics,
+    RandomVariantGraphics,
     # Helpers
     is_callback_result,
 )
@@ -115,6 +116,7 @@ __all__ = [
     "ClimateGraphics",
     "FrameLayout",
     "HouseTileGraphics",
+    "RandomVariantGraphics",
     "is_callback_result",
     # Raw parsing
     "RawSprite",

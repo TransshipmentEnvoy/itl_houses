@@ -221,7 +221,21 @@ class ClimateGraphics:
     construction_stages: list[Optional[FrameLayout]] = field(default_factory=list)
     completed:           Optional[FrameLayout]        = None
     # When the completed stage is animated, frames replaces completed.
-    animation_frames:    list[FrameLayout]            = field(default_factory=list)
+    # Entries may be None for sparse frame indices (padding).
+    animation_frames:    list[Optional[FrameLayout]]  = field(default_factory=list)
+
+
+@dataclass
+class RandomVariantGraphics:
+    """All graphics for one random variant, with per-climate sub-variants.
+
+    Each random selection entry (one "branch" of a type-80 random node)
+    may have independent sprites for temperate, snow, and tropic climates.
+    """
+    temperate: Optional[ClimateGraphics] = None
+    snow:      Optional[ClimateGraphics] = None
+    tropic:    Optional[ClimateGraphics] = None
+    arctic_v2: Optional[ClimateGraphics] = None
 
 
 @dataclass
@@ -234,10 +248,10 @@ class HouseTileGraphics:
       snow      : above snowline / arctic
       tropic    : sub-tropical desert / tropic
       arctic_v2 : second arctic variant (Pattern B ID 0x33) — rare
-    random_variants : list of temperate-climate FrameLayouts for random_switch
+    random_variants : per-variant graphics with per-climate sub-variants
     """
-    temperate:      Optional[ClimateGraphics]      = None
-    snow:           Optional[ClimateGraphics]      = None
-    tropic:         Optional[ClimateGraphics]      = None
-    arctic_v2:      Optional[ClimateGraphics]      = None
-    random_variants: list[ClimateGraphics]         = field(default_factory=list)
+    temperate:      Optional[ClimateGraphics]           = None
+    snow:           Optional[ClimateGraphics]           = None
+    tropic:         Optional[ClimateGraphics]           = None
+    arctic_v2:      Optional[ClimateGraphics]           = None
+    random_variants: list[RandomVariantGraphics]        = field(default_factory=list)

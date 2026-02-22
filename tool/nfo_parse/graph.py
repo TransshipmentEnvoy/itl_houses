@@ -47,7 +47,8 @@ from .nodes import (
     TERRAIN_SNOW,
     Action2Graph,
     Action2Node, ClimateGraphics, ComputationNode, FrameLayout,
-    HouseTileGraphics, LayoutNode, RandomNode, VariationalNode,
+    HouseTileGraphics, LayoutNode, RandomNode, RandomVariantGraphics,
+    VariationalNode,
     is_callback_result,
 )
 from .parse_layout import parse_all_layout_nodes
@@ -141,6 +142,16 @@ def _to_frame_layout(node: LayoutNode) -> FrameLayout:
     return FrameLayout(ground=node.ground, building=node.building, bbox=node.bbox)
 
 
+def _rvg_climate_graphics(rvg: RandomVariantGraphics, climate: str) -> ClimateGraphics:
+    """Return (creating if needed) the ClimateGraphics for *climate* inside a random variant."""
+    attr = {"temperate": "temperate", "snow": "snow", "tropic": "tropic", "arctic_v2": "arctic_v2"}.get(climate, "temperate")
+    cg = getattr(rvg, attr, None)
+    if cg is None:
+        cg = ClimateGraphics()
+        setattr(rvg, attr, cg)
+    return cg
+
+
 # ============================================================================
 # Core recursive traversal
 # ============================================================================
@@ -148,7 +159,9 @@ def _to_frame_layout(node: LayoutNode) -> FrameLayout:
 
 def _traverse(
     node_id: int,
-    graph: Action2Graph,
+    resolve_graph: Action2Graph,        # graph to look up node_id in
+    snapshots: dict[int, Action2Graph],  # keyed by id(node)
+    final_graph: Action2Graph,           # complete graph (fallback)
     state: _TraversalState,
     climate: str,                       # "temperate" | "snow" | "tropic" | "arctic_v2"
     in_constr: bool,                    # True when inside a construction-stage branch
@@ -161,18 +174,39 @@ def _traverse(
     """
     Recursively walk the graph.  All terminal type-00 nodes are recorded into
     *state.result*.
+
+    *resolve_graph* is the graph used to look up *node_id*.  For the initial
+    entry (from Action 3 root) this is the *final_graph*.  When a non-terminal
+    node N references a target, the target is looked up in N's **snapshot** —
+    the graph state at N's definition position — ensuring that reused set IDs
+    resolve to their correct, position-specific definitions.
+
+    The visited set tracks ``id(node)`` (Python object identity) rather than
+    ``node_id``, so the same set_id can be visited twice when it maps to
+    different node objects in different resolution contexts (e.g. a LayoutNode
+    at set_id 0x11 versus a VariationalNode at the same set_id 0x11).
     """
     if depth > state.max_depth:
         return
     if is_callback_result(node_id):
         return
-    if node_id in state.visited:
-        return
 
-    state.visited.add(node_id)
-    node = graph.get(node_id)
+    # Look up node: try resolve_graph first, then final_graph
+    node = resolve_graph.get(node_id)
+    if node is None:
+        node = final_graph.get(node_id)
     if node is None:
         return
+
+    # Visited guard uses object identity to handle set_id reuse
+    node_ident = id(node)
+    if node_ident in state.visited:
+        return
+
+    state.visited.add(node_ident)
+
+    # For non-layout nodes, the snapshot is the graph to pass downstream
+    node_snapshot = snapshots.get(node_ident, final_graph)
 
     # ------------------------------------------------------------------
     # 1. Terminal: type-00 layout
@@ -181,35 +215,32 @@ def _traverse(
         fl = _to_frame_layout(node)
 
         if in_random:
-            # Record as a random variant for the given climate
             idx = random_variant_idx if random_variant_idx is not None else 0
-            # Grow random_variants list as needed
             while len(state.result.random_variants) <= idx:
-                state.result.random_variants.append(ClimateGraphics())
-            rv_cg = state.result.random_variants[idx]
+                state.result.random_variants.append(RandomVariantGraphics())
+            rvg = state.result.random_variants[idx]
+            cg = _rvg_climate_graphics(rvg, climate)
             if in_constr:
-                _record_constr(rv_cg, constr_idx, fl)
+                _record_constr(cg, constr_idx, fl)
             elif anim_frame is not None:
-                rv_cg.animation_frames.append(fl)
-                # Pad to correct position if needed
-                while len(rv_cg.animation_frames) <= anim_frame:
-                    rv_cg.animation_frames.append(fl)
-                rv_cg.animation_frames[anim_frame] = fl
+                while len(cg.animation_frames) <= anim_frame:
+                    cg.animation_frames.append(None)
+                cg.animation_frames[anim_frame] = fl
             else:
-                rv_cg.completed = fl
+                if cg.completed is None:
+                    cg.completed = fl
         else:
             cg = _climate_graphics(state.result, climate)
             if in_constr:
                 _record_constr(cg, constr_idx, fl)
             elif anim_frame is not None:
-                # Pad animation_frames to the correct slot
                 while len(cg.animation_frames) <= anim_frame:
-                    cg.animation_frames.append(fl)
+                    cg.animation_frames.append(None)
                 cg.animation_frames[anim_frame] = fl
             else:
                 if cg.completed is None:
                     cg.completed = fl
-        state.visited.discard(node_id)
+        state.visited.discard(node_ident)
         return
 
     # ------------------------------------------------------------------
@@ -222,7 +253,8 @@ def _traverse(
         # 2a. Callback router (var 0x0C) — we only care about the *default*
         #     branch (= the graphics chain).
         if var == VAR_CALLBACK_ID:
-            _follow(node.default, graph, state, climate, in_constr, constr_idx,
+            _follow(node.default, node_snapshot, snapshots, final_graph, state,
+                    climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2b. Climate split (var 0x03)
@@ -238,7 +270,8 @@ def _traverse(
             climate_targets["temperate"] = node.default
 
             for cli, target in climate_targets.items():
-                _follow(target, graph, state, cli, in_constr, constr_idx,
+                _follow(target, node_snapshot, snapshots, final_graph, state,
+                        cli, in_constr, constr_idx,
                         anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2c. Terrain / snow check (var 0x43)
@@ -251,18 +284,21 @@ def _traverse(
                     snow_target = rng.result_id
 
             # No-snow path  (= default)
-            _follow(default_target, graph, state, climate, in_constr, constr_idx,
+            _follow(default_target, node_snapshot, snapshots, final_graph, state,
+                    climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
 
             # Snow path
             if snow_target is not None:
-                _follow(snow_target, graph, state, "snow", in_constr, constr_idx,
+                _follow(snow_target, node_snapshot, snapshots, final_graph, state,
+                        "snow", in_constr, constr_idx,
                         anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2d. Construction state (var 0x40)
         elif var == VAR_CONSTRUCTION_STATE:
             # Stage 3 = completed → follow default
-            _follow(node.default, graph, state, climate, False, -1,
+            _follow(node.default, node_snapshot, snapshots, final_graph, state,
+                    climate, False, -1,
                     anim_frame, in_random, random_variant_idx, depth + 1)
 
             # Stages 0-2 = under construction
@@ -273,7 +309,8 @@ def _traverse(
                 for stage in range(lo, hi + 1):
                     if stage not in covered:
                         covered.add(stage)
-                        _follow(rng.result_id, graph, state, climate, True, stage,
+                        _follow(rng.result_id, node_snapshot, snapshots, final_graph,
+                                state, climate, True, stage,
                                 anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2e. Animation frame (var 0x46)
@@ -281,20 +318,24 @@ def _traverse(
             # Follow each frame range
             for rng in node.ranges:
                 for frame in range(rng.range_lo, rng.range_hi + 1):
-                    _follow(rng.result_id, graph, state, climate, in_constr, constr_idx,
+                    _follow(rng.result_id, node_snapshot, snapshots, final_graph,
+                            state, climate, in_constr, constr_idx,
                             frame, in_random, random_variant_idx, depth + 1)
             # Default frame (also used as a representative if ranges cover all)
-            _follow(node.default, graph, state, climate, in_constr, constr_idx,
+            _follow(node.default, node_snapshot, snapshots, final_graph, state,
+                    climate, in_constr, constr_idx,
                     None, in_random, random_variant_idx, depth + 1)
 
         # 2f. Animation info (var 0x44) — used in callbacks; follow default
         elif var == VAR_ANIMATION_FRAME:
-            _follow(node.default, graph, state, climate, in_constr, constr_idx,
+            _follow(node.default, node_snapshot, snapshots, final_graph, state,
+                    climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2g. Re-random (var_type 0x82) — follow the default branch
         elif var_type == 0x82:
-            _follow(node.default, graph, state, climate, in_constr, constr_idx,
+            _follow(node.default, node_snapshot, snapshots, final_graph, state,
+                    climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2h. Other variational (town zone, building age, …) — follow all branches
@@ -303,10 +344,11 @@ def _traverse(
             for rng in node.ranges:
                 all_targets.add(rng.result_id)
             for target in sorted(all_targets):
-                _follow(target, graph, state, climate, in_constr, constr_idx,
+                _follow(target, node_snapshot, snapshots, final_graph, state,
+                        climate, in_constr, constr_idx,
                         anim_frame, in_random, random_variant_idx, depth + 1)
 
-        state.visited.discard(node_id)
+        state.visited.discard(node_ident)
         return
 
     # ------------------------------------------------------------------
@@ -320,9 +362,10 @@ def _traverse(
             if entry_id not in seen_entries:
                 idx = len(seen_entries)
                 seen_entries[entry_id] = idx
-                _follow(entry_id, graph, state, climate, in_constr, constr_idx,
+                _follow(entry_id, node_snapshot, snapshots, final_graph, state,
+                        climate, in_constr, constr_idx,
                         anim_frame, True, idx, depth + 1)
-        state.visited.discard(node_id)
+        state.visited.discard(node_ident)
         return
 
     # ------------------------------------------------------------------
@@ -332,23 +375,27 @@ def _traverse(
     if isinstance(node, ComputationNode):
         # Follow default
         if not is_callback_result(node.default):
-            _follow(node.default, graph, state, climate, in_constr, constr_idx,
+            _follow(node.default, node_snapshot, snapshots, final_graph, state,
+                    climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
         # Follow subroutine targets embedded in steps
         for step in node.steps:
             if step.var == 0x7E and step.add_val != 0:
-                _follow(step.add_val, graph, state, climate, in_constr, constr_idx,
+                _follow(step.add_val, node_snapshot, snapshots, final_graph, state,
+                        climate, in_constr, constr_idx,
                         anim_frame, in_random, random_variant_idx, depth + 1)
         # Also follow range results (they are return values, so typically skip)
-        state.visited.discard(node_id)
+        state.visited.discard(node_ident)
         return
 
-    state.visited.discard(node_id)
+    state.visited.discard(node_ident)
 
 
 def _follow(
     target: int,
-    graph: Action2Graph,
+    resolve_graph: Action2Graph,
+    snapshots: dict[int, Action2Graph],
+    final_graph: Action2Graph,
     state: _TraversalState,
     climate: str,
     in_constr: bool,
@@ -361,7 +408,8 @@ def _follow(
     """Helper: guard callback-result sentinels, then recurse."""
     if is_callback_result(target):
         return
-    _traverse(target, graph, state, climate, in_constr, constr_idx,
+    _traverse(target, resolve_graph, snapshots, final_graph, state,
+              climate, in_constr, constr_idx,
               anim_frame, in_random, random_variant_idx, depth)
 
 
@@ -381,17 +429,21 @@ def _record_constr(cg: ClimateGraphics, idx: int, fl: FrameLayout) -> None:
 def build_house_tile_graphics(
     root_id: int,
     graph: Action2Graph,
+    snapshots: dict[int, Action2Graph] | None = None,
 ) -> HouseTileGraphics:
     """
     Traverse the Action 2 graph starting from *root_id* and return a fully
     resolved :class:`~nodes.HouseTileGraphics` for one tile.
 
     *root_id* is typically the group ID read from the house's Action 3 entry.
+    *snapshots* provides position-aware graph views for each non-terminal node;
+    pass ``None`` (or omit) to use the global graph for all lookups.
     """
     result = HouseTileGraphics()
     state  = _TraversalState(result=result)
+    snaps  = snapshots if snapshots is not None else {}
     _traverse(
-        root_id, graph, state,
+        root_id, graph, snaps, graph, state,
         climate="temperate",
         in_constr=False, constr_idx=-1,
         anim_frame=None,
@@ -412,8 +464,13 @@ def build_all_house_graphics(
 
     Each house's graph is built from only the lines in its own NFO section
     (the ~400-line window before its Action 3 entry).  This ensures that
-    set IDs that are reused across houses are scoped correctly — the last
-    definition for each set ID within a section wins.
+    set IDs that are reused across houses are scoped correctly.
+
+    The graph builder is **position-aware**: when a set ID is defined multiple
+    times within a section (e.g. temperate then snow), each non-terminal node
+    receives a snapshot of the graph as it existed at the node's definition
+    position.  This correctly resolves references to set IDs that were reused
+    for different climate variants — the typical TTRS Pattern A pattern.
     """
     sections = collect_house_section_ranges(lines)
 
@@ -422,59 +479,78 @@ def build_all_house_graphics(
 
     for house_id, start_idx, end_idx, root_id in sections:
         sec_sprites = collect_action2_in_range(lines, start_idx, end_idx + 1)
-        # For per-house graphs use LAST-wins: later definitions (snow, tropic
-        # overrides) replace earlier ones when the same set ID appears twice.
-        sec_graph   = _build_graph_last_wins(sec_sprites)
-        htg         = build_house_tile_graphics(root_id, sec_graph)
+        sec_graph, snapshots = _build_graph_positional(sec_sprites)
+        htg = build_house_tile_graphics(root_id, sec_graph, snapshots)
         house_graphics[house_id] = htg
         house_graphs[house_id]   = sec_graph
 
     return house_graphics, house_graphs
 
 
-def _build_graph_last_wins(sprites: list[RawSprite]) -> Action2Graph:
-    """
-    Build an Action2Graph where the **last** definition for each set ID wins.
-
-    Within a single house's NFO section the ordering is:
-      1. Temperate type-00 entries first (small set IDs like 0x00-0x03, 0x30)
-      2. Snow type-00 entries next (same IDs reused OR IDs 0x31, 0x10-0x13)
-      3. Tropic/arctic type-00 entries (IDs 0x32, 0x33 — don't collide)
-      4. Routing variational nodes (callback router, constr-state, snow check …)
-
-    By keeping the last definition we get the full picture: the variational
-    nodes correctly reference all set IDs including snow/tropic variants.
-
-    Note that the collision of set IDs for snow vs temperate (e.g. both have
-    ID 0x30; temperate first, snow second) is intentional in Pattern B: the
-    variational (var 0x43 terrain-type) node routes to 0x30 vs 0x31, where
-    0x31 is the snow key.  The split_climate mechanism in the original heuristic
-    handled this; here we preserve it by NOT collapsing on first-wins.
-    """
+def _parse_one_sprite(rs: RawSprite) -> Action2Node | None:
+    """Parse a single RawSprite into its Action 2 node type."""
     from .parse_layout import parse_layout_node
     from .parse_variational import parse_variational_node
     from .parse_random import parse_random_node
     from .parse_computation import parse_computation_node
-    from .nodes import LayoutNode, VariationalNode, RandomNode, ComputationNode
 
-    graph: Action2Graph = {}
+    if len(rs.bytes) < 4:
+        return None
+    t = rs.bytes[3]
+    if t == 0x00:
+        return parse_layout_node(rs)
+    elif t in (0x81, 0x85):
+        return parse_variational_node(rs)
+    elif t in (0x80, 0x82):
+        return parse_random_node(rs)
+    elif t == 0x89:
+        return parse_computation_node(rs)
+    return None
 
-    for rs in sprites:
-        node: Action2Node | None = None
-        if len(rs.bytes) < 4:
-            continue
-        t = rs.bytes[3]
-        if t == 0x00:
-            node = parse_layout_node(rs)
-        elif t in (0x81, 0x85):
-            node = parse_variational_node(rs)
-        elif t in (0x80, 0x82):
-            node = parse_random_node(rs)
-        elif t == 0x89:
-            node = parse_computation_node(rs)
 
+def _build_graph_positional(
+    sprites: list[RawSprite],
+) -> tuple[Action2Graph, dict[int, Action2Graph]]:
+    """
+    Build an Action2Graph with **position-aware snapshots** for correct NFO
+    sequential semantics.
+
+    NFO set IDs are a mutable sequential namespace: when a variational node
+    at position P references set_id S, it means the definition of S that
+    existed at position P in the byte stream — not the final/global definition.
+
+    Returns:
+        final_graph : complete graph with last-wins for all set_ids
+            (used for root entry point resolution from Action 3)
+        snapshots : dict keyed by ``id(node)`` for each non-layout node,
+            containing only definitions that existed before that node's
+            position.  During traversal, when a non-terminal node N
+            references target T, T is looked up in ``snapshots[id(N)]``.
+    """
+    # Parse all nodes in definition order
+    parsed: list[tuple[int, Action2Node]] = []  # (position, node)
+    for pos, rs in enumerate(sprites):
+        node = _parse_one_sprite(rs)
         if node is not None:
-            # Last-wins: always overwrite
-            graph[node.node_id] = node  # type: ignore[assignment]
+            parsed.append((pos, node))
 
-    return graph
+    # Build final graph (last-wins for every set_id)
+    final_graph: Action2Graph = {}
+    for _, node in parsed:
+        final_graph[node.node_id] = node  # type: ignore[union-attr]
+
+    # Build per-node snapshots.
+    # running_graph accumulates definitions in order.  Before adding a
+    # non-layout node, we snapshot the running state — this is the graph
+    # that was "visible" at the point where the non-layout node was defined.
+    snapshots: dict[int, Action2Graph] = {}  # keyed by id(node)
+    running_graph: Action2Graph = {}
+
+    for _pos, node in parsed:
+        if not isinstance(node, LayoutNode):
+            # Snapshot the graph *before* this node's own definition
+            snapshots[id(node)] = dict(running_graph)
+        # Add / overwrite in running graph (all types, last-wins within order)
+        running_graph[node.node_id] = node  # type: ignore[union-attr]
+
+    return final_graph, snapshots

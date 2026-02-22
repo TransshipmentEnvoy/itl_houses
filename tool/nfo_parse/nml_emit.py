@@ -42,6 +42,7 @@ from typing import Any, Optional, Protocol, Sequence
 
 from .nodes import (
     ClimateGraphics, FrameLayout, HouseTileGraphics, LayoutSprite,
+    RandomVariantGraphics,
 )
 
 
@@ -203,6 +204,11 @@ def _emit_climate_variant(
         out.append(f"\tground   {{ sprite: {g_d}; }}")
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_done(0);{rc_d} }}")
         out.append("}")
+    elif done_ground_expr is not None and done_ground_expr != "0":
+        # Ground-only completed layout (no building sprite) — e.g. a snow corner tile
+        out.append(f"spritelayout {prefix}_done {{")
+        out.append(f"\tground   {{ sprite: {done_ground_expr}; }}")
+        out.append("}")
     elif constr_sprites:
         # Reuse last construction sprite as completed stage
         g_c = constr_ground_expr or "0"
@@ -217,7 +223,11 @@ def _emit_climate_variant(
     # Construction_state routing switch
     # ------------------------------------------------------------------
     has_constr = bool(constr_sprites)
-    has_done   = bool(done_sprite_sc or (not done_sprite_sc and constr_sprites))
+    has_done   = bool(
+        done_sprite_sc
+        or (done_ground_expr is not None and done_ground_expr != "0")
+        or constr_sprites
+    )
 
     if has_done:
         fallback = f"{prefix}_constr" if has_constr else f"{prefix}_done"
@@ -238,6 +248,8 @@ def _emit_climate_variant(
         out.append(f"spritelayout {prefix} {{")
         out.append(f"\tground {{ sprite: 0; }}")
         out.append("}")
+        # Note: done_ground_expr == "0" means the sprite table lookup also failed;
+        # in that case there is nothing useful to emit.
 
     return prefix
 
@@ -262,11 +274,11 @@ def _emit_animated_variant(
     frames are included in the ``animation_frame`` switch.
     """
     # Merge explicit frames + default frame (cg.completed)
-    all_frames: list[FrameLayout] = list(cg.animation_frames)
+    all_frames: list[Optional[FrameLayout]] = list(cg.animation_frames)
     if cg.completed is not None:
         all_frames.append(cg.completed)
 
-    if not all_frames:
+    if not all_frames or all(f is None for f in all_frames):
         # No frames resolved — emit a stub
         out.append(f"/* WARN: no animation frames resolved for {prefix} */")
         return prefix
@@ -319,6 +331,11 @@ def _emit_animated_variant(
     rc_flags: list[bool]          = []
 
     for idx, fl in enumerate(all_frames):
+        if fl is None:
+            g_exprs.append("0")
+            ss_names.append(None)
+            rc_flags.append(False)
+            continue
         g_exprs.append(_get_ground_expr_for_frame(fl, idx))
         ss_names.append(_get_bldg_ss_name(fl, idx))
         rc_flags.append(fl.building.has_recolour)
@@ -408,7 +425,7 @@ def emit_house_tile_nml(
     has_snow      = htg.snow        is not None and _cg_has_content(htg.snow)
     has_tropic    = htg.tropic      is not None and _cg_has_content(htg.tropic)
     has_arctic_v2 = htg.arctic_v2   is not None and _cg_has_content(htg.arctic_v2)
-    has_random    = bool(htg.random_variants)
+    has_random    = any(_rvg_has_content(rvg) for rvg in htg.random_variants)
 
     if not has_temp and not has_snow and not has_tropic and not has_random:
         out.append(f"/* WARN 0x{house_id_hex}: graph traversal yielded no usable layouts */")
@@ -469,6 +486,16 @@ def emit_house_tile_nml(
         # The random_switch IS the entry — no further terrain switch needed
         return out, entry_name
 
+    if has_random and needs_terrain_switch and top_temp_name is None:
+        # Random variants exist but we also need a terrain switch (e.g. snow ground-only
+        # on one tile of a multi-tile building that has random variants in non-snow climate).
+        # Emit random variants under a _nosnow name so they don't collide with the
+        # terrain-type switch that will occupy entry_name.
+        rand_name = f"{entry_name}_nosnow"
+        _emit_random_switch(house_id_hex, htg, sprite_table, pcx_path, out, rand_name)
+        out.append("")
+        top_temp_name = rand_name
+
     # ------------------------------------------------------------------
     # Terrain-type routing switch
     # ------------------------------------------------------------------
@@ -497,16 +524,86 @@ def _emit_random_switch(
     out: list[str],
     entry_name: str,
 ) -> None:
-    """Emit random_switch selecting among the random variant completed spritelayouts."""
+    """Emit random_switch selecting among per-climate random variant spritelayouts.
+
+    Each :class:`RandomVariantGraphics` may carry independent sprites for
+    temperate, snow, and tropic climates.  When a variant has multiple
+    climates, a per-variant ``terrain_type`` switch is emitted so the
+    random selection properly routes to the correct climate sprites.
+    """
     variant_names: list[str] = []
-    for i, cg in enumerate(htg.random_variants):
-        if not _cg_has_content(cg):
+
+    for i, rvg in enumerate(htg.random_variants):
+        v_entry = f"sl_ttrs_{house_id_hex}_rv{i}"
+
+        has_temp   = rvg.temperate is not None and _cg_has_content(rvg.temperate)
+        has_snow   = rvg.snow      is not None and _cg_has_content(rvg.snow)
+        has_tropic = rvg.tropic    is not None and _cg_has_content(rvg.tropic)
+        has_arctic = rvg.arctic_v2 is not None and _cg_has_content(rvg.arctic_v2)
+
+        if not has_temp and not has_snow and not has_tropic and not has_arctic:
             continue
-        vprefix  = f"sl_ttrs_{house_id_hex}_rv{i}"
-        vss_pref = f"ss_ttrs_{house_id_hex}_rv{i}"
-        _emit_climate_variant(vprefix, vss_pref, cg, sprite_table, pcx_path, out)
-        out.append("")
-        variant_names.append(vprefix)
+
+        needs_terrain = has_snow or has_tropic or has_arctic
+
+        if needs_terrain:
+            # --- Per-climate spritelayouts for this variant ----------------
+            top_temp: str | None    = None
+            top_snow: str | None    = None
+            top_tropic: str | None  = None
+
+            if has_temp:
+                prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_nosnow"
+                ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_nosnow"
+                _emit_climate_variant(prefix, ss_pref, rvg.temperate, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                out.append("")
+                top_temp = prefix
+
+            if has_snow:
+                prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_snow"
+                ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_snow"
+                _emit_climate_variant(prefix, ss_pref, rvg.snow, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                out.append("")
+                top_snow = prefix
+
+            if has_arctic and not has_snow:
+                prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_snow"
+                ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_snow"
+                _emit_climate_variant(prefix, ss_pref, rvg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                out.append("")
+                top_snow = prefix
+
+            if has_tropic:
+                prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_tropic"
+                ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_tropic"
+                _emit_climate_variant(prefix, ss_pref, rvg.tropic, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                out.append("")
+                top_tropic = prefix
+
+            # Terrain-type switch for this variant
+            fallback = top_temp or top_snow or top_tropic
+            cases: list[str] = []
+            if top_snow:
+                cases.append(f"TILETYPE_SNOW: {top_snow}")
+            if top_tropic:
+                cases.append(f"TILETYPE_DESERT: {top_tropic}")
+            cases_str = "; ".join(cases)
+            out.append(
+                f"switch (FEAT_HOUSES, SELF, {v_entry}, terrain_type) {{"
+                f" {cases_str}; return {fallback}; }}"
+            )
+            out.append("")
+            variant_names.append(v_entry)
+
+        else:
+            # Single climate — emit directly
+            cg = rvg.temperate
+            if cg is not None and _cg_has_content(cg):
+                vprefix  = v_entry
+                vss_pref = f"ss_ttrs_{house_id_hex}_rv{i}"
+                _emit_climate_variant(vprefix, vss_pref, cg, sprite_table, pcx_path, out)
+                out.append("")
+                variant_names.append(vprefix)
 
     if not variant_names:
         return
@@ -529,8 +626,16 @@ def _cg_has_content(cg: ClimateGraphics) -> bool:
         return True
     if any(fl is not None for fl in cg.construction_stages):
         return True
-    if cg.animation_frames:
+    if any(fl is not None for fl in cg.animation_frames):
         return True
+    return False
+
+
+def _rvg_has_content(rvg: RandomVariantGraphics) -> bool:
+    """True when *rvg* has content in any climate."""
+    for cg in (rvg.temperate, rvg.snow, rvg.tropic, rvg.arctic_v2):
+        if cg is not None and _cg_has_content(cg):
+            return True
     return False
 
 
