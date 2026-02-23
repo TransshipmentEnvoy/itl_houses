@@ -107,9 +107,11 @@ def parse_variational_node_81(rs: RawSprite) -> VariationalNode | None:
 
 def parse_variational_node_85(rs: RawSprite) -> VariationalNode | None:
     """
-    Parse a type-85 variational node from *rs*.
+    Parse a type-85/86 variational node from *rs*.
 
-    Returns ``None`` when *rs* is not type-85 or has too few bytes.
+    Returns ``None`` when *rs* is not type-85/86 or has too few bytes.
+    Type-86 is structurally identical to type-85 (word-range variational)
+    but accesses variables from the related object scope.
 
     Minimum required: ``02 07 set_id 85 var shift mask_lo mask_hi 0``
     = 9 bytes + 2-byte default = 11 bytes.
@@ -119,10 +121,11 @@ def parse_variational_node_85(rs: RawSprite) -> VariationalNode | None:
         return None
     if b[0] != 0x02 or b[1] != 0x07:
         return None
-    if b[3] != 0x85:
+    if b[3] not in (0x85, 0x86):
         return None
 
     set_id     = b[2]
+    var_type   = b[3]
     variable   = b[4]
     shift      = b[5]
     mask       = b[6] | (b[7] << 8)   # 16-bit mask
@@ -151,7 +154,7 @@ def parse_variational_node_85(rs: RawSprite) -> VariationalNode | None:
 
     return VariationalNode(
         node_id  = set_id,
-        var_type = 0x85,
+        var_type = var_type,
         variable = variable,
         shift    = shift,
         mask     = mask,

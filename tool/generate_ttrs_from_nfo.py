@@ -219,7 +219,7 @@ def collect_house_sections_from_action3(
             hid = m.group(1).upper()
             action3_positions.append((hid, idx))
 
-    sections: list[tuple[str, str, list[str], int]] = []
+    sections: list[tuple[str, str, list[str], int, int]] = []
     seen: set[str] = set()
 
     for house_id_hex, action3_idx in action3_positions:
@@ -242,6 +242,7 @@ def collect_house_sections_from_action3(
             label,
             lines[search_start : action3_idx + 1],
             search_start,
+            action3_idx,
         ))
 
     return sections
@@ -640,6 +641,37 @@ def class_to_construction_switch(building_class: Optional[int]) -> str:
     return "switch_ttrs_residential"
 
 
+def emit_colour_switch(
+    house_id_hex: str,
+    colour_values: list[int],
+) -> tuple[list[str], str]:
+    """Emit NML colour callback block and return (lines, switch_name).
+
+    For a single colour value, emits an inline ``return <value>;`` expression.
+    For multiple values, emits a ``random_switch`` that picks among them with
+    equal probability (triggered on tile loop, matching NFO semantics).
+    """
+    switch_name = f"switch_ttrs_{house_id_hex.lower()}_colour"
+    lines: list[str] = []
+
+    if len(colour_values) == 1:
+        # Single colour — no need for a random_switch, just inline it.
+        # We still emit a switch so the identifier exists.
+        lines.append(
+            f"switch (FEAT_HOUSES, SELF, {switch_name}, 0) "
+            f"{{ return {colour_values[0]}; }}"
+        )
+    else:
+        # Multiple colours — random_switch with equal weights
+        entries = " ".join(f"1: return {v};" for v in colour_values)
+        lines.append(
+            f"random_switch (FEAT_HOUSES, SELF, {switch_name}, "
+            f"bitmask(TRIGGER_HOUSE_TILELOOP)) {{ {entries} }}"
+        )
+
+    return lines, switch_name
+
+
 # ============================================================================
 # NML generation
 # ============================================================================
@@ -653,10 +685,12 @@ def build_item_block(
     layout_name: str,
     house_size: Optional[str] = None,
     tile_layouts: Optional[list[str]] = None,
+    colour_switch: Optional[str] = None,
 ) -> list[str]:
     """Build NML item block for a house.
 
     ``layout_name`` is what goes in ``default:`` when tile_layouts is not given.
+    ``colour_switch`` if set, is the NML identifier for the colour callback.
     """
     ident_suffix = sanitize_identifier(display_name)
     item_ident = f"item_ttrs_{house_id_hex.lower()}_{ident_suffix}"
@@ -849,6 +883,8 @@ def build_item_block(
     lines.append("\tgraphics {")
     lines.append(f"\t\tdefault: {default_graphics};")
     lines.append(f"\t\tconstruction_check: {class_to_construction_switch(building_class)};")
+    if colour_switch is not None:
+        lines.append(f"\t\tcolour: {colour_switch};")
     lines.append("\t}")
     lines.append("}")
     lines.append("")
@@ -873,9 +909,13 @@ def generate_ttrs_nml(
     action1_blocks = parse_house_action1_blocks(lines)
     house_sections = collect_house_sections_from_action3(lines)
     # Build a lookup: house_id_hex -> sprite_table
+    # Use the Action 3 line index (not section start) for sprite table lookup.
+    # The correct Action 1 block is always the last one *before* the house's
+    # Action 3 entry.  Using start_idx was wrong when an Action 1 block fell
+    # between the previous house's Action 3 and the current section start.
     section_data: dict[str, dict[int, SpriteCoord]] = {}
-    for house_id_hex, _label, _sec_lines, start_idx in house_sections:
-        section_data[house_id_hex] = sprite_table_for_house(start_idx, action1_blocks)
+    for house_id_hex, _label, _sec_lines, _start_idx, action3_idx in house_sections:
+        section_data[house_id_hex] = sprite_table_for_house(action3_idx, action1_blocks)
 
     # House property and name data
     action3_ids = extract_house_ids_from_action3(lines)
@@ -919,17 +959,27 @@ def generate_ttrs_nml(
             # ---- Multi-tile primary  ----------------------------------------
             size_name, num_tiles = MULTI_TILE_BASES[sub_val]
             tile_layouts: list[str] = []
+            multi_colour_values: list[int] = []
 
             for t in range(num_tiles):
                 tile_id = house_id + t
                 tile_hex = f"{tile_id:02X}"
                 st = section_data.get(tile_hex, {})
                 htg = _house_graphics[tile_id]
-                sprite_lines, layout_name = emit_house_tile_nml(tile_hex, htg, st, pcx_path)
+                sprite_lines, layout_name, tile_colours = emit_house_tile_nml(tile_hex, htg, st, pcx_path)
                 out.extend(sprite_lines)
                 tile_layouts.append(layout_name)
+                if t == 0 and tile_colours:
+                    multi_colour_values = tile_colours
                 if t > 0:
                     skip_ids.add(tile_id)
+
+            colour_switch_name = None
+            if multi_colour_values:
+                colour_lines, colour_switch_name = emit_colour_switch(
+                    house_id_hex, multi_colour_values
+                )
+                out.extend(colour_lines)
 
             out.extend(
                 build_item_block(
@@ -940,6 +990,7 @@ def generate_ttrs_nml(
                     layout_name=tile_layouts[0],  # not used directly (tile_layouts takes priority)
                     house_size=size_name,
                     tile_layouts=tile_layouts,
+                    colour_switch=colour_switch_name,
                 )
             )
 
@@ -951,8 +1002,16 @@ def generate_ttrs_nml(
             # ---- Regular 1×1 house  -----------------------------------------
             st = section_data.get(house_id_hex, {})
             htg = _house_graphics[house_id]
-            sprite_lines, layout_name = emit_house_tile_nml(house_id_hex, htg, st, pcx_path)
+            sprite_lines, layout_name, house_colours = emit_house_tile_nml(house_id_hex, htg, st, pcx_path)
             out.extend(sprite_lines)
+
+            colour_switch_name = None
+            if house_colours:
+                colour_lines, colour_switch_name = emit_colour_switch(
+                    house_id_hex, house_colours
+                )
+                out.extend(colour_lines)
+
             out.extend(
                 build_item_block(
                     house_id_hex,
@@ -960,6 +1019,7 @@ def generate_ttrs_nml(
                     display_name,
                     props,
                     layout_name=layout_name,
+                    colour_switch=colour_switch_name,
                 )
             )
 

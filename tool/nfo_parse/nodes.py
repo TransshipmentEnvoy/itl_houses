@@ -254,4 +254,6 @@ class HouseTileGraphics:
     snow:           Optional[ClimateGraphics]           = None
     tropic:         Optional[ClimateGraphics]           = None
     arctic_v2:      Optional[ClimateGraphics]           = None
-    random_variants: list[RandomVariantGraphics]        = field(default_factory=list)
+    random_variants: list[RandomVariantGraphics]        = field(default_factory=list)    # Colour callback values extracted from CB 0x1E random results.
+    # Each int is a company-colour palette index (0–255).
+    colour_values:   list[int]                          = field(default_factory=list)

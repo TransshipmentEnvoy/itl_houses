@@ -153,6 +153,71 @@ def _rvg_climate_graphics(rvg: RandomVariantGraphics, climate: str) -> ClimateGr
 
 
 # ============================================================================
+# Colour callback extraction (CB 0x1E)
+# ============================================================================
+
+# CBID_HOUSE_COLOUR in OpenTTD
+_CBID_HOUSE_COLOUR = 0x1E
+
+
+def _extract_colour_values(
+    target_id: int,
+    resolve_graph: Action2Graph,
+    final_graph: Action2Graph,
+) -> list[int]:
+    """Follow *target_id* and extract colour callback return values.
+
+    The NFO colour callback branch typically points to a type-80 random node
+    whose entries are all callback-result sentinels (bit 15 set).  We extract
+    the low byte of each unique entry as a colour palette index.
+
+    Also handles the case of a type-82 (re-randomise) node which contains
+    ranges that are callback results, and the case of a direct callback result.
+    """
+    if is_callback_result(target_id):
+        return [target_id & 0xFF]
+
+    node = resolve_graph.get(target_id)
+    if node is None:
+        node = final_graph.get(target_id)
+    if node is None:
+        return []
+
+    if isinstance(node, RandomNode):
+        colours: list[int] = []
+        seen: set[int] = set()
+        for entry_id in node.entries:
+            if is_callback_result(entry_id):
+                val = entry_id & 0xFF
+                if val not in seen:
+                    seen.add(val)
+                    colours.append(val)
+        return colours
+
+    # Type-82 re-randomise — treated as VariationalNode by the parser.
+    # Extract callback-result values from ranges and default.
+    if isinstance(node, VariationalNode) and node.var_type == 0x82:
+        colours = []
+        seen = set()
+        # Check default
+        if is_callback_result(node.default):
+            val = node.default & 0xFF
+            if val not in seen:
+                seen.add(val)
+                colours.append(val)
+        # Check range results
+        for rng in node.ranges:
+            if is_callback_result(rng.result_id):
+                val = rng.result_id & 0xFF
+                if val not in seen:
+                    seen.add(val)
+                    colours.append(val)
+        return colours
+
+    return []
+
+
+# ============================================================================
 # Core recursive traversal
 # ============================================================================
 
@@ -250,12 +315,23 @@ def _traverse(
         var = node.variable
         var_type = node.var_type
 
-        # 2a. Callback router (var 0x0C) — we only care about the *default*
-        #     branch (= the graphics chain).
+        # 2a. Callback router (var 0x0C) — follow the *default* branch
+        #     (= the graphics chain) and also extract colour values from
+        #     the CB 0x1E branch if present.
         if var == VAR_CALLBACK_ID:
             _follow(node.default, node_snapshot, snapshots, final_graph, state,
                     climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
+            # Extract colour callback values (CB 0x1E)
+            if not state.result.colour_values:
+                for rng in node.ranges:
+                    if rng.range_lo <= _CBID_HOUSE_COLOUR <= rng.range_hi:
+                        colours = _extract_colour_values(
+                            rng.result_id, node_snapshot, final_graph,
+                        )
+                        if colours:
+                            state.result.colour_values = colours
+                        break
 
         # 2b. Climate split (var 0x03)
         elif var == VAR_CLIMATE:
@@ -353,18 +429,33 @@ def _traverse(
 
     # ------------------------------------------------------------------
     # 3. Random node (type-80): record each unique entry as a variant
+    #
+    #    When randoms are nested (outer random → inner random), we compose
+    #    variant indices multiplicatively so that a 2×2 tree yields 4 flat
+    #    variant slots instead of overwriting slots 0-1 twice.
     # ------------------------------------------------------------------
     if isinstance(node, RandomNode):
-        seen_entries: dict[int, int] = {}   # entry_id → variant_index
+        # Deduplicate entries, preserving order
+        seen_entries: dict[int, int] = {}   # entry_id → local_index
+        unique_order: list[int] = []
         for entry_id in node.entries:
             if is_callback_result(entry_id):
                 continue
             if entry_id not in seen_entries:
-                idx = len(seen_entries)
-                seen_entries[entry_id] = idx
-                _follow(entry_id, node_snapshot, snapshots, final_graph, state,
-                        climate, in_constr, constr_idx,
-                        anim_frame, True, idx, depth + 1)
+                seen_entries[entry_id] = len(unique_order)
+                unique_order.append(entry_id)
+
+        num_branches = len(unique_order)
+        for entry_id in unique_order:
+            local_idx = seen_entries[entry_id]
+            if in_random and random_variant_idx is not None:
+                # Nested random: compose multiplicatively
+                effective_idx = random_variant_idx * num_branches + local_idx
+            else:
+                effective_idx = local_idx
+            _follow(entry_id, node_snapshot, snapshots, final_graph, state,
+                    climate, in_constr, constr_idx,
+                    anim_frame, True, effective_idx, depth + 1)
         state.visited.discard(node_ident)
         return
 
@@ -421,6 +512,104 @@ def _record_constr(cg: ClimateGraphics, idx: int, fl: FrameLayout) -> None:
         cg.construction_stages[idx] = fl
 
 
+def _fixup_construction_replication(result: HouseTileGraphics) -> None:
+    """Replicate construction stages to align with nested random's completed variants.
+
+    When the completed state uses a nested random (N variants) but the
+    construction state uses a flat (non-nested) random (M < N variants),
+    the construction stages end up at indices 0..M-1 instead of being
+    distributed across the correct stride.  This function detects the
+    mismatch and replicates construction data to fill all variant slots.
+
+    Example: completed random 2×2 → 4 variants (0,1,2,3).
+    Construction random flat    → 2 variants at (0,1).
+    After fixup: construction[0] → slots 0,1 ; construction[1] → slots 2,3.
+    """
+    n = len(result.random_variants)
+    if n <= 1:
+        return
+
+    for attr in ("temperate", "snow", "tropic", "arctic_v2"):
+        # Collect construction sources and count completed variants
+        constr_sources: list[tuple[int, list]] = []  # (index, stages_copy)
+        total_with_content = 0
+
+        for i, rvg in enumerate(result.random_variants):
+            cg = getattr(rvg, attr)
+            if cg is None:
+                continue
+            has_content = (cg.completed is not None or
+                           any(fl is not None for fl in cg.animation_frames))
+            if has_content:
+                total_with_content += 1
+            has_constr = any(fl is not None for fl in cg.construction_stages)
+            if has_constr:
+                constr_sources.append((i, list(cg.construction_stages)))
+
+        m = len(constr_sources)
+        if m == 0 or m >= total_with_content or total_with_content <= 1:
+            continue  # No replication needed
+
+        # Check for clean divisibility (expected from multiplicative nesting)
+        if n % m != 0:
+            continue
+
+        # Verify sources are at contiguous indices 0..m-1
+        if not all(constr_sources[j][0] == j for j in range(m)):
+            continue  # Sources not at expected positions, skip
+
+        stride = n // m
+
+        # Replicate: source j fills slots [j*stride, (j+1)*stride)
+        for j, (_, stages) in enumerate(constr_sources):
+            for slot in range(j * stride, min((j + 1) * stride, n)):
+                rvg = result.random_variants[slot]
+                cg = getattr(rvg, attr)
+                if cg is None:
+                    cg = ClimateGraphics()
+                    setattr(rvg, attr, cg)
+                cg.construction_stages = list(stages)
+
+
+def _fixup_snow_construction_fallback(result: HouseTileGraphics) -> None:
+    """Copy construction stages from temperate to snow/tropic/arctic_v2 when missing.
+
+    In Pattern A houses (NFO checks construction_state before terrain_type),
+    construction stages 0–2 branch directly to layout nodes without passing
+    through the terrain check.  The traversal records these layouts only under
+    ``climate="temperate"``, leaving the snow/tropic/arctic_v2 construction
+    stages empty.  The NFO's intended behaviour is that construction sprites
+    are climate-independent — only the completed building differs.
+
+    This fixup copies temperate construction stages to any climate variant
+    that has a completed sprite (or animation frames) but no construction
+    stages of its own.
+    """
+    def _has_constr(cg: ClimateGraphics | None) -> bool:
+        return cg is not None and any(fl is not None for fl in cg.construction_stages)
+
+    def _has_content(cg: ClimateGraphics | None) -> bool:
+        if cg is None:
+            return False
+        return (cg.completed is not None
+                or any(fl is not None for fl in cg.animation_frames))
+
+    # Non-random path
+    if _has_constr(result.temperate):
+        for attr in ("snow", "tropic", "arctic_v2"):
+            cg = getattr(result, attr)
+            if _has_content(cg) and not _has_constr(cg):
+                cg.construction_stages = list(result.temperate.construction_stages)  # type: ignore[union-attr]
+
+    # Random variants path
+    for rvg in result.random_variants:
+        if _has_constr(rvg.temperate):
+            for attr in ("snow", "tropic", "arctic_v2"):
+                cg = getattr(rvg, attr)
+                if _has_content(cg) and not _has_constr(cg):
+                    cg.construction_stages = list(rvg.temperate.construction_stages)  # type: ignore[union-attr]
+
+
 # ============================================================================
 # Public API
 # ============================================================================
@@ -450,6 +639,8 @@ def build_house_tile_graphics(
         in_random=False, random_variant_idx=None,
         depth=0,
     )
+    _fixup_construction_replication(result)
+    _fixup_snow_construction_fallback(result)
     return result
 
 
@@ -499,7 +690,7 @@ def _parse_one_sprite(rs: RawSprite) -> Action2Node | None:
     t = rs.bytes[3]
     if t == 0x00:
         return parse_layout_node(rs)
-    elif t in (0x81, 0x85):
+    elif t in (0x81, 0x85, 0x86):
         return parse_variational_node(rs)
     elif t in (0x80, 0x82):
         return parse_random_node(rs)

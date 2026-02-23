@@ -41,7 +41,7 @@ from __future__ import annotations
 from typing import Any, Optional, Protocol, Sequence
 
 from .nodes import (
-    ClimateGraphics, FrameLayout, HouseTileGraphics, LayoutSprite,
+    BoundingBox, ClimateGraphics, FrameLayout, HouseTileGraphics, LayoutSprite,
     RandomVariantGraphics,
 )
 
@@ -101,6 +101,16 @@ def _recolour_clause(bsprite: LayoutSprite) -> str:
     return ""
 
 
+def _bbox_clause(bbox: Optional[BoundingBox]) -> str:
+    """Return NML bounding-box properties for a building block, or empty string."""
+    if bbox is None:
+        return ""
+    return (
+        f" xoffset: {bbox.xoff}; yoffset: {bbox.yoff};"
+        f" xextent: {bbox.xext}; yextent: {bbox.yext}; zextent: {bbox.zext};"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Emitting a single climate variant
 # ---------------------------------------------------------------------------
@@ -126,9 +136,11 @@ def _emit_climate_variant(
     constr_sprites: list[Any]           = []
     constr_recolour: bool               = False
     constr_ground_expr: Optional[str]   = None
+    constr_bbox: Optional[BoundingBox]  = None
 
     valid_constr = [fl for fl in cg.construction_stages if fl is not None]
     if valid_constr:
+        constr_bbox = valid_constr[0].bbox
         seen_indices: list[int] = []
         for fl in valid_constr:
             bs = fl.building
@@ -154,7 +166,7 @@ def _emit_climate_variant(
     if cg.animation_frames:
         return _emit_animated_variant(
             prefix, ss_prefix, cg, constr_sprites, constr_recolour,
-            constr_ground_expr, sprite_table, pcx_path, out,
+            constr_ground_expr, constr_bbox, sprite_table, pcx_path, out,
         )
 
     # ------------------------------------------------------------------
@@ -163,9 +175,11 @@ def _emit_climate_variant(
     done_sprite_sc: Optional[Any] = None
     done_recolour: bool           = False
     done_ground_expr: Optional[str] = None
+    done_bbox: Optional[BoundingBox] = None
 
     if cg.completed is not None:
         fl = cg.completed
+        done_bbox = fl.bbox
         bs = fl.building
         if bs.is_action1:
             sc = sprite_table.get(bs.index)
@@ -190,7 +204,7 @@ def _emit_climate_variant(
         out.append(f"spritelayout {prefix}_constr {{")
         out.append(f"\tground   {{ sprite: {g_c}; }}")
         expr = _build_layout_expr(len(constr_sprites))
-        out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc} }}")
+        out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
 
     # Done spriteset
@@ -202,7 +216,7 @@ def _emit_climate_variant(
         g_d = done_ground_expr or constr_ground_expr or "0"
         out.append(f"spritelayout {prefix}_done {{")
         out.append(f"\tground   {{ sprite: {g_d}; }}")
-        out.append(f"\tbuilding {{ sprite: {ss_prefix}_done(0);{rc_d} }}")
+        out.append(f"\tbuilding {{ sprite: {ss_prefix}_done(0);{rc_d}{_bbox_clause(done_bbox)} }}")
         out.append("}")
     elif done_ground_expr is not None and done_ground_expr != "0":
         # Ground-only completed layout (no building sprite) — e.g. a snow corner tile
@@ -216,7 +230,7 @@ def _emit_climate_variant(
         out.append(f"spritelayout {prefix}_done {{")
         out.append(f"\tground   {{ sprite: {g_c}; }}")
         expr = _build_layout_expr(len(constr_sprites))
-        out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc} }}")
+        out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
 
     # ------------------------------------------------------------------
@@ -261,6 +275,7 @@ def _emit_animated_variant(
     constr_sprites: list[Any],
     constr_recolour: bool,
     constr_ground_expr: Optional[str],
+    constr_bbox: Optional[BoundingBox],
     sprite_table: dict[int, Any],
     pcx_path: str,
     out: list[str],
@@ -352,7 +367,7 @@ def _emit_animated_variant(
         layout_name = f"{prefix}_frame{idx}"
         out.append(f"spritelayout {layout_name} {{")
         out.append(f"\tground   {{ sprite: {g_expr}; }}")
-        out.append(f"\tbuilding {{ sprite: {ss_name}(0);{rc_clause} }}")
+        out.append(f"\tbuilding {{ sprite: {ss_name}(0);{rc_clause}{_bbox_clause(fl.bbox)} }}")
         out.append("}")
         frame_layout_names.append(layout_name)
 
@@ -387,7 +402,7 @@ def _emit_animated_variant(
         out.append(f"spritelayout {prefix}_constr {{")
         out.append(f"\tground   {{ sprite: {g_c}; }}")
         expr = _build_layout_expr(len(constr_sprites))
-        out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc} }}")
+        out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
         fallback = f"{prefix}_constr"
     else:
@@ -410,16 +425,18 @@ def emit_house_tile_nml(
     htg: HouseTileGraphics,
     sprite_table: dict[int, Any],
     pcx_path: str,
-) -> tuple[list[str], str]:
+) -> tuple[list[str], str, list[int]]:
     """
     Emit NML blocks for all climate variants of one house tile.
 
-    Returns ``(lines, entry_name)`` where *entry_name* is always
+    Returns ``(lines, entry_name, colour_values)`` where *entry_name* is always
     ``sl_ttrs_{house_id_hex}`` — the top-level identifier referenced by the
-    ``item`` block graphics section.
+    ``item`` block graphics section, and *colour_values* is a (possibly empty)
+    list of colour palette indices extracted from the CB 0x1E callback chain.
     """
     out: list[str] = []
     entry_name = f"sl_ttrs_{house_id_hex}"
+    colour_values = list(htg.colour_values)
 
     has_temp      = htg.temperate   is not None and _cg_has_content(htg.temperate)
     has_snow      = htg.snow        is not None and _cg_has_content(htg.snow)
@@ -430,7 +447,7 @@ def emit_house_tile_nml(
     if not has_temp and not has_snow and not has_tropic and not has_random:
         out.append(f"/* WARN 0x{house_id_hex}: graph traversal yielded no usable layouts */")
         out.append("")
-        return out, entry_name
+        return out, entry_name, colour_values
 
     needs_terrain_switch = has_snow or has_tropic or has_arctic_v2
     climate_suffix_temp  = "_nosnow" if needs_terrain_switch else ""
@@ -484,7 +501,7 @@ def emit_house_tile_nml(
         _emit_random_switch(house_id_hex, htg, sprite_table, pcx_path, out, entry_name)
         out.append("")
         # The random_switch IS the entry — no further terrain switch needed
-        return out, entry_name
+        return out, entry_name, colour_values
 
     if has_random and needs_terrain_switch and top_temp_name is None:
         # Random variants exist but we also need a terrain switch (e.g. snow ground-only
@@ -513,7 +530,7 @@ def emit_house_tile_nml(
         )
         out.append("")
 
-    return out, entry_name
+    return out, entry_name, colour_values
 
 
 def _emit_random_switch(
