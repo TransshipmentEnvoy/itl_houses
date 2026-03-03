@@ -98,20 +98,40 @@ def _parse_steps(b: list[int], start: int) -> tuple[list[ComputationStep], int]:
 
     Returns ``(steps, cursor)`` where *cursor* is the byte position just
     after the last consumed byte of the chain.
+
+    .. note::
+
+       Variables in the 0x60–0x7F range require an extra parameter byte
+       after the variable byte.  This parser detects them and adjusts the
+       step offset accordingly.
     """
     steps: list[ComputationStep] = []
     p = start
 
     while True:
-        # Each step: var(1) shift(1) and_mask(4) add_val(4) = 10 bytes
-        if p + 9 >= len(b):
+        # Each step: var(1) [param(1)] shift(1) and_mask(4) add_val(4)
+        if p >= len(b):
             break
 
-        var      = b[p]
-        shift    = b[p + 1]
-        and_mask = _le32(b, p + 2)
-        add_val  = _le32(b, p + 6)
-        p += 10
+        var = b[p]
+        p += 1
+
+        # 60+x variables carry an extra parameter byte
+        param: int | None = None
+        if 0x60 <= var <= 0x7F:
+            if p >= len(b):
+                break
+            param = b[p]
+            p += 1
+
+        # Remaining fixed part: shift(1) + and_mask(4) + add_val(4) = 9 bytes
+        if p + 8 >= len(b):
+            break
+
+        shift    = b[p]
+        and_mask = _le32(b, p + 1)
+        add_val  = _le32(b, p + 5)
+        p += 9
 
         # Determine operation (comes after the 10-byte step block)
         op = "var"
@@ -153,16 +173,19 @@ def _parse_steps(b: list[int], start: int) -> tuple[list[ComputationStep], int]:
 
 def parse_computation_node(rs: RawSprite) -> ComputationNode | None:
     """
-    Try to parse a type-89 computation node from *rs*.
+    Try to parse a type-89 or type-8A computation node from *rs*.
 
-    Returns ``None`` when *rs* is not type-89 or has too few bytes.
+    Type-8A uses the related-object scope but has the same byte layout
+    as type-89.
+
+    Returns ``None`` when *rs* is not type-89/8A or has too few bytes.
     """
     b = rs.bytes
     if len(b) < 5:
         return None
     if b[0] != 0x02 or b[1] != 0x07:
         return None
-    if b[3] != 0x89:
+    if b[3] not in (0x89, 0x8A):
         return None
 
     set_id = b[2]

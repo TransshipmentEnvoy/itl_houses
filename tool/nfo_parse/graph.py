@@ -29,7 +29,7 @@ Traversal
     7. **Type-00 layout** — terminal node; record as a :class:`~nodes.FrameLayout`.
     8. **Computation** (type-89) — follow default / any subroutine calls
        (best-effort, records what it can).
-    9. **Re-random** (type-82) — follow the default branch.
+    9. **Related-object variational** (type-82) — follow the default branch.
 
     Visited-set prevents infinite loops.  Callback-result sentinel values
     (bit 15 set) are never followed.
@@ -44,7 +44,7 @@ from .nodes import (
     VAR_ANIMATION_COUNTER, VAR_ANIMATION_FRAME, VAR_CALLBACK_ID,
     VAR_CLIMATE, VAR_CONSTRUCTION_STATE, VAR_TERRAIN_TYPE,
     CLIMATE_ARCTIC, CLIMATE_TROPIC,
-    TERRAIN_SNOW,
+    TERRAIN_DESERT, TERRAIN_RAINFOREST, TERRAIN_SNOW,
     Action2Graph,
     Action2Node, ClimateGraphics, ComputationNode, FrameLayout,
     HouseTileGraphics, LayoutNode, RandomNode, RandomVariantGraphics,
@@ -75,23 +75,20 @@ def build_graph(sprites: list[RawSprite]) -> Action2Graph:
 
     When more than one parser claims the same set ID (shouldn't happen for a
     valid NFO but can occur when two types share an ID) the priority order is:
-        layout > variational > random (80) > rerand (82) > computation
+        layout > variational > random (80) > computation
     """
     graph: Action2Graph = {}
 
     # Lowest priority first so higher-priority parsers overwrite.
     comp_nodes = parse_all_computation_nodes(sprites)
-    rand_nodes, rerand_nodes = parse_all_random_nodes(sprites)
-    var_nodes   = parse_all_variational_nodes(sprites)
-    lay_nodes   = parse_all_layout_nodes(sprites)
+    rand_nodes = parse_all_random_nodes(sprites)
+    var_nodes  = parse_all_variational_nodes(sprites)
+    lay_nodes  = parse_all_layout_nodes(sprites)
 
     for nid, node in comp_nodes.items():
         graph[nid] = node
     for nid, node in rand_nodes.items():
         graph[nid] = node
-    for nid, node in rerand_nodes.items():
-        if nid not in rand_nodes:   # don't overwrite random with rerand
-            graph[nid] = node
     for nid, node in var_nodes.items():
         graph[nid] = node
     for nid, node in lay_nodes.items():
@@ -351,15 +348,22 @@ def _traverse(
                         anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2c. Terrain / snow check (var 0x43)
+        #     Per spec: 0=normal, 1=desert, 2=rainforest, 4=snow
         elif var == VAR_TERRAIN_TYPE:
             snow_target: int | None = None
+            desert_target: int | None = None
+            rainforest_target: int | None = None
             default_target = node.default
 
             for rng in node.ranges:
                 if rng.range_lo <= TERRAIN_SNOW <= rng.range_hi:
                     snow_target = rng.result_id
+                if rng.range_lo <= TERRAIN_DESERT <= rng.range_hi:
+                    desert_target = rng.result_id
+                if rng.range_lo <= TERRAIN_RAINFOREST <= rng.range_hi:
+                    rainforest_target = rng.result_id
 
-            # No-snow path  (= default)
+            # No-snow / no-desert path (= default → temperate)
             _follow(default_target, node_snapshot, snapshots, final_graph, state,
                     climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
@@ -370,24 +374,53 @@ def _traverse(
                         "snow", in_constr, constr_idx,
                         anim_frame, in_random, random_variant_idx, depth + 1)
 
+            # Desert path → maps to "tropic" climate slot
+            if desert_target is not None and desert_target != default_target:
+                _follow(desert_target, node_snapshot, snapshots, final_graph, state,
+                        "tropic", in_constr, constr_idx,
+                        anim_frame, in_random, random_variant_idx, depth + 1)
+
+            # Rainforest path — usually same as temperate; only follow if distinct
+            if (rainforest_target is not None
+                    and rainforest_target != default_target
+                    and rainforest_target != desert_target):
+                # No dedicated slot; treat as temperate (already covered by default)
+                pass
+
         # 2d. Construction state (var 0x40)
         elif var == VAR_CONSTRUCTION_STATE:
-            # Stage 3 = completed → follow default
-            _follow(node.default, node_snapshot, snapshots, final_graph, state,
-                    climate, False, -1,
-                    anim_frame, in_random, random_variant_idx, depth + 1)
+            effective_shift = node.shift_count
+            effective_mask = node.mask
 
-            # Stages 0-2 = under construction
-            covered: set[int] = set()
-            for rng in node.ranges:
-                lo = max(0, rng.range_lo)
-                hi = min(2, rng.range_hi)
-                for stage in range(lo, hi + 1):
-                    if stage not in covered:
-                        covered.add(stage)
-                        _follow(rng.result_id, node_snapshot, snapshots, final_graph,
-                                state, climate, True, stage,
-                                anim_frame, in_random, random_variant_idx, depth + 1)
+            # Standard construction state: shift=0, mask covers bits 0-1
+            if effective_shift == 0 and (effective_mask & 0x03) == 0x03:
+                # Stage 3 = completed → follow default
+                _follow(node.default, node_snapshot, snapshots, final_graph, state,
+                        climate, False, -1,
+                        anim_frame, in_random, random_variant_idx, depth + 1)
+
+                # Stages 0-2 = under construction
+                covered: set[int] = set()
+                for rng in node.ranges:
+                    lo = max(0, rng.range_lo)
+                    hi = min(2, rng.range_hi)
+                    for stage in range(lo, hi + 1):
+                        if stage not in covered:
+                            covered.add(stage)
+                            _follow(rng.result_id, node_snapshot, snapshots,
+                                    final_graph, state, climate, True, stage,
+                                    anim_frame, in_random, random_variant_idx,
+                                    depth + 1)
+            else:
+                # Non-standard extraction (e.g. pseudo-random bits 2-3):
+                # follow all branches without construction-state semantics.
+                all_targets: set[int] = {node.default}
+                for rng in node.ranges:
+                    all_targets.add(rng.result_id)
+                for target in sorted(all_targets):
+                    _follow(target, node_snapshot, snapshots, final_graph, state,
+                            climate, in_constr, constr_idx,
+                            anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2e. Animation frame (var 0x46)
         elif var == VAR_ANIMATION_COUNTER:
@@ -408,7 +441,7 @@ def _traverse(
                     climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
 
-        # 2g. Re-random (var_type 0x82) — follow the default branch
+        # 2g. Related-object variational (var_type 0x82) — follow default
         elif var_type == 0x82:
             _follow(node.default, node_snapshot, snapshots, final_graph, state,
                     climate, in_constr, constr_idx,
@@ -679,7 +712,18 @@ def build_all_house_graphics(
 
 
 def _parse_one_sprite(rs: RawSprite) -> Action2Node | None:
-    """Parse a single RawSprite into its Action 2 node type."""
+    """Parse a single RawSprite into its Action 2 node type.
+
+    Routing table
+    -------------
+    - ``0x00``               → basic sprite layout (parse_layout)
+    - ``0x01..0x3F``         → extended sprite layout (parse_layout, warns)
+    - ``0x40..0x7F``         → advanced sprite layout (parse_layout, warns)
+    - ``0x80``, ``0x83``     → random action (parse_random)
+    - ``0x81``, ``0x82``     → variational byte (parse_variational)
+    - ``0x85``, ``0x86``     → variational dword (parse_variational)
+    - ``0x89``, ``0x8A``     → computation chain (parse_computation)
+    """
     from .parse_layout import parse_layout_node
     from .parse_variational import parse_variational_node
     from .parse_random import parse_random_node
@@ -688,13 +732,19 @@ def _parse_one_sprite(rs: RawSprite) -> Action2Node | None:
     if len(rs.bytes) < 4:
         return None
     t = rs.bytes[3]
-    if t == 0x00:
+
+    # --- Sprite layouts (type byte < 0x80) ---------------------------------
+    if t < 0x80:
         return parse_layout_node(rs)
-    elif t in (0x81, 0x85, 0x86):
-        return parse_variational_node(rs)
-    elif t in (0x80, 0x82):
+
+    # --- Callback / decision types (type byte >= 0x80) ---------------------
+    if t in (0x80, 0x83):
+        # 0x80 = self scope random; 0x83 = related object random
         return parse_random_node(rs)
-    elif t == 0x89:
+    elif t in (0x81, 0x82, 0x85, 0x86):
+        return parse_variational_node(rs)
+    elif t in (0x89, 0x8A):
+        # 0x89 = self scope computation; 0x8A = related scope computation
         return parse_computation_node(rs)
     return None
 

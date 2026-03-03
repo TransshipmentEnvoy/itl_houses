@@ -35,7 +35,7 @@ def parse_layout_node(rs: RawSprite) -> LayoutNode | None:
 
     Returns ``None`` when *rs* is not a type-00 entry or has too few bytes.
 
-    Expected byte layout of ``rs.bytes``::
+    Expected byte layout of ``rs.bytes`` (basic format)::
 
         [0]  02   — Action 2
         [1]  07   — feature: houses
@@ -54,14 +54,46 @@ def parse_layout_node(rs: RawSprite) -> LayoutNode | None:
         [14] xext
         [15] yext
         [16] zext
+
+    .. note::
+
+       NFO also defines **extended** sprite layouts (num-sprites > 0,
+       multiple building sprites) and **advanced** layouts (with register
+       modifier flags after each sprite entry).  These are detected and
+       logged as warnings but not fully parsed — the basic 1-ground +
+       1-building format is the only layout emitted.
     """
     b = rs.bytes
     if len(b) < 4:
         return None
     if b[0] != 0x02 or b[1] != 0x07:
         return None
-    if b[3] != 0x00:
-        return None   # not type-00
+
+    type_byte = b[3]
+
+    # --- Detect extended / advanced layout formats -------------------------
+    # type_byte < 0x40: sprite layout; 0x00 = basic (1 building sprite).
+    # type_byte >= 0x40 and < 0x80: advanced sprite layout (register flags).
+    # type_byte >= 0x80: not a layout (random / variational / computation).
+    if type_byte >= 0x80:
+        return None  # not a sprite layout at all
+    if type_byte >= 0x40:
+        import logging
+        logging.warning(
+            "set_id 0x%02X: advanced sprite layout (type byte 0x%02X) "
+            "— not supported, skipping.",
+            b[2], type_byte,
+        )
+        return None
+    if type_byte != 0x00:
+        import logging
+        logging.warning(
+            "set_id 0x%02X: extended sprite layout with %d building "
+            "sprites — only basic format (1 building) is supported, "
+            "skipping.",
+            b[2], type_byte,
+        )
+        return None
 
     set_id = b[2]
 

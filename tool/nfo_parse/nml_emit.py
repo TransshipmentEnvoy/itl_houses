@@ -96,9 +96,18 @@ def _ground_expr(
 
 
 def _recolour_clause(bsprite: LayoutSprite) -> str:
-    if bsprite.has_recolour:
-        return " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;"
-    return ""
+    """Return NML recolour clause for a building sprite.
+
+    Checks sprite_type (bits 14-15) and recolour_sprite (bits 16-29)
+    to emit the correct palette reference.
+    """
+    if not bsprite.has_recolour:
+        return ""
+    rs = bsprite.recolour_sprite
+    if rs is not None and rs != 0:
+        # Custom recolour sprite — emit as literal sprite number
+        return f" recolour_mode: RECOLOUR_REMAP; palette: {rs};"
+    return " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;"
 
 
 def _bbox_clause(bbox: Optional[BoundingBox]) -> str:

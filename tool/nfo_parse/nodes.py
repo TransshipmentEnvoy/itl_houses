@@ -7,9 +7,10 @@ Node hierarchy
 Action2Node (abstract base) — identified by node_id (== set_id in NFO byte)
   ├─ LayoutNode       type-00  basic sprite layout
   ├─ VariationalNode  type-81  byte-mask variational (var-based routing)
+  │                   type-82  byte-mask variational (related object)
   │                   type-85  word-mask variational
+  │                   type-86  word-mask variational (related object)
   ├─ RandomNode       type-80  random selection
-  │                   type-82  random with re-randomise trigger
   └─ ComputationNode  type-89  multi-step arithmetic computation
 
 Special result IDs
@@ -53,9 +54,11 @@ VAR_CALLBACK_ID        = 0x0C   # which callback is being invoked
 VAR_CLIMATE            = 0x03   # game climate (0=temp, 1=arctic, 2=tropic, 3=toy)
 
 # Terrain type values (for VAR_TERRAIN_TYPE)
-TERRAIN_SNOW    = 0x04
-TERRAIN_DESERT  = 0x02
-TERRAIN_ARCTIC  = 0x01  # arctic ground (not snow per se — used in 3-way checks)
+# Per NFO spec — variable 43 returns: 0=normal, 1=desert, 2=rainforest, 4=snow
+TERRAIN_NORMAL     = 0x00
+TERRAIN_DESERT     = 0x01
+TERRAIN_RAINFOREST = 0x02
+TERRAIN_SNOW       = 0x04
 
 # Climate values (for VAR_CLIMATE)
 CLIMATE_TEMPERATE = 0
@@ -79,13 +82,26 @@ def is_callback_result(result_id: int) -> bool:
 
 @dataclass(frozen=True)
 class LayoutSprite:
-    """Single sprite DWORD from a type-00 layout entry."""
+    """Single sprite DWORD from a type-00 layout entry.
+
+    DWORD bit layout (per NFO Action2/Sprite_Layout spec):
+        bit 31         : custom sprite from Action 1 set
+        bits 16-29     : recolour sprite number (when sprite_type != 0)
+        bits 14-15     : sprite type (0=normal, 1=use recolour sprite)
+        bits 0-13      : sprite index / base-game sprite number
+    """
     dword: int
 
     # bit 31 = sprite from Action 1 set (not base-game sprite)
     SPRITE_ACTION1_FLAG  = 0x80000000
-    # bit 15 = enable recolour remap
+    # bits 14-15 = sprite type (2-bit field)
+    SPRITE_TYPE_MASK     = 0x0000C000
+    SPRITE_TYPE_SHIFT    = 14
+    # bit 15 = enable recolour remap (legacy single-bit check)
     SPRITE_RECOLOUR_FLAG = 0x00008000
+    # bits 16-29 = recolour sprite number
+    RECOLOUR_SPRITE_MASK  = 0x3FFF0000
+    RECOLOUR_SPRITE_SHIFT = 16
     # bits 0-13 = sprite index
     SPRITE_INDEX_MASK    = 0x00003FFF
 
@@ -96,6 +112,18 @@ class LayoutSprite:
     @property
     def has_recolour(self) -> bool:
         return bool(self.dword & self.SPRITE_RECOLOUR_FLAG)
+
+    @property
+    def sprite_type(self) -> int:
+        """2-bit sprite type field (bits 14-15): 0=normal, 1=recolour sprite."""
+        return (self.dword & self.SPRITE_TYPE_MASK) >> self.SPRITE_TYPE_SHIFT
+
+    @property
+    def recolour_sprite(self) -> int | None:
+        """Recolour sprite number (bits 16-29), or None if sprite_type==0."""
+        if self.sprite_type == 0:
+            return None
+        return (self.dword & self.RECOLOUR_SPRITE_MASK) >> self.RECOLOUR_SPRITE_SHIFT
 
     @property
     def index(self) -> int:
@@ -149,11 +177,26 @@ class VariationalNode:
 
     var_type: int               # 0x81 (byte ranges) or 0x85 (word ranges)
     variable: int               # e.g. VAR_TERRAIN_TYPE, VAR_ANIMATION_COUNTER …
-    shift:    int               # shift amount (bits 0-4) + and/or flags (bits 5-7)
+    shift:    int               # raw shift byte (kept for backward compat)
     mask:     int               # AND mask applied after shift
 
     ranges:  list[VariationalRange] = field(default_factory=list)
     default: int = 0            # default result when no range matches
+
+    @property
+    def shift_count(self) -> int:
+        """Right-shift amount (bits 0-4 of the shift byte)."""
+        return self.shift & 0x1F
+
+    @property
+    def has_chain(self) -> bool:
+        """Whether shift-and-add-divmod chain follows (bit 5)."""
+        return bool(self.shift & 0x20)
+
+    @property
+    def sign_extend(self) -> bool:
+        """Whether the variable should be sign-extended (bit 6)."""
+        return bool(self.shift & 0x40)
 
 
 @dataclass

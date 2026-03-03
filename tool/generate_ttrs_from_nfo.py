@@ -513,6 +513,22 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                             props["13"] = [f"{zone:02X}", f"{climate:02X}"]
                         p += 2
 
+                # Property 14: callback flags 1 (1 byte)
+                elif key_int == 0x14:
+                    if p < len(tokens):
+                        val = parse_token_value(tokens[p])
+                        if val is not None and "14" not in props:
+                            props["14"] = f"{val:02X}"
+                        p += 1
+
+                # Property 15: override flag (1 byte)
+                elif key_int == 0x15:
+                    if p < len(tokens):
+                        val = parse_token_value(tokens[p])
+                        if val is not None and "15" not in props:
+                            props["15"] = f"{val:02X}"
+                        p += 1
+
                 # Property 16: refresh_multiplier
                 elif key_int == 0x16:
                     if p < len(tokens):
@@ -561,6 +577,14 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                             props["1C"] = f"{val:02X}"
                         p += 1
 
+                # Property 1D: callback flags 2 (1 byte)
+                elif key_int == 0x1D:
+                    if p < len(tokens):
+                        val = parse_token_value(tokens[p])
+                        if val is not None and "1D" not in props:
+                            props["1D"] = f"{val:02X}"
+                        p += 1
+
                 # Property 1F: minimum_lifetime
                 elif key_int == 0x1F:
                     if p < len(tokens):
@@ -569,9 +593,23 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                             props["1F"] = f"{val:02X}"
                         p += 1
 
-                # Unknown property - skip 1 byte
+                # Unknown property — use size lookup table to skip correctly.
+                # Action0/Houses property sizes (bytes per value):
+                #   08:1  09:1  0A:2  0B:1  0C:1  0D:1  0E:1  0F:1
+                #   10:2  11:1  12:2  13:2  14:1  15:1  16:1  17:2
+                #   18:1  19:1  1A:2  1B:1  1C:1  1D:1  1E:2  1F:2
+                #   20:4  21:2  22:4  23:1  24:1
                 else:
-                    p += 1
+                    _PROP_SIZES: dict[int, int] = {
+                        0x08: 1, 0x09: 1, 0x0A: 2, 0x0B: 1, 0x0C: 1,
+                        0x0D: 1, 0x0E: 1, 0x0F: 1, 0x10: 2, 0x11: 1,
+                        0x12: 2, 0x13: 2, 0x14: 1, 0x15: 1, 0x16: 1,
+                        0x17: 2, 0x18: 1, 0x19: 1, 0x1A: 2, 0x1B: 1,
+                        0x1C: 1, 0x1D: 1, 0x1E: 2, 0x1F: 2,
+                        0x20: 4, 0x21: 2, 0x22: 4, 0x23: 1, 0x24: 1,
+                    }
+                    skip = _PROP_SIZES.get(key_int, 1)
+                    p += skip
 
         line_num += 1
 
@@ -806,8 +844,10 @@ def build_item_block(
     if isinstance(prob_raw, str):
         prob = token_to_int(prob_raw)
         if prob is not None:
-            # NFO prop 0x18 uses /16 scaling in NML's user-facing 'probability'.
-            lines.append(f"\t\tprobability: {max(1, prob // 16)};")
+            # NFO prop 0x18 (0-255) → NML probability (1-15).
+            # Use round(prob/17) for a more uniform distribution
+            # (17 ≈ 255/15) instead of the coarser prob//16.
+            lines.append(f"\t\tprobability: {max(1, min(15, round(prob / 17)))};")
             used_props.add("18")
 
     refresh_raw = props.get("16")

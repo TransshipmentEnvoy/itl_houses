@@ -12,8 +12,8 @@ Module layout
     nodes.py              Data classes for all node types and traversal results
     parse_raw.py          Multi-line NFO byte collector
     parse_layout.py       Type-00 sprite layout parser
-    parse_variational.py  Type-81 / type-85 variational parser
-    parse_random.py       Type-80 / type-82 random-selection parser
+    parse_variational.py  Type-81 / type-82 / type-85 / type-86 variational parser
+    parse_random.py       Type-80 random-selection parser
     parse_computation.py  Type-89 advanced computation parser
     graph.py              Graph builder + recursive traversal → HouseTileGraphics
     nml_emit.py           NML code emitter (spritesets, spritelayouts, switches)

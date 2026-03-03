@@ -1,5 +1,5 @@
 """
-parse_variational.py — Parse type-81 and type-85 Action 2 variational entries.
+parse_variational.py — Parse type-81/82 and type-85/86 Action 2 variational entries.
 
 Type-81 format (byte-range variational)
 ----------------------------------------
@@ -45,9 +45,12 @@ from .parse_raw import RawSprite
 
 def parse_variational_node_81(rs: RawSprite) -> VariationalNode | None:
     """
-    Parse a type-81 variational node from *rs*.
+    Parse a type-81/82 variational node from *rs*.
 
-    Returns ``None`` when *rs* is not type-81 or has too few bytes.
+    Type-82 is structurally identical to type-81 (byte-range) but accesses
+    variables from the related object scope.
+
+    Returns ``None`` when *rs* is not type-81/82 or has too few bytes.
 
     Minimum required: ``02 07 set_id 81 var shift mask 0``
     = 8 bytes + 2-byte default = 10 bytes.
@@ -57,13 +60,25 @@ def parse_variational_node_81(rs: RawSprite) -> VariationalNode | None:
         return None
     if b[0] != 0x02 or b[1] != 0x07:
         return None
-    if b[3] != 0x81:
+    if b[3] not in (0x81, 0x82):
         return None
 
     set_id     = b[2]
     variable   = b[4]
     shift      = b[5]
     mask       = b[6]
+
+    # Decompose shift byte: bits 0-4 = shift count, bit 5 = chain, bit 6 = sign
+    has_chain = bool(shift & 0x20)
+    if has_chain:
+        import logging
+        logging.warning(
+            "set_id 0x%02X: type-81/82 variational with shift-and-add-divmod "
+            "chain (shift byte 0x%02X) — chain not fully parsed, "
+            "ranges may be inaccurate.",
+            set_id, shift,
+        )
+
     num_ranges = b[7]
 
     # Minimum byte check for ranges + default
@@ -129,6 +144,18 @@ def parse_variational_node_85(rs: RawSprite) -> VariationalNode | None:
     variable   = b[4]
     shift      = b[5]
     mask       = b[6] | (b[7] << 8)   # 16-bit mask
+
+    # Decompose shift byte: bits 0-4 = shift count, bit 5 = chain, bit 6 = sign
+    has_chain = bool(shift & 0x20)
+    if has_chain:
+        import logging
+        logging.warning(
+            "set_id 0x%02X: type-85/86 variational with shift-and-add-divmod "
+            "chain (shift byte 0x%02X) — chain not fully parsed, "
+            "ranges may be inaccurate.",
+            set_id, shift,
+        )
+
     num_ranges = b[8]
 
     # Each word range: 6 bytes (2 result + 4 range bounds).  Default: 2 bytes.
@@ -177,16 +204,16 @@ def parse_variational_node(rs: RawSprite) -> VariationalNode | None:
     if len(rs.bytes) < 4:
         return None
     t = rs.bytes[3]
-    if t == 0x81:
+    if t in (0x81, 0x82):
         return parse_variational_node_81(rs)
-    if t == 0x85:
+    if t in (0x85, 0x86):
         return parse_variational_node_85(rs)
     return None
 
 
 def parse_all_variational_nodes(sprites: list[RawSprite]) -> dict[int, VariationalNode]:
     """
-    Parse every type-81 / type-85 entry from *sprites*.
+    Parse every type-81 / type-82 / type-85 / type-86 entry from *sprites*.
 
     When multiple entries have the same set ID the **first** wins.
     """
