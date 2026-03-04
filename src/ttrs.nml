@@ -46,7 +46,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_00_snow, construction_state) { 3: sl_ttrs_00_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_00, terrain_type) { TILETYPE_SNOW: sl_ttrs_00_snow; return sl_ttrs_00_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_00_fire_station, 200) {
+item (FEAT_HOUSES, item_ttrs_00_house_00, 200) {
 	property {
 		substitute: 3;
 		building_flags: bitmask(HOUSE_FLAG_CHURCH);
@@ -103,7 +103,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_01_snow, construction_state) { 3: sl_ttrs_01_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_01, terrain_type) { TILETYPE_SNOW: sl_ttrs_01_snow; return sl_ttrs_01_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_01_library_planetarium, 201) {
+item (FEAT_HOUSES, item_ttrs_01_house_01, 201) {
 	property {
 		substitute: 39;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -425,16 +425,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv3, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_03) { 1: sl_ttrs_03_rv0; 1: sl_ttrs_03_rv1; 1: sl_ttrs_03_rv2; 1: sl_ttrs_03_rv3; }
 
-item (FEAT_HOUSES, item_ttrs_02_prison, 202, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_02_fire_station, 202, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_FIRE_STATION);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1930, 1980];
 		refresh_multiplier: 3;
 		accepted_cargos: [[MAIL, 1],[GOOD, 1]];
 		/* NFO cargo amount is 0 for: PASS */
-		/* NFO name string-id: DC00; visible name: Prison */
+		/* NFO name string-id: DC00; visible name: Fire station */
 		/* NFO field 14: 01 */
 	}
 	graphics {
@@ -486,7 +487,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_04_snow, construction_state) { 3: sl_ttrs_04_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_04, terrain_type) { TILETYPE_SNOW: sl_ttrs_04_snow; return sl_ttrs_04_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_04_water_tower, 204) {
+item (FEAT_HOUSES, item_ttrs_04_house_04, 204) {
 	property {
 		substitute: 27;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -519,7 +520,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_05_snow, construction_state) { 3: sl_ttrs_05_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_05, terrain_type) { TILETYPE_SNOW: sl_ttrs_05_snow; return sl_ttrs_05_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_05_large_block_of_flats, 205) {
+item (FEAT_HOUSES, item_ttrs_05_house_05, 205) {
 	property {
 		substitute: 10;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND)];
@@ -638,7 +639,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_07_snow, construction_state) { 3: sl_ttrs_07_
 switch (FEAT_HOUSES, SELF, sl_ttrs_07, terrain_type) { TILETYPE_SNOW: sl_ttrs_07_snow; return sl_ttrs_07_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_06_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 14; 1: return 16; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_06_luxury_apartments, 206, HOUSE_SIZE_1X2) {
+item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 7;
 		building_flags: bitmask(HOUSE_FLAG_ANIMATE, HOUSE_FLAG_ONLY_SE, HOUSE_FLAG_PROTECTED, HOUSE_FLAG_SYNC_CALLBACK);
@@ -722,7 +723,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_08_tropic, construction_state) { 3: sl_ttrs_0
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_08, terrain_type) { TILETYPE_SNOW: sl_ttrs_08_snow; TILETYPE_DESERT: sl_ttrs_08_tropic; return sl_ttrs_08_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_08_park_avenue_1457, 208) {
+item (FEAT_HOUSES, item_ttrs_08_house_08, 208) {
 	property {
 		substitute: 26;
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -779,7 +780,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_09_snow, construction_state) { 3: sl_ttrs_09_
 switch (FEAT_HOUSES, SELF, sl_ttrs_09, terrain_type) { TILETYPE_SNOW: sl_ttrs_09_snow; return sl_ttrs_09_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_09_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 30; 1: return 31; 1: return 32; 1: return 33; }
-item (FEAT_HOUSES, item_ttrs_09_police_station, 209) {
+item (FEAT_HOUSES, item_ttrs_09_house_09, 209) {
 	property {
 		substitute: 25;
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -855,7 +856,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_0A_tropic, construction_state) { 3: sl_ttrs_0
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_0A, terrain_type) { TILETYPE_SNOW: sl_ttrs_0A_snow; TILETYPE_DESERT: sl_ttrs_0A_tropic; return sl_ttrs_0A_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_0a_z_office_block, 210) {
+item (FEAT_HOUSES, item_ttrs_0a_house_0a, 210) {
 	property {
 		substitute: 25;
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -928,7 +929,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_0B_tropic, construction_state) { 3: sl_ttrs_0
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_0B, terrain_type) { TILETYPE_SNOW: sl_ttrs_0B_snow; TILETYPE_DESERT: sl_ttrs_0B_tropic; return sl_ttrs_0B_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_0b_zimmlocks_house, 211) {
+item (FEAT_HOUSES, item_ttrs_0b_house_0b, 211) {
 	property {
 		substitute: 25;
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -1037,15 +1038,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_0D_snow, construction_state) { 3: sl_ttrs_0D_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_0D, terrain_type) { TILETYPE_SNOW: sl_ttrs_0D_snow; return sl_ttrs_0D_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_0d_library, 213) {
+item (FEAT_HOUSES, item_ttrs_0d_library_planetarium, 213) {
 	property {
 		substitute: 31;
+		name: string(STR_TTRS_NAME_LIBRARY_PLANETARIUM);
 		availability_mask: [bitmask(TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63500 */
 		years_available: [1930, 1980];
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
 		/* NFO cargo amount is 0 for: GOOD */
-		/* NFO name string-id: DC01; visible name: Library */
+		/* NFO name string-id: DC01; visible name: Library-Planetarium */
 	}
 	graphics {
 		default: sl_ttrs_0D;
@@ -1075,7 +1077,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_0E_snow, construction_state) { 3: sl_ttrs_0E_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_0E, terrain_type) { TILETYPE_SNOW: sl_ttrs_0E_snow; return sl_ttrs_0E_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_0e_mosque, 214) {
+item (FEAT_HOUSES, item_ttrs_0e_house_0e, 214) {
 	property {
 		substitute: 12;
 		building_flags: 0;
@@ -1259,16 +1261,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_12_snow, construction_state) { 3: sl_ttrs_12_
 switch (FEAT_HOUSES, SELF, sl_ttrs_12, terrain_type) { TILETYPE_SNOW: sl_ttrs_12_snow; return sl_ttrs_12_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_0f_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_0f_observatorium, 215, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_0f_prison, 215, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 20;
+		name: string(STR_TTRS_NAME_PRISON);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1930, 1980];
 		population: 200;
 		mail_multiplier: 10;
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
-		/* NFO name string-id: DC02; visible name: Observatorium */
+		/* NFO name string-id: DC02; visible name: Prison */
 		/* NFO field 14: 11 */
 		/* Unmapped NFO fields retained for review: 10=15E */
 	}
@@ -1305,7 +1308,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_13_snow, construction_state) { 3: sl_ttrs_13_
 switch (FEAT_HOUSES, SELF, sl_ttrs_13, terrain_type) { TILETYPE_SNOW: sl_ttrs_13_snow; return sl_ttrs_13_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_13_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 30; 1: return 31; 1: return 32; 1: return 33; }
-item (FEAT_HOUSES, item_ttrs_13_stock_exchange_building, 219) {
+item (FEAT_HOUSES, item_ttrs_13_house_13, 219) {
 	property {
 		substitute: 29;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -1363,7 +1366,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_14_snow, construction_state) { 3: sl_ttrs_14_
 switch (FEAT_HOUSES, SELF, sl_ttrs_14, terrain_type) { TILETYPE_SNOW: sl_ttrs_14_snow; return sl_ttrs_14_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_14_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 10; 1: return 12; 1: return 13; 1: return 15; 1: return 18; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_14_old_town_houses, 220) {
+item (FEAT_HOUSES, item_ttrs_14_house_14, 220) {
 	property {
 		substitute: 15;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -1500,7 +1503,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_15_rv2, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_15) { 1: sl_ttrs_15_rv0; 1: sl_ttrs_15_rv1; 1: sl_ttrs_15_rv2; }
 
-item (FEAT_HOUSES, item_ttrs_15_endless_flats, 221) {
+item (FEAT_HOUSES, item_ttrs_15_house_15, 221) {
 	property {
 		substitute: 16;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -1560,7 +1563,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_16) { 1: sl_ttrs_16_rv0; 1: sl_ttrs_16_rv1; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_16_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 30; 1: return 31; 1: return 32; }
-item (FEAT_HOUSES, item_ttrs_16_hospital, 222) {
+item (FEAT_HOUSES, item_ttrs_16_house_16, 222) {
 	property {
 		substitute: 0;
 		building_flags: 0;
@@ -1620,7 +1623,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_17_snow, construction_state) { 3: sl_ttrs_17_
 switch (FEAT_HOUSES, SELF, sl_ttrs_17, terrain_type) { TILETYPE_SNOW: sl_ttrs_17_snow; return sl_ttrs_17_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_17_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_17_petrol_station, 223) {
+item (FEAT_HOUSES, item_ttrs_17_house_17, 223) {
 	property {
 		availability_mask: [0, 0];
 		/* NFO availability packed value: 0 */
@@ -1676,7 +1679,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_18_snow, construction_state) { 3: sl_ttrs_18_
 switch (FEAT_HOUSES, SELF, sl_ttrs_18, terrain_type) { TILETYPE_SNOW: sl_ttrs_18_snow; return sl_ttrs_18_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_18_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 31; 1: return 32; }
-item (FEAT_HOUSES, item_ttrs_18_hotel_zvon, 224) {
+item (FEAT_HOUSES, item_ttrs_18_house_18, 224) {
 	property {
 		substitute: 28;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -1732,7 +1735,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_19_snow, construction_state) { 3: sl_ttrs_19_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_19, terrain_type) { TILETYPE_SNOW: sl_ttrs_19_snow; return sl_ttrs_19_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_19_hotel_praha, 225) {
+item (FEAT_HOUSES, item_ttrs_19_house_19, 225) {
 	property {
 		substitute: 31;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -1768,13 +1771,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_1A_snow, construction_state) { 3: sl_ttrs_1A_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1A, terrain_type) { TILETYPE_SNOW: sl_ttrs_1A_snow; return sl_ttrs_1A_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_1a_hotel_regent, 226) {
+item (FEAT_HOUSES, item_ttrs_1a_house_1a, 226) {
 	property {
 		substitute: 29;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
-		/* NFO name string-id: 2014; visible name: Hotel Regent */
+		/* NFO name string-id: 2014; visible name: house_1A */
 	}
 	graphics {
 		default: sl_ttrs_1A;
@@ -1804,13 +1807,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_1B_snow, construction_state) { 3: sl_ttrs_1B_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1B, terrain_type) { TILETYPE_SNOW: sl_ttrs_1B_snow; return sl_ttrs_1B_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_1b_hotel_pribaltiskaya, 227) {
+item (FEAT_HOUSES, item_ttrs_1b_house_1b, 227) {
 	property {
 		substitute: 14;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
-		/* NFO name string-id: 2014; visible name: Hotel Pribaltiskaya */
+		/* NFO name string-id: 2014; visible name: house_1B */
 	}
 	graphics {
 		default: sl_ttrs_1B;
@@ -1858,7 +1861,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_1C_snow, construction_state) { 3: sl_ttrs_1C_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1C, terrain_type) { TILETYPE_SNOW: sl_ttrs_1C_snow; return sl_ttrs_1C_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_1c_bronze_horseman_statue, 228) {
+item (FEAT_HOUSES, item_ttrs_1c_house_1c, 228) {
 	property {
 		substitute: 18;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -1896,9 +1899,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_1D_snow, construction_state) { 3: sl_ttrs_1D_
 switch (FEAT_HOUSES, SELF, sl_ttrs_1D, terrain_type) { TILETYPE_SNOW: sl_ttrs_1D_snow; return sl_ttrs_1D_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_1d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_1d_statue_of_john_batchelor, 229) {
+item (FEAT_HOUSES, item_ttrs_1d_water_tower, 229) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_WATER_TOWER);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63495 */
 		years_available: [1930, 1950];
@@ -1907,7 +1911,7 @@ item (FEAT_HOUSES, item_ttrs_1d_statue_of_john_batchelor, 229) {
 		building_class: 1;
 		probability: 3;
 		/* NFO cargo amount is 0 for: PASS, MAIL, GOOD */
-		/* NFO name string-id: DC04; visible name: Statue of John Batchelor */
+		/* NFO name string-id: DC04; visible name: Water tower */
 		/* NFO field 14: 31 */
 		/* NFO field 1D: 04 */
 	}
@@ -1977,7 +1981,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_1E_tropic, construction_state) { 3: sl_ttrs_1
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1E, terrain_type) { TILETYPE_SNOW: sl_ttrs_1E_snow; TILETYPE_DESERT: sl_ttrs_1E_tropic; return sl_ttrs_1E_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_1e_statue_of_v_i_lenin, 230) {
+item (FEAT_HOUSES, item_ttrs_1e_house_1e, 230) {
 	property {
 		substitute: 3;
 		building_flags: bitmask(HOUSE_FLAG_CHURCH);
@@ -2034,7 +2038,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_1F_snow, construction_state) { 3: sl_ttrs_1F_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1F, terrain_type) { TILETYPE_SNOW: sl_ttrs_1F_snow; return sl_ttrs_1F_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_1f_statue_of_captain_cook, 231) {
+item (FEAT_HOUSES, item_ttrs_1f_house_1f, 231) {
 	property {
 		substitute: 39;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -2107,7 +2111,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_20_tropic, construction_state) { 3: sl_ttrs_2
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_20, terrain_type) { TILETYPE_SNOW: sl_ttrs_20_snow; TILETYPE_DESERT: sl_ttrs_20_tropic; return sl_ttrs_20_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_20_bank, 232) {
+item (FEAT_HOUSES, item_ttrs_20_house_20, 232) {
 	property {
 		substitute: 27;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -2655,16 +2659,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_27_snow, construction_state) { 3: sl_ttrs_27_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_27, terrain_type) { TILETYPE_SNOW: sl_ttrs_27_snow; return sl_ttrs_27_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_26_house_26, 238, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_26_large_block_of_flats, 238, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_LARGE_BLOCK_OF_FLATS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
 		population: 200;
 		mail_multiplier: 50;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 2]];
-		/* NFO name string-id: DC05; visible name: house_26 */
+		/* NFO name string-id: DC05; visible name: Large block of flats */
 	}
 	graphics {
 		graphics_north: sl_ttrs_26;
@@ -2713,14 +2718,15 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_28_snow, construction_state) { 3: sl_ttrs_28_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_28, terrain_type) { TILETYPE_SNOW: sl_ttrs_28_snow; return sl_ttrs_28_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_28_house_28, 240) {
+item (FEAT_HOUSES, item_ttrs_28_luxury_apartments, 240) {
 	property {
 		substitute: 27;
+		name: string(STR_TTRS_NAME_LUXURY_APARTMENTS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
 		probability: 1;
-		/* NFO name string-id: DC06; visible name: house_28 */
+		/* NFO name string-id: DC06; visible name: Luxury apartments */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -2831,13 +2837,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2A_snow, construction_state) { 3: sl_ttrs_2A_
 switch (FEAT_HOUSES, SELF, sl_ttrs_2A, terrain_type) { TILETYPE_SNOW: sl_ttrs_2A_snow; return sl_ttrs_2A_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_2a_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_2a_house_2a, 242) {
+item (FEAT_HOUSES, item_ttrs_2a_multimedia_offices, 242) {
 	property {
 		substitute: 36;
+		name: string(STR_TTRS_NAME_MULTIMEDIA_OFFICES);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
-		/* NFO name string-id: DC07; visible name: house_2A */
+		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -2890,13 +2897,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2B_snow, construction_state) { 3: sl_ttrs_2B_
 switch (FEAT_HOUSES, SELF, sl_ttrs_2B, terrain_type) { TILETYPE_SNOW: sl_ttrs_2B_snow; return sl_ttrs_2B_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_2b_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 20; 1: return 21; 1: return 22; }
-item (FEAT_HOUSES, item_ttrs_2b_house_2b, 243) {
+item (FEAT_HOUSES, item_ttrs_2b_multimedia_offices, 243) {
 	property {
 		substitute: 13;
+		name: string(STR_TTRS_NAME_MULTIMEDIA_OFFICES);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
-		/* NFO name string-id: DC07; visible name: house_2B */
+		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -2993,16 +3001,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2D_tropic, construction_state) { 3: sl_ttrs_2
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_2D, terrain_type) { TILETYPE_SNOW: sl_ttrs_2D_snow; TILETYPE_DESERT: sl_ttrs_2D_tropic; return sl_ttrs_2D_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_2d_house_2d, 245) {
+item (FEAT_HOUSES, item_ttrs_2d_park_avenue_1457, 245) {
 	property {
 		substitute: 12;
+		name: string(STR_TTRS_NAME_PARK_AVENUE_1457);
 		availability_mask: [bitmask(TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63496 */
 		years_available: [1950, 1980];
 		population: 100;
 		mail_multiplier: 50;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 4]];
-		/* NFO name string-id: DC08; visible name: house_2D */
+		/* NFO name string-id: DC08; visible name: Park Avenue 1457 */
 	}
 	graphics {
 		default: sl_ttrs_2D;
@@ -3391,15 +3400,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv3, terrain_type) { TILETYPE_SNOW: sl_ttr
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_2F) { 1: sl_ttrs_2F_rv0; 1: sl_ttrs_2F_rv1; 1: sl_ttrs_2F_rv2; 1: sl_ttrs_2F_rv3; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_2e_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; 1: return 22; }
-item (FEAT_HOUSES, item_ttrs_2e_house_2e, 246, HOUSE_SIZE_1X2) {
+item (FEAT_HOUSES, item_ttrs_2e_police_station, 246, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 7;
+		name: string(STR_TTRS_NAME_POLICE_STATION);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1970, 2175];
 		accepted_cargos: [[PASS, 2],[MAIL, 1]];
 		/* NFO cargo amount is 0 for: GOOD */
-		/* NFO name string-id: DC09; visible name: house_2E */
+		/* NFO name string-id: DC09; visible name: Police station */
 		/* NFO field 14: 11 */
 	}
 	graphics {
@@ -3720,9 +3730,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_35_snow, construction_state) { 3: sl_ttrs_35_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_35, terrain_type) { TILETYPE_SNOW: sl_ttrs_35_snow; return sl_ttrs_35_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_35_house_35, 253) {
+item (FEAT_HOUSES, item_ttrs_35_water_tower, 253) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_WATER_TOWER);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63495 */
 		years_available: [1950, 1980];
@@ -3731,7 +3742,7 @@ item (FEAT_HOUSES, item_ttrs_35_house_35, 253) {
 		building_class: 1;
 		probability: 3;
 		/* NFO cargo amount is 0 for: PASS, MAIL, GOOD */
-		/* NFO name string-id: DC04; visible name: house_35 */
+		/* NFO name string-id: DC04; visible name: Water tower */
 		/* NFO field 14: 21 */
 		/* NFO field 1D: 04 */
 	}
@@ -3804,13 +3815,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_36_tropic, construction_state) { 3: sl_ttrs_3
 switch (FEAT_HOUSES, SELF, sl_ttrs_36, terrain_type) { TILETYPE_SNOW: sl_ttrs_36_snow; TILETYPE_DESERT: sl_ttrs_36_tropic; return sl_ttrs_36_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_36_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 31; 1: return 32; }
-item (FEAT_HOUSES, item_ttrs_36_house_36, 254) {
+item (FEAT_HOUSES, item_ttrs_36_z_office_block, 254) {
 	property {
 		substitute: 1;
+		name: string(STR_TTRS_NAME_Z_OFFICE_BLOCK);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
-		/* NFO name string-id: DC0A; visible name: house_36 */
+		/* NFO name string-id: DC0A; visible name: "Z" office block */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -4110,16 +4122,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_3A) { 1: sl_ttrs_3A_rv0; 1: sl_ttrs_3A_rv1; 1: sl_ttrs_3A_rv2; 1: sl_ttrs_3A_rv3; }
 
-item (FEAT_HOUSES, item_ttrs_39_house_39, 257, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_39_fire_station, 257, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_FIRE_STATION);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1980, 2175];
 		refresh_multiplier: 3;
 		accepted_cargos: [[MAIL, 2],[GOOD, 2]];
 		/* NFO cargo amount is 0 for: PASS */
-		/* NFO name string-id: DC00; visible name: house_39 */
+		/* NFO name string-id: DC00; visible name: Fire station */
 		/* NFO field 14: 01 */
 	}
 	graphics {
@@ -4451,14 +4464,15 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_40_tropic, construction_state) { 3: sl_ttrs_4
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_40, terrain_type) { TILETYPE_SNOW: sl_ttrs_40_snow; TILETYPE_DESERT: sl_ttrs_40_tropic; return sl_ttrs_40_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_40_house_40, 264) {
+item (FEAT_HOUSES, item_ttrs_40_zimmlocks_house, 264) {
 	property {
 		substitute: 25;
+		name: string(STR_TTRS_NAME_ZIMMLOCKS_HOUSE);
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
 		years_available: [1980, 2175];
 		accepted_cargos: [[GOOD, 1]];
-		/* NFO name string-id: DC0B; visible name: house_40 */
+		/* NFO name string-id: DC0B; visible name: Zimmlock's house */
 	}
 	graphics {
 		default: sl_ttrs_40;
@@ -4597,15 +4611,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_43_snow, construction_state) { 3: sl_ttrs_43_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_43, terrain_type) { TILETYPE_SNOW: sl_ttrs_43_snow; return sl_ttrs_43_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_42_house_42, 266, HOUSE_SIZE_1X2) {
+item (FEAT_HOUSES, item_ttrs_42_large_block_of_flats, 266, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 7;
+		name: string(STR_TTRS_NAME_LARGE_BLOCK_OF_FLATS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
 		accepted_cargos: [[PASS, 6],[MAIL, 3]];
 		/* NFO cargo amount is 0 for: GOOD */
-		/* NFO name string-id: DC05; visible name: house_42 */
+		/* NFO name string-id: DC05; visible name: Large block of flats */
 	}
 	graphics {
 		graphics_north: sl_ttrs_42;
@@ -4740,15 +4755,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_45_snow, construction_state) { 3: sl_ttrs_45_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_45, terrain_type) { TILETYPE_SNOW: sl_ttrs_45_snow; return sl_ttrs_45_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_45_house_45, 269) {
+item (FEAT_HOUSES, item_ttrs_45_library, 269) {
 	property {
 		substitute: 31;
+		name: string(STR_TTRS_NAME_LIBRARY);
 		availability_mask: [bitmask(TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63500 */
 		years_available: [1980, 2175];
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
 		/* NFO cargo amount is 0 for: GOOD */
-		/* NFO name string-id: DC0D; visible name: house_45 */
+		/* NFO name string-id: DC0D; visible name: Library */
 	}
 	graphics {
 		default: sl_ttrs_45;
@@ -4798,13 +4814,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_46_snow, construction_state) { 3: sl_ttrs_46_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_46, terrain_type) { TILETYPE_SNOW: sl_ttrs_46_snow; return sl_ttrs_46_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_46_house_46, 270) {
+item (FEAT_HOUSES, item_ttrs_46_luxury_apartments, 270) {
 	property {
 		substitute: 27;
+		name: string(STR_TTRS_NAME_LUXURY_APARTMENTS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
-		/* NFO name string-id: DC06; visible name: house_46 */
+		/* NFO name string-id: DC06; visible name: Luxury apartments */
 	}
 	graphics {
 		default: sl_ttrs_46;
@@ -4908,13 +4925,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_48_snow, construction_state) { 3: sl_ttrs_48_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_48, terrain_type) { TILETYPE_SNOW: sl_ttrs_48_snow; return sl_ttrs_48_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_48_house_48, 272) {
+item (FEAT_HOUSES, item_ttrs_48_mosque, 272) {
 	property {
 		substitute: 3;
+		name: string(STR_TTRS_NAME_MOSQUE);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1980, 2175];
-		/* NFO name string-id: DC0E; visible name: house_48 */
+		/* NFO name string-id: DC0E; visible name: Mosque */
 		/* NFO field 14: 01 */
 	}
 	graphics {
@@ -4966,13 +4984,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_49_snow, construction_state) { 3: sl_ttrs_49_
 switch (FEAT_HOUSES, SELF, sl_ttrs_49, terrain_type) { TILETYPE_SNOW: sl_ttrs_49_snow; return sl_ttrs_49_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_49_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 31; 1: return 32; }
-item (FEAT_HOUSES, item_ttrs_49_house_49, 273) {
+item (FEAT_HOUSES, item_ttrs_49_multimedia_offices, 273) {
 	property {
 		substitute: 36;
+		name: string(STR_TTRS_NAME_MULTIMEDIA_OFFICES);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
-		/* NFO name string-id: DC07; visible name: house_49 */
+		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -5113,16 +5132,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_4C_snow, construction_state) { 3: sl_ttrs_4C_
 switch (FEAT_HOUSES, SELF, sl_ttrs_4C, terrain_type) { TILETYPE_SNOW: sl_ttrs_4C_snow; return sl_ttrs_4C_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_4c_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 14; 1: return 16; 1: return 20; 1: return 21; 1: return 22; }
-item (FEAT_HOUSES, item_ttrs_4c_house_4c, 276) {
+item (FEAT_HOUSES, item_ttrs_4c_park_avenue_1457, 276) {
 	property {
 		substitute: 12;
+		name: string(STR_TTRS_NAME_PARK_AVENUE_1457);
 		availability_mask: [bitmask(TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63496 */
 		years_available: [1980, 2010];
 		population: 100;
 		mail_multiplier: 50;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 4]];
-		/* NFO name string-id: DC08; visible name: house_4C */
+		/* NFO name string-id: DC08; visible name: Park Avenue 1457 */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -5301,16 +5321,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_50_snow, construction_state) { 3: sl_ttrs_50_
 switch (FEAT_HOUSES, SELF, sl_ttrs_50, terrain_type) { TILETYPE_SNOW: sl_ttrs_50_snow; return sl_ttrs_50_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_4d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 14; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_4d_house_4d, 277, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_4d_prison, 277, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 20;
+		name: string(STR_TTRS_NAME_PRISON);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1980, 2175];
 		population: 200;
 		mail_multiplier: 10;
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
-		/* NFO name string-id: DC02; visible name: house_4D */
+		/* NFO name string-id: DC02; visible name: Prison */
 		/* NFO field 14: 11 */
 		/* Unmapped NFO fields retained for review: 10=15E */
 	}
@@ -5722,13 +5743,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_58_snow, construction_state) { 3: sl_ttrs_58_
 switch (FEAT_HOUSES, SELF, sl_ttrs_58, terrain_type) { TILETYPE_SNOW: sl_ttrs_58_snow; return sl_ttrs_58_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_58_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 19; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_58_house_58, 288) {
+item (FEAT_HOUSES, item_ttrs_58_statue_residence, 288) {
 	property {
 		substitute: 54;
+		name: string(STR_TTRS_NAME_STATUE_RESIDENCE);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2175];
-		/* NFO name string-id: DC03; visible name: house_58 */
+		/* NFO name string-id: DC03; visible name: Statue residence */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -6172,9 +6194,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_5C_tropic, construction_state) { 3: sl_ttrs_5
 switch (FEAT_HOUSES, SELF, sl_ttrs_5C, terrain_type) { TILETYPE_SNOW: sl_ttrs_5C_snow; TILETYPE_DESERT: sl_ttrs_5C_tropic; return sl_ttrs_5C_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_5c_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; 1: return 22; }
-item (FEAT_HOUSES, item_ttrs_5c_house_5c, 292) {
+item (FEAT_HOUSES, item_ttrs_5c_observatorium, 292) {
 	property {
 		substitute: 39;
+		name: string(STR_TTRS_NAME_OBSERVATORIUM);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63491 */
 		years_available: [1980, 2175];
@@ -6182,7 +6205,7 @@ item (FEAT_HOUSES, item_ttrs_5c_house_5c, 292) {
 		mail_multiplier: 15;
 		probability: 1;
 		accepted_cargos: [[PASS, 4]];
-		/* NFO name string-id: DC0F; visible name: house_5C */
+		/* NFO name string-id: DC0F; visible name: Observatorium */
 		/* NFO field 14: 11 */
 	}
 	graphics {
@@ -6361,9 +6384,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_60_snow, construction_state) { 3: sl_ttrs_60_
 switch (FEAT_HOUSES, SELF, sl_ttrs_60, terrain_type) { TILETYPE_SNOW: sl_ttrs_60_snow; return sl_ttrs_60_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_5d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 18; 1: return 19; 1: return 20; }
-item (FEAT_HOUSES, item_ttrs_5d_house_5d, 293, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_5d_world_trade_center, 293, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
+		name: string(STR_TTRS_NAME_WORLD_TRADE_CENTER);
 		building_flags: bitmask(HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
@@ -6372,7 +6396,7 @@ item (FEAT_HOUSES, item_ttrs_5d_house_5d, 293, HOUSE_SIZE_2X2) {
 		mail_multiplier: 25;
 		removal_cost_multiplier: 255;
 		accepted_cargos: [[PASS, 8],[MAIL, 8],[GOOD, 8]];
-		/* NFO name string-id: DC10; visible name: house_5D */
+		/* NFO name string-id: DC10; visible name: World Trade Center */
 		/* NFO field 14: 11 */
 		/* NFO field 1D: 04 */
 		/* Unmapped NFO fields retained for review: 10=190 */
@@ -7154,16 +7178,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_6A_snow, construction_state) { 3: sl_ttrs_6A_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_6A, terrain_type) { TILETYPE_SNOW: sl_ttrs_6A_snow; return sl_ttrs_6A_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_69_house_69, 305, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_69_large_block_of_flats, 305, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_LARGE_BLOCK_OF_FLATS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
 		population: 200;
 		mail_multiplier: 50;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 2]];
-		/* NFO name string-id: DC05; visible name: house_69 */
+		/* NFO name string-id: DC05; visible name: Large block of flats */
 	}
 	graphics {
 		graphics_north: sl_ttrs_69;
@@ -7214,13 +7239,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_6B_snow, construction_state) { 3: sl_ttrs_6B_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_6B, terrain_type) { TILETYPE_SNOW: sl_ttrs_6B_snow; return sl_ttrs_6B_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_6b_house_6b, 307) {
+item (FEAT_HOUSES, item_ttrs_6b_luxury_apartments, 307) {
 	property {
 		substitute: 27;
+		name: string(STR_TTRS_NAME_LUXURY_APARTMENTS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
-		/* NFO name string-id: DC06; visible name: house_6B */
+		/* NFO name string-id: DC06; visible name: Luxury apartments */
 	}
 	graphics {
 		default: sl_ttrs_6B;
@@ -7330,13 +7356,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_6D_snow, construction_state) { 3: sl_ttrs_6D_
 switch (FEAT_HOUSES, SELF, sl_ttrs_6D, terrain_type) { TILETYPE_SNOW: sl_ttrs_6D_snow; return sl_ttrs_6D_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_6d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 12; 1: return 14; 1: return 16; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_6d_house_6d, 309) {
+item (FEAT_HOUSES, item_ttrs_6d_multimedia_offices, 309) {
 	property {
 		substitute: 36;
+		name: string(STR_TTRS_NAME_MULTIMEDIA_OFFICES);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
-		/* NFO name string-id: DC07; visible name: house_6D */
+		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -7391,14 +7418,15 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_6F_snow, construction_state) { 3: sl_ttrs_6F_
 switch (FEAT_HOUSES, SELF, sl_ttrs_6F, terrain_type) { TILETYPE_SNOW: sl_ttrs_6F_snow; return sl_ttrs_6F_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_6e_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_6e_house_6e, 310, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_6e_museum_of_modern_arts, 310, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 87;
+		name: string(STR_TTRS_NAME_MUSEUM_OF_MODERN_ARTS);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63491 */
 		years_available: [2070, 2175];
 		accepted_cargos: [[PASS, 8],[MAIL, 6],[GOOD, 4]];
-		/* NFO name string-id: DC11; visible name: house_6E */
+		/* NFO name string-id: DC11; visible name: Museum of Modern Arts */
 		/* NFO field 14: 11 */
 	}
 	graphics {
@@ -7558,16 +7586,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_72_tropic, construction_state) { 3: sl_ttrs_7
 switch (FEAT_HOUSES, SELF, sl_ttrs_72, terrain_type) { TILETYPE_SNOW: sl_ttrs_72_snow; TILETYPE_DESERT: sl_ttrs_72_tropic; return sl_ttrs_72_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_72_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 14; 1: return 16; 1: return 20; 1: return 21; 1: return 22; }
-item (FEAT_HOUSES, item_ttrs_72_house_72, 314) {
+item (FEAT_HOUSES, item_ttrs_72_park_avenue_1457, 314) {
 	property {
 		substitute: 12;
+		name: string(STR_TTRS_NAME_PARK_AVENUE_1457);
 		availability_mask: [bitmask(TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63496 */
 		years_available: [2010, 2175];
 		population: 100;
 		mail_multiplier: 50;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 4]];
-		/* NFO name string-id: DC08; visible name: house_72 */
+		/* NFO name string-id: DC08; visible name: Park Avenue 1457 */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -7943,13 +7972,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_78_snow, construction_state) { 3: sl_ttrs_78_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_78, terrain_type) { TILETYPE_SNOW: sl_ttrs_78_snow; return sl_ttrs_78_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_78_house_78, 320) {
+item (FEAT_HOUSES, item_ttrs_78_z_office_block, 320) {
 	property {
 		substitute: 1;
+		name: string(STR_TTRS_NAME_Z_OFFICE_BLOCK);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
-		/* NFO name string-id: DC0A; visible name: house_78 */
+		/* NFO name string-id: DC0A; visible name: "Z" office block */
 	}
 	graphics {
 		default: sl_ttrs_78;
@@ -7999,13 +8029,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_79_snow, construction_state) { 3: sl_ttrs_79_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_79, terrain_type) { TILETYPE_SNOW: sl_ttrs_79_snow; return sl_ttrs_79_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_79_house_79, 321) {
+item (FEAT_HOUSES, item_ttrs_79_z_office_block, 321) {
 	property {
 		substitute: 1;
+		name: string(STR_TTRS_NAME_Z_OFFICE_BLOCK);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
-		/* NFO name string-id: DC0A; visible name: house_79 */
+		/* NFO name string-id: DC0A; visible name: "Z" office block */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -8748,9 +8779,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_7D_rv7, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_7D) { 1: sl_ttrs_7D_rv0; 1: sl_ttrs_7D_rv1; 1: sl_ttrs_7D_rv2; 1: sl_ttrs_7D_rv3; 1: sl_ttrs_7D_rv4; 1: sl_ttrs_7D_rv5; 1: sl_ttrs_7D_rv6; 1: sl_ttrs_7D_rv7; }
 
-item (FEAT_HOUSES, item_ttrs_7a_house_7a, 322, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_7a_cathedral, 322, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
+		name: string(STR_TTRS_NAME_CATHEDRAL);
 		building_flags: bitmask(HOUSE_FLAG_ONLY_SE, HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63519 */
@@ -8760,7 +8792,7 @@ item (FEAT_HOUSES, item_ttrs_7a_house_7a, 322, HOUSE_SIZE_2X2) {
 		removal_cost_multiplier: 255;
 		probability: 3;
 		accepted_cargos: [[PASS, 8],[MAIL, 4],[GOOD, 2]];
-		/* NFO name string-id: DC12; visible name: house_7A */
+		/* NFO name string-id: DC12; visible name: Cathedral */
 		/* NFO field 14: 01 */
 		/* Unmapped NFO fields retained for review: 10=258 */
 	}
@@ -9313,9 +9345,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_81_snow, construction_state) { 3: sl_ttrs_81_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_81, terrain_type) { TILETYPE_SNOW: sl_ttrs_81_snow; return sl_ttrs_81_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_7e_house_7e, 326, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_7e_stock_exchange_building, 326, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
+		name: string(STR_TTRS_NAME_STOCK_EXCHANGE_BUILDING);
 		building_flags: bitmask(HOUSE_FLAG_ANIMATE, HOUSE_FLAG_ONLY_SE, HOUSE_FLAG_PROTECTED, HOUSE_FLAG_SYNC_CALLBACK);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63519 */
@@ -9324,7 +9357,7 @@ item (FEAT_HOUSES, item_ttrs_7e_house_7e, 326, HOUSE_SIZE_2X2) {
 		animation_info: [0, 24];
 		accepted_cargos: [[PASS, 6]];
 		/* NFO cargo amount is 0 for: MAIL, GOOD */
-		/* NFO name string-id: DC13; visible name: house_7E */
+		/* NFO name string-id: DC13; visible name: Stock exchange building */
 		/* NFO field 14: E7 */
 	}
 	graphics {
@@ -9424,16 +9457,17 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_85_snow, construction_state) { 3: sl_ttrs_85_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_85, terrain_type) { TILETYPE_SNOW: sl_ttrs_85_snow; return sl_ttrs_85_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_82_house_82, 330, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_82_old_town_houses, 330, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
+		name: string(STR_TTRS_NAME_OLD_TOWN_HOUSES);
 		building_flags: bitmask(HOUSE_FLAG_ONLY_SE, HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
 		years_available: [1930, 1950];
 		probability: 15;
 		refresh_multiplier: 8;
-		/* NFO name string-id: DC14; visible name: house_82 */
+		/* NFO name string-id: DC14; visible name: Old town houses */
 		/* NFO field 14: 81 */
 		/* NFO field 1D: 04 */
 	}
@@ -9861,15 +9895,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_87_snow, construction_state) { 3: sl_ttrs_87_
 switch (FEAT_HOUSES, SELF, sl_ttrs_87, terrain_type) { TILETYPE_SNOW: sl_ttrs_87_snow; return sl_ttrs_87_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_86_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 15; 1: return 16; 1: return 17; 1: return 18; 1: return 20; 1: return 22; }
-item (FEAT_HOUSES, item_ttrs_86_house_86, 334, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_86_endless_flats, 334, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_ENDLESS_FLATS);
 		building_flags: bitmask(HOUSE_FLAG_ANIMATE, HOUSE_FLAG_SYNC_CALLBACK);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1950, 1980];
 		refresh_multiplier: 5;
-		/* NFO name string-id: DC15; visible name: house_86 */
+		/* NFO name string-id: DC15; visible name: "Endless" flats */
 		/* NFO field 14: F7 */
 		/* NFO field 1D: 04 */
 	}
@@ -10484,9 +10519,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_8B_snow, construction_state) { 3: sl_ttrs_8B_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_8B, terrain_type) { TILETYPE_SNOW: sl_ttrs_8B_snow; return sl_ttrs_8B_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_88_house_88, 336, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_88_hospital, 336, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
+		name: string(STR_TTRS_NAME_HOSPITAL);
 		building_flags: bitmask(HOUSE_FLAG_ANIMATE, HOUSE_FLAG_ONLY_SE, HOUSE_FLAG_PROTECTED, HOUSE_FLAG_SYNC_CALLBACK);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63519 */
@@ -10495,7 +10531,7 @@ item (FEAT_HOUSES, item_ttrs_88_house_88, 336, HOUSE_SIZE_2X2) {
 		probability: 2;
 		refresh_multiplier: 9;
 		animation_info: [0, 24];
-		/* NFO name string-id: DC16; visible name: house_88 */
+		/* NFO name string-id: DC16; visible name: Hospital */
 		/* NFO field 14: FF */
 		/* NFO field 1D: 00 */
 	}
@@ -10676,15 +10712,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_8F_snow, construction_state) { 3: sl_ttrs_8F_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_8F, terrain_type) { TILETYPE_SNOW: sl_ttrs_8F_snow; return sl_ttrs_8F_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_8c_house_8c, 340, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_8c_hospital, 340, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
+		name: string(STR_TTRS_NAME_HOSPITAL);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1990, 2175];
 		building_class: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 8],[GOOD, 8]];
-		/* NFO name string-id: DC16; visible name: house_8C */
+		/* NFO name string-id: DC16; visible name: Hospital */
 		/* NFO field 14: 11 */
 		/* NFO field 1D: 00 */
 	}
@@ -10720,9 +10757,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_90_snow, construction_state) { 3: sl_ttrs_90_
 switch (FEAT_HOUSES, SELF, sl_ttrs_90, terrain_type) { TILETYPE_SNOW: sl_ttrs_90_snow; return sl_ttrs_90_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_90_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 18; 1: return 19; 1: return 22; }
-item (FEAT_HOUSES, item_ttrs_90_house_90, 344) {
+item (FEAT_HOUSES, item_ttrs_90_petrol_station, 344) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_PETROL_STATION);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED);
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -10733,7 +10771,7 @@ item (FEAT_HOUSES, item_ttrs_90_house_90, 344) {
 		local_authority_impact: 16;
 		removal_cost_multiplier: 64;
 		accepted_cargos: [[PASS, 6],[MAIL, 3],[GOOD, 1]];
-		/* NFO name string-id: DC17; visible name: house_90 */
+		/* NFO name string-id: DC17; visible name: Petrol station */
 		/* NFO field 14: 11 */
 	}
 	graphics {
@@ -10787,9 +10825,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_92_snow, construction_state) { 3: sl_ttrs_92_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_92, terrain_type) { TILETYPE_SNOW: sl_ttrs_92_snow; return sl_ttrs_92_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_91_house_91, 345, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_91_petrol_station, 345, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_PETROL_STATION);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63495 */
@@ -10800,7 +10839,7 @@ item (FEAT_HOUSES, item_ttrs_91_house_91, 345, HOUSE_SIZE_2X1) {
 		removal_cost_multiplier: 128;
 		probability: 1;
 		accepted_cargos: [[PASS, 6],[MAIL, 3],[GOOD, 1]];
-		/* NFO name string-id: DC17; visible name: house_91 */
+		/* NFO name string-id: DC17; visible name: Petrol station */
 		/* NFO field 14: 11 */
 	}
 	graphics {
@@ -10854,9 +10893,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_94_snow, construction_state) { 3: sl_ttrs_94_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_94, terrain_type) { TILETYPE_SNOW: sl_ttrs_94_snow; return sl_ttrs_94_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_93_house_93, 347, HOUSE_SIZE_1X2) {
+item (FEAT_HOUSES, item_ttrs_93_petrol_station, 347, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 66;
+		name: string(STR_TTRS_NAME_PETROL_STATION);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
@@ -10867,7 +10907,7 @@ item (FEAT_HOUSES, item_ttrs_93_house_93, 347, HOUSE_SIZE_1X2) {
 		removal_cost_multiplier: 128;
 		probability: 1;
 		accepted_cargos: [[PASS, 8],[MAIL, 4],[GOOD, 1]];
-		/* NFO name string-id: DC17; visible name: house_93 */
+		/* NFO name string-id: DC17; visible name: Petrol station */
 		/* NFO field 14: 11 */
 	}
 	graphics {
@@ -10945,9 +10985,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_95_rv2, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_95) { 1: sl_ttrs_95_rv0; 1: sl_ttrs_95_rv1; 1: sl_ttrs_95_rv2; }
 
-item (FEAT_HOUSES, item_ttrs_95_house_95, 349) {
+item (FEAT_HOUSES, item_ttrs_95_hotel_zvon, 349) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_HOTEL_ZVON);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED, HOUSE_FLAG_PROTECTED);
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -10958,7 +10999,7 @@ item (FEAT_HOUSES, item_ttrs_95_house_95, 349) {
 		removal_cost_multiplier: 191;
 		probability: 5;
 		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 8]];
-		/* NFO name string-id: DC18; visible name: house_95 */
+		/* NFO name string-id: DC18; visible name: Hotel Zvon */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=320 */
@@ -11061,9 +11102,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_97_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_97) { 1: sl_ttrs_97_rv0; 1: sl_ttrs_97_rv1; }
 
-item (FEAT_HOUSES, item_ttrs_96_house_96, 350, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_96_hotel_praha, 350, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_HOTEL_PRAHA);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED, HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
@@ -11073,7 +11115,7 @@ item (FEAT_HOUSES, item_ttrs_96_house_96, 350, HOUSE_SIZE_2X1) {
 		removal_cost_multiplier: 191;
 		probability: 6;
 		accepted_cargos: [[PASS, 7],[MAIL, 2],[GOOD, 3]];
-		/* NFO name string-id: DC19; visible name: house_96 */
+		/* NFO name string-id: DC19; visible name: Hotel Praha */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=384 */
@@ -11129,9 +11171,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_99_snow, construction_state) { 3: sl_ttrs_99_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_99, terrain_type) { TILETYPE_SNOW: sl_ttrs_99_snow; return sl_ttrs_99_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_98_house_98, 352, HOUSE_SIZE_2X1) {
+item (FEAT_HOUSES, item_ttrs_98_hotel_regent, 352, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
+		name: string(STR_TTRS_NAME_HOTEL_REGENT);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63490 */
@@ -11141,7 +11184,7 @@ item (FEAT_HOUSES, item_ttrs_98_house_98, 352, HOUSE_SIZE_2X1) {
 		removal_cost_multiplier: 160;
 		probability: 3;
 		accepted_cargos: [[PASS, 7],[MAIL, 2],[GOOD, 3]];
-		/* NFO name string-id: DC1A; visible name: house_98 */
+		/* NFO name string-id: DC1A; visible name: Hotel Regent */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=320 */
@@ -11397,9 +11440,10 @@ random_switch (FEAT_HOUSES, SELF, sl_ttrs_9D_nosnow) { 1: sl_ttrs_9D_rv0; 1: sl_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_9D, terrain_type) { TILETYPE_SNOW: sl_ttrs_9D_snow; return sl_ttrs_9D_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_9a_house_9a, 354, HOUSE_SIZE_2X2) {
+item (FEAT_HOUSES, item_ttrs_9a_hotel_pribaltiskaya, 354, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
+		name: string(STR_TTRS_NAME_HOTEL_PRIBALTISKAYA);
 		building_flags: bitmask(HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63490 */
@@ -11409,7 +11453,7 @@ item (FEAT_HOUSES, item_ttrs_9a_house_9a, 354, HOUSE_SIZE_2X2) {
 		removal_cost_multiplier: 255;
 		probability: 8;
 		accepted_cargos: [[PASS, 8],[MAIL, 3],[GOOD, 4]];
-		/* NFO name string-id: DC1B; visible name: house_9A */
+		/* NFO name string-id: DC1B; visible name: Hotel Pribaltiskaya */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=3E4 */
@@ -11469,9 +11513,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_9E_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_9E) { 1: sl_ttrs_9E_rv0; 1: sl_ttrs_9E_rv1; }
 
-item (FEAT_HOUSES, item_ttrs_9e_house_9e, 358) {
+item (FEAT_HOUSES, item_ttrs_9e_bronze_horseman_statue, 358) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_BRONZE_HORSEMAN_STATUE);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED, HOUSE_FLAG_PROTECTED);
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -11483,7 +11528,7 @@ item (FEAT_HOUSES, item_ttrs_9e_house_9e, 358) {
 		building_class: 3;
 		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
-		/* NFO name string-id: DC1C; visible name: house_9E */
+		/* NFO name string-id: DC1C; visible name: "Bronze Horseman" statue */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=1F4 */
@@ -11516,9 +11561,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_9F_snow, construction_state) { 3: sl_ttrs_9F_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_9F, terrain_type) { TILETYPE_SNOW: sl_ttrs_9F_snow; return sl_ttrs_9F_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_9f_house_9f, 359) {
+item (FEAT_HOUSES, item_ttrs_9f_statue_of_john_batchelor, 359) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_STATUE_OF_JOHN_BATCHELOR);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED, HOUSE_FLAG_PROTECTED);
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -11530,7 +11576,7 @@ item (FEAT_HOUSES, item_ttrs_9f_house_9f, 359) {
 		building_class: 3;
 		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
-		/* NFO name string-id: DC1D; visible name: house_9F */
+		/* NFO name string-id: DC1D; visible name: Statue of John Batchelor */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=1F4 */
@@ -11563,9 +11609,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_A0_snow, construction_state) { 3: sl_ttrs_A0_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_A0, terrain_type) { TILETYPE_SNOW: sl_ttrs_A0_snow; return sl_ttrs_A0_nosnow; }
 
-item (FEAT_HOUSES, item_ttrs_a0_house_a0, 360) {
+item (FEAT_HOUSES, item_ttrs_a0_statue_of_v_i_lenin, 360) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_STATUE_OF_V_I_LENIN);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED, HOUSE_FLAG_PROTECTED);
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -11577,7 +11624,7 @@ item (FEAT_HOUSES, item_ttrs_a0_house_a0, 360) {
 		building_class: 3;
 		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
-		/* NFO name string-id: DC1E; visible name: house_A0 */
+		/* NFO name string-id: DC1E; visible name: Statue of V.I. Lenin */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=1F4 */
@@ -11611,9 +11658,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_A1_snow, construction_state) { 3: sl_ttrs_A1_
 switch (FEAT_HOUSES, SELF, sl_ttrs_A1, terrain_type) { TILETYPE_SNOW: sl_ttrs_A1_snow; return sl_ttrs_A1_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, switch_ttrs_a1_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 10; 1: return 14; 1: return 20; 1: return 21; }
-item (FEAT_HOUSES, item_ttrs_a1_house_a1, 361) {
+item (FEAT_HOUSES, item_ttrs_a1_statue_of_captain_cook, 361) {
 	property {
 		substitute: 9;
+		name: string(STR_TTRS_NAME_STATUE_OF_CAPTAIN_COOK);
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED, HOUSE_FLAG_PROTECTED);
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
@@ -11625,7 +11673,7 @@ item (FEAT_HOUSES, item_ttrs_a1_house_a1, 361) {
 		building_class: 3;
 		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
-		/* NFO name string-id: DC1F; visible name: house_A1 */
+		/* NFO name string-id: DC1F; visible name: Statue of Captain Cook */
 		/* NFO field 14: 11 */
 		/* NFO field 1D: 02 */
 		/* Unmapped NFO fields retained for review: 10=1F4 */

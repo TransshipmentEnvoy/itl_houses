@@ -720,6 +720,143 @@ def emit_colour_switch(
 
 
 # ============================================================================
+# Language string generation
+# ============================================================================
+
+
+def sanitize_string_id(text: str) -> str:
+    """Convert a house name to an NML string identifier component.
+
+    E.g. 'Fire station' -> 'FIRE_STATION',
+         '"Z" office block' -> 'Z_OFFICE_BLOCK'
+    """
+    ident = text.upper()
+    ident = ident.replace('\u201c', '').replace('\u201d', '')
+    ident = ident.replace('"', '').replace("'", '')
+    ident = re.sub(r'[^A-Z0-9]+', '_', ident).strip('_')
+    # Collapse multiple underscores
+    ident = re.sub(r'_+', '_', ident)
+    return ident or 'UNNAMED'
+
+
+def resolve_house_names(
+    dc_names: dict[int, str],
+    properties: dict[int, dict[str, object]],
+) -> dict[int, str]:
+    """Map house IDs to display names via Action 0 property 0x12 (DC string ref).
+
+    Action 4 ``04 48`` entries define names indexed by *DC string slot*
+    (0x00, 0x01, ...) — these are NOT house IDs.  The actual house→name
+    binding comes from Action 0 property ``0x12``, which stores a word
+    value like ``\\wxDCxx`` pointing into the DC00 string range.
+
+    This function resolves:  house_id  →  prop 0x12  →  DC slot  →  name.
+    """
+    resolved: dict[int, str] = {}
+    for house_id, props in properties.items():
+        name_ref_raw = props.get("12")
+        if not isinstance(name_ref_raw, str):
+            continue
+        name_ref = int(name_ref_raw, 16)
+        # DC string references are in the 0xDC00-0xDCFF range
+        if 0xDC00 <= name_ref <= 0xDCFF:
+            dc_slot = name_ref - 0xDC00
+            if dc_slot in dc_names:
+                resolved[house_id] = dc_names[dc_slot]
+    return resolved
+
+
+def generate_lang_strings(
+    names: dict[int, str],
+    action3_ids: dict[int, int],
+) -> dict[int, tuple[str, str]]:
+    """Build a mapping {house_id: (string_id, english_value)} for named houses.
+
+    Only houses that appear in both *names* (have a resolved name) **and**
+    *action3_ids* (will get an item block) are included.
+
+    Houses that share the same name (e.g. multiple Hospital tiles) reuse
+    the same string ID so only one lang entry is emitted per unique name.
+    """
+    result: dict[int, tuple[str, str]] = {}
+    # Map each unique name to a single string ID
+    name_to_string_id: dict[str, str] = {}
+    used_ids: set[str] = set()
+
+    for house_id in sorted(action3_ids.keys()):
+        if house_id not in names:
+            continue
+        english_name = names[house_id]
+
+        if english_name in name_to_string_id:
+            # Reuse existing string ID for this name
+            string_id = name_to_string_id[english_name]
+        else:
+            base_id = f"STR_TTRS_NAME_{sanitize_string_id(english_name)}"
+            string_id = base_id
+            if string_id in used_ids:
+                string_id = f"{base_id}_{house_id:02X}"
+            used_ids.add(string_id)
+            name_to_string_id[english_name] = string_id
+
+        result[house_id] = (string_id, english_name)
+
+    return result
+
+
+def write_lang_strings(
+    lang_dir: Path,
+    lang_strings: dict[int, tuple[str, str]],
+) -> None:
+    """Update src/lang/english.lng with STR_TTRS_NAME_* entries.
+
+    Existing STR_TTRS_NAME_* lines are removed first (idempotent).
+    New entries are inserted after the last existing STR_NAME_* line,
+    or appended at the end of the file.
+    """
+    lng_path = lang_dir / 'english.lng'
+    if not lng_path.exists():
+        return
+
+    existing_lines = lng_path.read_text(encoding='utf-8').splitlines()
+
+    # Remove any previous STR_TTRS_NAME_* lines
+    cleaned = [l for l in existing_lines if not l.startswith('STR_TTRS_NAME_')]
+
+    # Remove trailing blank lines to avoid accumulation
+    while cleaned and cleaned[-1].strip() == '':
+        cleaned.pop()
+
+    # Find insertion point: after last STR_NAME_* line
+    insert_idx = len(cleaned)
+    for i, line in enumerate(cleaned):
+        if line.startswith('STR_NAME_'):
+            insert_idx = i + 1
+
+    # Build new lines (deduplicate: one entry per unique string_id)
+    new_lines: list[str] = ['']
+    written_ids: set[str] = set()
+    for house_id in sorted(lang_strings.keys()):
+        string_id, english_value = lang_strings[house_id]
+        if string_id in written_ids:
+            continue
+        written_ids.add(string_id)
+        # Tab-align the colon to match existing convention (~6 tabs)
+        tab_count = max(1, 6 - len(string_id) // 4)
+        tabs = '\t' * tab_count
+        new_lines.append(f'{string_id}{tabs}:{english_value}')
+
+    # Insert
+    for j, nl in enumerate(new_lines):
+        cleaned.insert(insert_idx + j, nl)
+
+    # Ensure file ends with newline
+    cleaned.append('')
+
+    lng_path.write_text('\n'.join(cleaned), encoding='utf-8')
+
+
+# ============================================================================
 # NML generation
 # ============================================================================
 
@@ -733,11 +870,13 @@ def build_item_block(
     house_size: Optional[str] = None,
     tile_layouts: Optional[list[str]] = None,
     colour_switch: Optional[str] = None,
+    name_string_id: Optional[str] = None,
 ) -> list[str]:
     """Build NML item block for a house.
 
     ``layout_name`` is what goes in ``default:`` when tile_layouts is not given.
     ``colour_switch`` if set, is the NML identifier for the colour callback.
+    ``name_string_id`` if set, emits a ``name: string(...)`` property.
     """
     ident_suffix = sanitize_identifier(display_name)
     item_ident = f"item_ttrs_{house_id_hex.lower()}_{ident_suffix}"
@@ -776,6 +915,9 @@ def build_item_block(
         if sub_val is not None:
             lines.append(f"\t\tsubstitute: {sub_val};")
             used_props.add("08")
+
+    if name_string_id is not None:
+        lines.append(f"\t\tname: string({name_string_id});")
 
     low_raw = props.get("09")
     high_raw = props.get("19")
@@ -952,6 +1094,7 @@ def generate_ttrs_nml(
     output_path: Path,
     start_id: int = 200,
     pcx_path: str = "src/sprites/pcx/ttrs3w.pcx",
+    lang_dir: Optional[Path] = None,
 ) -> None:
     """Generate combined sprites+items TTRS NML file from NFO source."""
     nfo_text = read_nfo_text(nfo_path)
@@ -974,8 +1117,15 @@ def generate_ttrs_nml(
 
     # House property and name data
     action3_ids = extract_house_ids_from_action3(lines)
-    names = parse_names(nfo_text)
+    dc_names = parse_names(nfo_text)  # DC string slot index -> name
     properties = parse_action0_properties(lines)
+    # Resolve actual house_id -> name via Action 0 prop 0x12 -> DC slot
+    names = resolve_house_names(dc_names, properties)
+
+    # Generate lang strings and write to english.lng
+    lang_strings = generate_lang_strings(names, action3_ids)
+    if lang_dir is not None:
+        write_lang_strings(lang_dir, lang_strings)
 
     out: list[str] = []
     out.append("/* Begin TTRS — sprites and item definitions auto-generated from ttrs3wmod.nfo */")
@@ -1009,6 +1159,7 @@ def generate_ttrs_nml(
         sub_raw = props.get("08")
         sub_val = token_to_int(sub_raw) if isinstance(sub_raw, str) else None
         display_name = names.get(house_id, f"house_{house_id_hex}")
+        name_str_id = lang_strings[house_id][0] if house_id in lang_strings else None
 
         if sub_val is not None and sub_val in MULTI_TILE_BASES:
             # ---- Multi-tile primary  ----------------------------------------
@@ -1046,6 +1197,7 @@ def generate_ttrs_nml(
                     house_size=size_name,
                     tile_layouts=tile_layouts,
                     colour_switch=colour_switch_name,
+                    name_string_id=name_str_id,
                 )
             )
 
@@ -1075,6 +1227,7 @@ def generate_ttrs_nml(
                     props,
                     layout_name=layout_name,
                     colour_switch=colour_switch_name,
+                    name_string_id=name_str_id,
                 )
             )
 
@@ -1100,9 +1253,15 @@ def main() -> None:
         default="src/sprites/pcx/ttrs3w.pcx",
         help="PCX path written into spriteset declarations (default: src/sprites/pcx/ttrs3w.pcx)",
     )
+    parser.add_argument(
+        "--lang-dir",
+        type=Path,
+        default=Path("src/lang"),
+        help="Directory containing .lng language files (default: src/lang)",
+    )
     args = parser.parse_args()
 
-    generate_ttrs_nml(args.nfo, args.out, args.start_id, args.pcx_path)
+    generate_ttrs_nml(args.nfo, args.out, args.start_id, args.pcx_path, args.lang_dir)
     print(f"Generated {args.out}")
 
 
