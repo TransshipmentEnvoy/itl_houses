@@ -78,9 +78,9 @@ def _ground_expr(
     sprite_table: dict[int, Any],
     pcx_path: str,
     out: list[str],
-) -> str:
+) -> tuple[str, bool]:
     """
-    Return an NML ground-sprite expression.
+    Return ``(nml_expression, has_recolour)`` for a ground sprite.
 
     When the ground comes from Action 1, a one-sprite ``spriteset`` is emitted
     into *out* and the expression ``{ss_name}(0)`` is returned.
@@ -89,10 +89,10 @@ def _ground_expr(
     if gsprite.is_action1:
         sc = sprite_table.get(gsprite.index)
         if sc is None:
-            return "0"   # missing — use blank
+            return "0", False   # missing — use blank
         out.append(f"spriteset({ss_name}, \"{pcx_path}\") {{ {_sprite_literal(sc)} }}")
-        return f"{ss_name}(0)"
-    return str(gsprite.index)
+        return f"{ss_name}(0)", gsprite.has_recolour
+    return str(gsprite.index), False
 
 
 def _recolour_clause(bsprite: LayoutSprite) -> str:
@@ -147,6 +147,8 @@ def _emit_climate_variant(
     constr_ground_expr: Optional[str]   = None
     constr_bbox: Optional[BoundingBox]  = None
 
+    constr_ground_recolour: bool = False
+
     valid_constr = [fl for fl in cg.construction_stages if fl is not None]
     if valid_constr:
         constr_bbox = valid_constr[0].bbox
@@ -163,7 +165,7 @@ def _emit_climate_variant(
                         if bs.has_recolour:
                             constr_recolour = True
         # Ground for construction (use first valid stage's ground)
-        constr_ground_expr = _ground_expr(
+        constr_ground_expr, constr_ground_recolour = _ground_expr(
             valid_constr[0].ground,
             f"{ss_prefix}_gc",
             sprite_table, pcx_path, out,
@@ -175,7 +177,8 @@ def _emit_climate_variant(
     if cg.animation_frames:
         return _emit_animated_variant(
             prefix, ss_prefix, cg, constr_sprites, constr_recolour,
-            constr_ground_expr, constr_bbox, sprite_table, pcx_path, out,
+            constr_ground_expr, constr_ground_recolour, constr_bbox,
+            sprite_table, pcx_path, out,
         )
 
     # ------------------------------------------------------------------
@@ -186,6 +189,8 @@ def _emit_climate_variant(
     done_ground_expr: Optional[str] = None
     done_bbox: Optional[BoundingBox] = None
 
+    done_ground_recolour: bool = False
+
     if cg.completed is not None:
         fl = cg.completed
         done_bbox = fl.bbox
@@ -195,7 +200,7 @@ def _emit_climate_variant(
             done_sprite_sc = sc
             if bs.has_recolour:
                 done_recolour = True
-        done_ground_expr = _ground_expr(
+        done_ground_expr, done_ground_recolour = _ground_expr(
             fl.ground, f"{ss_prefix}_gd", sprite_table, pcx_path, out,
         )
 
@@ -205,13 +210,14 @@ def _emit_climate_variant(
     # Construction spriteset
     if constr_sprites:
         rc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_recolour else ""
+        grc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_ground_recolour else ""
         out.append(f"spriteset({ss_prefix}_c, \"{pcx_path}\") {{")
         for i, sc in enumerate(constr_sprites):
             out.append(f"\t{_sprite_literal(sc)}  /* constr {i} */")
         out.append("}")
         g_c = constr_ground_expr or "0"
         out.append(f"spritelayout {prefix}_constr {{")
-        out.append(f"\tground   {{ sprite: {g_c}; }}")
+        out.append(f"\tground   {{ sprite: {g_c};{grc} }}")
         expr = _build_layout_expr(len(constr_sprites))
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
@@ -219,25 +225,28 @@ def _emit_climate_variant(
     # Done spriteset
     if done_sprite_sc is not None:
         rc_d = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if done_recolour else ""
+        grc_d = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if done_ground_recolour else ""
         out.append(f"spriteset({ss_prefix}_done, \"{pcx_path}\") {{")
         out.append(f"\t{_sprite_literal(done_sprite_sc)}  /* completed */")
         out.append("}")
         g_d = done_ground_expr or constr_ground_expr or "0"
         out.append(f"spritelayout {prefix}_done {{")
-        out.append(f"\tground   {{ sprite: {g_d}; }}")
+        out.append(f"\tground   {{ sprite: {g_d};{grc_d} }}")
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_done(0);{rc_d}{_bbox_clause(done_bbox)} }}")
         out.append("}")
     elif done_ground_expr is not None and done_ground_expr != "0":
         # Ground-only completed layout (no building sprite) — e.g. a snow corner tile
+        grc_d = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if done_ground_recolour else ""
         out.append(f"spritelayout {prefix}_done {{")
-        out.append(f"\tground   {{ sprite: {done_ground_expr}; }}")
+        out.append(f"\tground   {{ sprite: {done_ground_expr};{grc_d} }}")
         out.append("}")
     elif constr_sprites:
         # Reuse last construction sprite as completed stage
         g_c = constr_ground_expr or "0"
         rc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_recolour else ""
+        grc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_ground_recolour else ""
         out.append(f"spritelayout {prefix}_done {{")
-        out.append(f"\tground   {{ sprite: {g_c}; }}")
+        out.append(f"\tground   {{ sprite: {g_c};{grc} }}")
         expr = _build_layout_expr(len(constr_sprites))
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
@@ -284,6 +293,7 @@ def _emit_animated_variant(
     constr_sprites: list[Any],
     constr_recolour: bool,
     constr_ground_expr: Optional[str],
+    constr_ground_recolour: bool,
     constr_bbox: Optional[BoundingBox],
     sprite_table: dict[int, Any],
     pcx_path: str,
@@ -308,28 +318,29 @@ def _emit_animated_variant(
         return prefix
 
     # ---- Ground sprite deduplication ------------------------------------
-    # Key: (action1_flag, sprite_index)  →  emitted spriteset name
+    # Key: (action1_flag, sprite_index)  →  (emitted expression, has_recolour)
     # For base-game ground sprites we use the literal number, no spriteset.
-    ground_cache: dict[tuple[bool, int], str] = {}
+    ground_cache: dict[tuple[bool, int], tuple[str, bool]] = {}
 
-    def _get_ground_expr_for_frame(fl: FrameLayout, frame_idx: int) -> str:
+    def _get_ground_expr_for_frame(fl: FrameLayout, frame_idx: int) -> tuple[str, bool]:
         gs = fl.ground
         cache_key = (gs.is_action1, gs.index)
         if cache_key in ground_cache:
             return ground_cache[cache_key]
         if not gs.is_action1:
-            expr = str(gs.index)
-            ground_cache[cache_key] = expr
-            return expr
+            result = (str(gs.index), False)
+            ground_cache[cache_key] = result
+            return result
         sc = sprite_table.get(gs.index)
         if sc is None:
-            ground_cache[cache_key] = "0"
-            return "0"
+            result = ("0", False)
+            ground_cache[cache_key] = result
+            return result
         ss_name = f"{ss_prefix}_gf{frame_idx}"
         out.append(f"spriteset({ss_name}, \"{pcx_path}\") {{ {_sprite_literal(sc)} }}")
-        expr = f"{ss_name}(0)"
-        ground_cache[cache_key] = expr
-        return expr
+        result = (f"{ss_name}(0)", gs.has_recolour)
+        ground_cache[cache_key] = result
+        return result
 
     # ---- Building spriteset deduplication --------------------------------
     bldg_ss_cache: dict[int, str] = {}   # action1_index → emitted ss name
@@ -351,37 +362,42 @@ def _emit_animated_variant(
 
     # Pre-pass: emit all unique spriteset declarations
     g_exprs:  list[str]           = []
+    g_rc_flags: list[bool]        = []
     ss_names: list[Optional[str]] = []
     rc_flags: list[bool]          = []
 
     for idx, fl in enumerate(all_frames):
         if fl is None:
             g_exprs.append("0")
+            g_rc_flags.append(False)
             ss_names.append(None)
             rc_flags.append(False)
             continue
-        g_exprs.append(_get_ground_expr_for_frame(fl, idx))
+        g_expr, g_rc = _get_ground_expr_for_frame(fl, idx)
+        g_exprs.append(g_expr)
+        g_rc_flags.append(g_rc)
         ss_names.append(_get_bldg_ss_name(fl, idx))
         rc_flags.append(fl.building.has_recolour)
 
     # ---- Spritelayout per frame -----------------------------------------
     frame_layout_names: list[Optional[str]] = []
-    for idx, (fl, g_expr, ss_name, rc) in enumerate(
-        zip(all_frames, g_exprs, ss_names, rc_flags)
+    for idx, (fl, g_expr, g_rc, ss_name, rc) in enumerate(
+        zip(all_frames, g_exprs, g_rc_flags, ss_names, rc_flags)
     ):
         if ss_name is None:
             frame_layout_names.append(None)
             continue
         rc_clause = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if rc else ""
+        grc_clause = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if g_rc else ""
         layout_name = f"{prefix}_frame{idx}"
         out.append(f"spritelayout {layout_name} {{")
-        out.append(f"\tground   {{ sprite: {g_expr}; }}")
+        out.append(f"\tground   {{ sprite: {g_expr};{grc_clause} }}")
         out.append(f"\tbuilding {{ sprite: {ss_name}(0);{rc_clause}{_bbox_clause(fl.bbox)} }}")
         out.append("}")
         frame_layout_names.append(layout_name)
 
-    # Pick a fallback frame (first valid layout)
-    fallback_layout = next((n for n in frame_layout_names if n is not None), None)
+    # Pick a fallback frame (last valid layout = cg.completed, appended at end)
+    fallback_layout = next((n for n in reversed(frame_layout_names) if n is not None), None)
     if fallback_layout is None:
         out.append(f"/* WARN: no valid animation frames for {prefix}, using ground-only fallback */")
         out.append(f"spritelayout {prefix} {{")
@@ -403,13 +419,14 @@ def _emit_animated_variant(
     # ---- Construction spriteset ----------------------------------------
     if constr_sprites:
         rc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_recolour else ""
+        grc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_ground_recolour else ""
         g_c = constr_ground_expr or "0"
         out.append(f"spriteset({ss_prefix}_c, \"{pcx_path}\") {{")
         for i, sc in enumerate(constr_sprites):
             out.append(f"\t{_sprite_literal(sc)}  /* constr {i} */")
         out.append("}")
         out.append(f"spritelayout {prefix}_constr {{")
-        out.append(f"\tground   {{ sprite: {g_c}; }}")
+        out.append(f"\tground   {{ sprite: {g_c};{grc} }}")
         expr = _build_layout_expr(len(constr_sprites))
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
@@ -494,13 +511,22 @@ def emit_house_tile_nml(
         out.append("")
         top_tropic_name = prefix
 
-    # arctic_v2: use snow name collision if identical to snow (most cases it is)
+    # arctic_v2: separate arctic-below-snowline ground sprites
+    top_arctic_v2_name: str | None = None
     if has_arctic_v2 and not has_snow:
+        # No snow variant — arctic_v2 fills the snow slot
         prefix  = f"sl_ttrs_{house_id_hex}_snow"
         ss_pref = f"ss_ttrs_{house_id_hex}_snow"
         _emit_climate_variant(prefix, ss_pref, htg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
         out.append("")
         top_snow_name = prefix
+    elif has_arctic_v2 and has_snow:
+        # Both snow AND arctic_v2 exist — emit arctic_v2 as a separate variant
+        prefix  = f"sl_ttrs_{house_id_hex}_arctic"
+        ss_pref = f"ss_ttrs_{house_id_hex}_arctic"
+        _emit_climate_variant(prefix, ss_pref, htg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+        out.append("")
+        top_arctic_v2_name = prefix
 
     # ------------------------------------------------------------------
     # Random variants (append after primary variants, before terrain switch)
@@ -526,17 +552,40 @@ def emit_house_tile_nml(
     # Terrain-type routing switch
     # ------------------------------------------------------------------
     if needs_terrain_switch:
-        fallback = top_temp_name or top_snow_name or top_tropic_name
-        cases: list[str] = []
-        if top_snow_name:
+        if top_arctic_v2_name and top_snow_name:
+            # Both arctic_v2 (below snowline) and snow (above snowline) exist.
+            # In arctic climate below snowline, terrain_type is TILETYPE_NORMAL
+            # but ground sprites differ from temperate.  Use a runtime
+            # var[0x03] (game climate) switch on the non-snow default branch:
+            #   terrain_type == SNOW → snow
+            #   terrain_type != SNOW → climate==1(arctic) ? arctic_v2 : temperate
+            climate_sw = f"sl_ttrs_{house_id_hex}_clisw"
+            other_fallback = top_temp_name or top_arctic_v2_name
+            out.append(
+                f"switch (FEAT_HOUSES, SELF, {climate_sw}, var[0x03, 0, 0xFF]) {{"
+                f" 1: {top_arctic_v2_name}; return {other_fallback}; }}"
+            )
+            cases: list[str] = []
             cases.append(f"TILETYPE_SNOW: {top_snow_name}")
-        if top_tropic_name:
-            cases.append(f"TILETYPE_DESERT: {top_tropic_name}")
-        cases_str = "; ".join(cases)
-        out.append(
-            f"switch (FEAT_HOUSES, SELF, {entry_name}, terrain_type) {{"
-            f" {cases_str}; return {fallback}; }}"
-        )
+            if top_tropic_name:
+                cases.append(f"TILETYPE_DESERT: {top_tropic_name}")
+            cases_str = "; ".join(cases)
+            out.append(
+                f"switch (FEAT_HOUSES, SELF, {entry_name}, terrain_type) {{"
+                f" {cases_str}; return {climate_sw}; }}"
+            )
+        else:
+            fallback = top_temp_name or top_snow_name or top_tropic_name
+            cases: list[str] = []
+            if top_snow_name:
+                cases.append(f"TILETYPE_SNOW: {top_snow_name}")
+            if top_tropic_name:
+                cases.append(f"TILETYPE_DESERT: {top_tropic_name}")
+            cases_str = "; ".join(cases)
+            out.append(
+                f"switch (FEAT_HOUSES, SELF, {entry_name}, terrain_type) {{"
+                f" {cases_str}; return {fallback}; }}"
+            )
         out.append("")
 
     return out, entry_name, colour_values
@@ -599,6 +648,14 @@ def _emit_random_switch(
                 out.append("")
                 top_snow = prefix
 
+            top_arctic: str | None = None
+            if has_arctic and has_snow:
+                prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_arctic"
+                ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_arctic"
+                _emit_climate_variant(prefix, ss_pref, rvg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                out.append("")
+                top_arctic = prefix
+
             if has_tropic:
                 prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_tropic"
                 ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_tropic"
@@ -607,17 +664,35 @@ def _emit_random_switch(
                 top_tropic = prefix
 
             # Terrain-type switch for this variant
-            fallback = top_temp or top_snow or top_tropic
-            cases: list[str] = []
-            if top_snow:
+            if top_arctic and top_snow:
+                # Runtime climate switch for arctic_v2 + snow
+                climate_sw = f"sl_ttrs_{house_id_hex}_rv{i}_clisw"
+                other_fb = top_temp or top_arctic
+                out.append(
+                    f"switch (FEAT_HOUSES, SELF, {climate_sw}, var[0x03, 0, 0xFF]) {{"
+                    f" 1: {top_arctic}; return {other_fb}; }}"
+                )
+                cases: list[str] = []
                 cases.append(f"TILETYPE_SNOW: {top_snow}")
-            if top_tropic:
-                cases.append(f"TILETYPE_DESERT: {top_tropic}")
-            cases_str = "; ".join(cases)
-            out.append(
-                f"switch (FEAT_HOUSES, SELF, {v_entry}, terrain_type) {{"
-                f" {cases_str}; return {fallback}; }}"
-            )
+                if top_tropic:
+                    cases.append(f"TILETYPE_DESERT: {top_tropic}")
+                cases_str = "; ".join(cases)
+                out.append(
+                    f"switch (FEAT_HOUSES, SELF, {v_entry}, terrain_type) {{"
+                    f" {cases_str}; return {climate_sw}; }}"
+                )
+            else:
+                fallback = top_temp or top_snow or top_tropic
+                cases: list[str] = []
+                if top_snow:
+                    cases.append(f"TILETYPE_SNOW: {top_snow}")
+                if top_tropic:
+                    cases.append(f"TILETYPE_DESERT: {top_tropic}")
+                cases_str = "; ".join(cases)
+                out.append(
+                    f"switch (FEAT_HOUSES, SELF, {v_entry}, terrain_type) {{"
+                    f" {cases_str}; return {fallback}; }}"
+                )
             out.append("")
             variant_names.append(v_entry)
 
