@@ -116,6 +116,15 @@ for _base, (_sz, _nt) in MULTI_TILE_BASES.items():
 # Size bits in building_flags that NML sets automatically for multi-tile houses.
 SIZE_FLAG_BITS = {2, 3, 4}
 
+# NML per-tile graphics callback names for multi-tile houses.
+# house_tile variable values: NORTH=0, EAST=1, WEST=2, SOUTH=3
+# 2x1 = north + west; 1x2 = north + east; 2x2 = N + E + W + S
+TILE_CALLBACK_NAMES: dict[str, list[str]] = {
+    "HOUSE_SIZE_2X1": ["graphics_north", "graphics_west"],
+    "HOUSE_SIZE_1X2": ["graphics_north", "graphics_east"],
+    "HOUSE_SIZE_2X2": ["graphics_north", "graphics_east", "graphics_west", "graphics_south"],
+}
+
 # ============================================================================
 # File I/O utilities
 # ============================================================================
@@ -739,13 +748,15 @@ def build_item_block(
 
     lines: list[str] = []
 
-    # For multi-tile houses, emit a tile-routing switch before the item.
-    if tile_layouts and len(tile_layouts) > 1:
-        switch_name = f"switch_ttrs_{house_id_hex.lower()}_tile"
-        cases = " ".join(f"{i}: {layout};" for i, layout in enumerate(tile_layouts))
-        lines.append(f"switch (FEAT_HOUSES, SELF, {switch_name}, house_tile) {{ {cases} }}")
-        lines.append("")
-        default_graphics = switch_name
+    # For multi-tile houses, use per-tile graphics callbacks instead of
+    # a house_tile routing switch.  NML provides graphics_north,
+    # graphics_east, graphics_west, graphics_south that map directly to
+    # the correct tile positions.
+    per_tile_callbacks: list[tuple[str, str]] | None = None
+    if tile_layouts and len(tile_layouts) > 1 and house_size and house_size in TILE_CALLBACK_NAMES:
+        cb_names = TILE_CALLBACK_NAMES[house_size]
+        per_tile_callbacks = list(zip(cb_names, tile_layouts))
+        default_graphics = tile_layouts[0]
     elif tile_layouts:
         default_graphics = tile_layouts[0]
     else:
@@ -921,7 +932,11 @@ def build_item_block(
 
     lines.append("\t}")
     lines.append("\tgraphics {")
-    lines.append(f"\t\tdefault: {default_graphics};")
+    if per_tile_callbacks:
+        for cb_name, cb_layout in per_tile_callbacks:
+            lines.append(f"\t\t{cb_name}: {cb_layout};")
+    else:
+        lines.append(f"\t\tdefault: {default_graphics};")
     lines.append(f"\t\tconstruction_check: {class_to_construction_switch(building_class)};")
     if colour_switch is not None:
         lines.append(f"\t\tcolour: {colour_switch};")
