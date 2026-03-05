@@ -39,6 +39,14 @@ ACTION3_HOUSE_RE = re.compile(r"^\s*\d+\s+\*\s+\d+\s+03\s+07\s+01\s+([0-9A-Fa-f]
 ACTION0_HOUSE_RE = re.compile(
     r"^\s*\d+\s+\*\s+\d+\s+00\s+07\s+([0-9A-Fa-f]{2})\s+([0-9A-Fa-f]{2})\s+([0-9A-Fa-f]{2})(?:\s+(.*))?$")
 
+# Action 0 for feature 08 (general), property 09 = cargo translation table
+# Format: <sprite> * <len> 00 08 01 <count> 00 09 "XXXX" "XXXX" ...
+ACTION0_CTT_RE = re.compile(
+    r'^\s*\d+\s+\*\s+\d+\s+00\s+08\s+01\s+([0-9A-Fa-f]{2})\s+00\s+09\s+(.*)',
+    re.IGNORECASE,
+)
+CTT_LABEL_RE = re.compile(r'"([A-Z]{4})"')
+
 # Action 4 for house names (feature 07 with 0x40 offset = 0x48)
 # Format: <sprite> * <len> 04 48 FF 01 <house_id> DC "<name>" 00
 # Note: Names may contain escaped quotes like \"
@@ -326,6 +334,23 @@ def tokenize_line(line: str) -> list[str]:
     return re.findall(r"\\b\d+|\\w\d+|\\wx[0-9A-Fa-f]+|[0-9A-Fa-f]{2}", line)
 
 
+def parse_cargo_translation_table(nfo_text: str) -> dict[int, str]:
+    """Extract the Cargo Translation Table (CTT) from Action 0 / Feature 08.
+
+    Returns a mapping from CTT index to NML cargo label, e.g.
+    {0: "PASS", 1: "PETR", 2: "MAIL", 3: "TOUR", 4: "FOOD", 5: "GOOD"}.
+    """
+    ctt_map: dict[int, str] = {}
+    for line in nfo_text.splitlines():
+        m = ACTION0_CTT_RE.match(line)
+        if m:
+            labels = CTT_LABEL_RE.findall(m.group(2))
+            for idx, label in enumerate(labels):
+                ctt_map[idx] = label
+            break  # only need the first CTT definition
+    return ctt_map
+
+
 def parse_names(nfo_text: str) -> dict[int, str]:
     """Extract house names from Action 4 entries."""
     names: dict[int, str] = {}
@@ -594,6 +619,15 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                             props["1D"] = f"{val:02X}"
                         p += 1
 
+                # Property 1E: accepted cargo types (DWORD = 4 bytes)
+                # Format: slot1_ctt_idx slot2_ctt_idx slot3_ctt_idx 0x00
+                elif key_int == 0x1E:
+                    if p + 3 < len(tokens):
+                        vals = [parse_token_value(tokens[p + i]) for i in range(4)]
+                        if all(v is not None for v in vals) and "1E" not in props:
+                            props["1E"] = [vals[0], vals[1], vals[2]]  # 3 CTT indices
+                        p += 4
+
                 # Property 1F: minimum_lifetime
                 elif key_int == 0x1F:
                     if p < len(tokens):
@@ -603,10 +637,10 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                         p += 1
 
                 # Unknown property — use size lookup table to skip correctly.
-                # Action0/Houses property sizes (bytes per value):
+                # Action0/Houses property sizes (tokens per value):
                 #   08:1  09:1  0A:2  0B:1  0C:1  0D:1  0E:1  0F:1
                 #   10:2  11:1  12:2  13:2  14:1  15:1  16:1  17:2
-                #   18:1  19:1  1A:2  1B:1  1C:1  1D:1  1E:2  1F:2
+                #   18:1  19:1  1A:2  1B:1  1C:1  1D:1  1E:4  1F:2
                 #   20:4  21:2  22:4  23:1  24:1
                 else:
                     _PROP_SIZES: dict[int, int] = {
@@ -614,7 +648,7 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                         0x0D: 1, 0x0E: 1, 0x0F: 1, 0x10: 2, 0x11: 1,
                         0x12: 2, 0x13: 2, 0x14: 1, 0x15: 1, 0x16: 1,
                         0x17: 2, 0x18: 1, 0x19: 1, 0x1A: 2, 0x1B: 1,
-                        0x1C: 1, 0x1D: 1, 0x1E: 2, 0x1F: 2,
+                        0x1C: 1, 0x1D: 1, 0x1E: 4, 0x1F: 2,
                         0x20: 4, 0x21: 2, 0x22: 4, 0x23: 1, 0x24: 1,
                     }
                     skip = _PROP_SIZES.get(key_int, 1)
@@ -677,15 +711,101 @@ def decode_animation_info(value: int) -> tuple[int, int]:
     return loop, frames
 
 
-def class_to_construction_switch(building_class: Optional[int]) -> str:
-    """Map building class to appropriate construction check switch."""
-    if building_class == 2:
-        return "switch_ttrs_flats"
-    if building_class == 3:
-        return "switch_ttrs_offices"
-    if building_class is not None and building_class >= 4:
-        return "switch_ttrs_landmark_unique"
-    return "switch_ttrs_residential"
+# ============================================================================
+# House classification for construction checks and probability
+# ============================================================================
+
+# Substitute IDs that are clearly office buildings in vanilla OpenTTD
+OFFICE_SUBSTITUTES = {13, 19, 30, 31, 36}
+# Substitute IDs that are tall residential / flats
+FLAT_SUBSTITUTES = {15, 16, 17, 18}
+# Substitute IDs for landmark / special buildings
+LANDMARK_SPECIAL_SUBSTITUTES = {9, 20, 40, 54, 87}
+
+# Name-based keyword sets for classification
+_OFFICE_NAME_KW = {'office', 'z_office', 'z block'}
+_FLAT_NAME_KW = {'flat', 'apartment', 'endless'}
+_LANDMARK_UNIQUE_NAME_KW = {
+    'cathedral', 'statue', 'stock exchange', 'world trade',
+    'museum', 'old town',
+}
+_LANDMARK_NAME_KW = {
+    'hospital', 'fire station', 'police', 'prison', 'library',
+    'planetarium', 'observatorium', 'hotel', 'water tower',
+}
+# Probability caps per category
+_PROB_CAPS = {
+    'residential': 1,
+    'flats': 1,
+    'offices': 1,
+    'landmark': 3,
+    'landmark_unique': 3,
+}
+# Default probability per category (when NFO does not provide one)
+_PROB_DEFAULTS = {
+    'residential': 1,
+    'flats': 1,
+    'offices': 1,
+    'landmark': 2,
+    'landmark_unique': 2,
+}
+
+
+def classify_ttrs_house(
+    substitute: Optional[int],
+    building_class: Optional[int],
+    display_name: str,
+    building_flags_mask: int,
+) -> tuple[str, str, int]:
+    """Classify a TTRS house and return (category, construction_switch, default_probability).
+
+    Classification priority:
+      1. Church flag → landmark_unique
+      2. Name-based landmark_unique keywords
+      3. Name-based landmark keywords
+      4. Name-based office / flat keywords
+      5. Protected + special substitute → landmark_unique
+      6. Substitute-based office / flat classification
+      7. Default → residential
+    """
+    name_lower = display_name.lower().replace('"', '').replace("'", '')
+    is_protected = bool(building_flags_mask & (1 << 9))  # HOUSE_FLAG_PROTECTED
+    is_church = bool(building_flags_mask & (1 << 6))     # HOUSE_FLAG_CHURCH
+
+    # 1) Churches (by flag)
+    if is_church:
+        return 'landmark_unique', 'switch_ttrs_landmark_unique', _PROB_DEFAULTS['landmark_unique']
+
+    # 2) Unique landmark buildings (by name)
+    if any(kw in name_lower for kw in _LANDMARK_UNIQUE_NAME_KW):
+        return 'landmark_unique', 'switch_ttrs_landmark_unique', _PROB_DEFAULTS['landmark_unique']
+
+    # 3) Regular landmark / public buildings (by name)
+    if any(kw in name_lower for kw in _LANDMARK_NAME_KW):
+        return 'landmark', 'switch_ttrs_landmark', _PROB_DEFAULTS['landmark']
+
+    # 4a) Offices (by name)
+    if any(kw in name_lower for kw in _OFFICE_NAME_KW):
+        return 'offices', 'switch_ttrs_offices', _PROB_DEFAULTS['offices']
+
+    # 4b) Flats (by name)
+    if any(kw in name_lower for kw in _FLAT_NAME_KW):
+        return 'flats', 'switch_ttrs_flats', _PROB_DEFAULTS['flats']
+
+    # 5) Protected buildings with special substitute → landmark_unique
+    if is_protected and substitute in LANDMARK_SPECIAL_SUBSTITUTES:
+        return 'landmark_unique', 'switch_ttrs_landmark_unique', _PROB_DEFAULTS['landmark_unique']
+
+    # 6a) Offices (by substitute type)
+    if substitute in OFFICE_SUBSTITUTES:
+        return 'offices', 'switch_ttrs_offices', _PROB_DEFAULTS['offices']
+
+    # 6b) Flats (by substitute type)
+    if substitute in FLAT_SUBSTITUTES:
+        return 'flats', 'switch_ttrs_flats', _PROB_DEFAULTS['flats']
+
+    # 7) Default → residential
+    return 'residential', 'switch_ttrs_residential', _PROB_DEFAULTS['residential']
 
 
 def emit_colour_switch(
@@ -871,6 +991,7 @@ def build_item_block(
     tile_layouts: Optional[list[str]] = None,
     colour_switch: Optional[str] = None,
     name_string_id: Optional[str] = None,
+    ctt_map: Optional[dict[int, str]] = None,
 ) -> list[str]:
     """Build NML item block for a house.
 
@@ -884,6 +1005,20 @@ def build_item_block(
     building_class: int | None = None
     if isinstance(props.get("1C"), str):
         building_class = as_dec(props["1C"])
+
+    # --- Compute building flags mask for classification ---
+    _low_raw = props.get("09")
+    _high_raw = props.get("19")
+    _low_val = token_to_int(_low_raw) if isinstance(_low_raw, str) else 0
+    _high_val = token_to_int(_high_raw) if isinstance(_high_raw, str) else 0
+    building_flags_mask = (_low_val or 0) + ((_high_val or 0) << 8)
+    has_animate_flag = bool(building_flags_mask & (1 << 5))  # HOUSE_FLAG_ANIMATE
+
+    # --- Classify house ---
+    sub_for_class = token_to_int(props["08"]) if isinstance(props.get("08"), str) else None
+    category, construction_switch, default_prob = classify_ttrs_house(
+        sub_for_class, building_class, display_name, building_flags_mask,
+    )
 
     lines: list[str] = []
 
@@ -993,15 +1128,20 @@ def build_item_block(
         lines.append(f"\t\tbuilding_class: {building_class};")
         used_props.add("1C")
 
+    # --- Probability: use NFO value (capped by category) or category default ---
     prob_raw = props.get("18")
     if isinstance(prob_raw, str):
         prob = token_to_int(prob_raw)
         if prob is not None:
-            # NFO prop 0x18 (0-255) → NML probability (1-15).
-            # Use round(prob/17) for a more uniform distribution
-            # (17 ≈ 255/15) instead of the coarser prob//16.
-            lines.append(f"\t\tprobability: {max(1, min(15, round(prob / 17)))};")
+            nml_prob = max(1, min(15, round(prob / 17)))
+            cap = _PROB_CAPS.get(category, 15)
+            nml_prob = min(nml_prob, cap)
+            lines.append(f"\t\tprobability: {nml_prob};")
             used_props.add("18")
+        else:
+            lines.append(f"\t\tprobability: {default_prob};")
+    else:
+        lines.append(f"\t\tprobability: {default_prob};")
 
     refresh_raw = props.get("16")
     if isinstance(refresh_raw, str):
@@ -1010,47 +1150,56 @@ def build_item_block(
             lines.append(f"\t\trefresh_multiplier: {refresh};")
             used_props.add("16")
 
+    # --- Animation properties (ensure consistency when HOUSE_FLAG_ANIMATE is set) ---
     anim_info_raw = props.get("1A")
+    has_anim_info = False
     if isinstance(anim_info_raw, str):
         anim_info = token_to_int(anim_info_raw)
         if anim_info is not None:
             loop, frames = decode_animation_info(anim_info)
             lines.append(f"\t\tanimation_info: [{loop}, {frames}];")
             used_props.add("1A")
+            has_anim_info = True
+    # If ANIMATE flag is set but no animation_info, add a minimal default
+    if has_animate_flag and not has_anim_info:
+        lines.append("\t\tanimation_info: [1, 1];")
+        lines.append("\t\t/* NOTE: ANIMATE flag set but NFO had no animation_info; using minimal default */")
 
     anim_speed_raw = props.get("1B")
+    has_anim_speed = False
     if isinstance(anim_speed_raw, str):
         anim_speed = token_to_int(anim_speed_raw)
         if anim_speed is not None:
             lines.append(f"\t\tanimation_speed: {anim_speed};")
             used_props.add("1B")
+            has_anim_speed = True
+    # If ANIMATE flag is set but no animation_speed, add a safe default
+    if has_animate_flag and not has_anim_speed:
+        lines.append("\t\tanimation_speed: 2;")
+        lines.append("\t\t/* NOTE: ANIMATE flag set but NFO had no animation_speed; defaulting to 2 */")
+
+    # Resolve cargo labels for each acceptance slot.
+    # Default: slot1=PASS, slot2=MAIL, slot3=GOOD.
+    # Property 1E overrides the cargo types via the Cargo Translation Table.
+    slot_labels = ["PASS", "MAIL", "GOOD"]
+    if isinstance(props.get("1E"), list) and ctt_map:
+        ctt_indices: list[int] = props["1E"]
+        for i, idx in enumerate(ctt_indices):
+            if idx in ctt_map:
+                slot_labels[i] = ctt_map[idx]
+        used_props.add("1E")
 
     cargos: list[str] = []
     zero_cargos: list[str] = []
-    if isinstance(props.get("0D"), str):
-        pass_amt = token_to_int(props["0D"])
-        if pass_amt is not None:
-            if pass_amt > 0:
-                cargos.append(f"[PASS, {pass_amt}]")
-            else:
-                zero_cargos.append("PASS")
-            used_props.add("0D")
-    if isinstance(props.get("0E"), str):
-        mail_amt = token_to_int(props["0E"])
-        if mail_amt is not None:
-            if mail_amt > 0:
-                cargos.append(f"[MAIL, {mail_amt}]")
-            else:
-                zero_cargos.append("MAIL")
-            used_props.add("0E")
-    if isinstance(props.get("0F"), str):
-        goods_amt = token_to_int(props["0F"])
-        if goods_amt is not None:
-            if goods_amt > 0:
-                cargos.append(f"[GOOD, {goods_amt}]")
-            else:
-                zero_cargos.append("GOOD")
-            used_props.add("0F")
+    for slot_idx, prop_key in enumerate(["0D", "0E", "0F"]):
+        if isinstance(props.get(prop_key), str):
+            amt = token_to_int(props[prop_key])
+            if amt is not None:
+                if amt > 0:
+                    cargos.append(f"[{slot_labels[slot_idx]}, {amt}]")
+                else:
+                    zero_cargos.append(slot_labels[slot_idx])
+                used_props.add(prop_key)
     if cargos:
         lines.append(f"\t\taccepted_cargos: [{','.join(cargos)}];")
     if zero_cargos:
@@ -1061,7 +1210,7 @@ def build_item_block(
         lines.append(f"\t\t/* NFO name string-id: {name_id_raw}; visible name: {display_name} */")
         used_props.add("12")
 
-    for passthrough_key in ["14", "1D", "1E", "21", "22", "23"]:
+    for passthrough_key in ["14", "1D", "21", "22", "23"]:
         if passthrough_key in props:
             lines.append(f"\t\t/* NFO field {passthrough_key}: {props[passthrough_key]} */")
             used_props.add(passthrough_key)
@@ -1079,7 +1228,8 @@ def build_item_block(
             lines.append(f"\t\t{cb_name}: {cb_layout};")
     else:
         lines.append(f"\t\tdefault: {default_graphics};")
-    lines.append(f"\t\tconstruction_check: {class_to_construction_switch(building_class)};")
+    lines.append(f"\t\tconstruction_check: {construction_switch};")
+    lines.append(f"\t\t/* classification: {category} */")
     if colour_switch is not None:
         lines.append(f"\t\tcolour: {colour_switch};")
     lines.append("\t}")
@@ -1115,7 +1265,8 @@ def generate_ttrs_nml(
     for house_id_hex, _label, _sec_lines, _start_idx, action3_idx in house_sections:
         section_data[house_id_hex] = sprite_table_for_house(action3_idx, action1_blocks)
 
-    # House property and name data
+    # Cargo translation table and house property/name data
+    ctt_map = parse_cargo_translation_table(nfo_text)
     action3_ids = extract_house_ids_from_action3(lines)
     dc_names = parse_names(nfo_text)  # DC string slot index -> name
     properties = parse_action0_properties(lines)
@@ -1198,6 +1349,7 @@ def generate_ttrs_nml(
                     tile_layouts=tile_layouts,
                     colour_switch=colour_switch_name,
                     name_string_id=name_str_id,
+                    ctt_map=ctt_map,
                 )
             )
 
@@ -1228,6 +1380,7 @@ def generate_ttrs_nml(
                     layout_name=layout_name,
                     colour_switch=colour_switch_name,
                     name_string_id=name_str_id,
+                    ctt_map=ctt_map,
                 )
             )
 

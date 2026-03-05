@@ -78,21 +78,24 @@ def _ground_expr(
     sprite_table: dict[int, Any],
     pcx_path: str,
     out: list[str],
-) -> tuple[str, bool]:
+) -> tuple[str, LayoutSprite]:
     """
-    Return ``(nml_expression, has_recolour)`` for a ground sprite.
+    Return ``(nml_expression, ground_sprite)`` for a ground sprite.
 
     When the ground comes from Action 1, a one-sprite ``spriteset`` is emitted
     into *out* and the expression ``{ss_name}(0)`` is returned.
     When it is a base-game sprite the literal number is returned.
+
+    The second element is the original :class:`LayoutSprite` so callers can
+    pass it to :func:`_recolour_clause`.
     """
     if gsprite.is_action1:
         sc = sprite_table.get(gsprite.index)
         if sc is None:
-            return "0", False   # missing — use blank
+            return "0", gsprite   # missing — use blank
         out.append(f"spriteset({ss_name}, \"{pcx_path}\") {{ {_sprite_literal(sc)} }}")
-        return f"{ss_name}(0)", gsprite.has_recolour
-    return str(gsprite.index), False
+        return f"{ss_name}(0)", gsprite
+    return str(gsprite.index), gsprite
 
 
 def _recolour_clause(bsprite: LayoutSprite) -> str:
@@ -143,11 +146,11 @@ def _emit_climate_variant(
     # Construction stages
     # ------------------------------------------------------------------
     constr_sprites: list[Any]           = []
-    constr_recolour: bool               = False
+    constr_bsprite: Optional[LayoutSprite] = None   # first recoloured building sprite
     constr_ground_expr: Optional[str]   = None
     constr_bbox: Optional[BoundingBox]  = None
 
-    constr_ground_recolour: bool = False
+    constr_ground_sprite: Optional[LayoutSprite] = None
 
     valid_constr = [fl for fl in cg.construction_stages if fl is not None]
     if valid_constr:
@@ -162,10 +165,10 @@ def _emit_climate_variant(
                     if sc is not None:
                         constr_sprites.append(sc)
                         seen_indices.append(idx)
-                        if bs.has_recolour:
-                            constr_recolour = True
+                        if bs.has_recolour and constr_bsprite is None:
+                            constr_bsprite = bs
         # Ground for construction (use first valid stage's ground)
-        constr_ground_expr, constr_ground_recolour = _ground_expr(
+        constr_ground_expr, constr_ground_sprite = _ground_expr(
             valid_constr[0].ground,
             f"{ss_prefix}_gc",
             sprite_table, pcx_path, out,
@@ -176,8 +179,8 @@ def _emit_climate_variant(
     # ------------------------------------------------------------------
     if cg.animation_frames:
         return _emit_animated_variant(
-            prefix, ss_prefix, cg, constr_sprites, constr_recolour,
-            constr_ground_expr, constr_ground_recolour, constr_bbox,
+            prefix, ss_prefix, cg, constr_sprites, constr_bsprite,
+            constr_ground_expr, constr_ground_sprite, constr_bbox,
             sprite_table, pcx_path, out,
         )
 
@@ -185,11 +188,11 @@ def _emit_climate_variant(
     # Completed stage (non-animated)
     # ------------------------------------------------------------------
     done_sprite_sc: Optional[Any] = None
-    done_recolour: bool           = False
+    done_bsprite: Optional[LayoutSprite] = None
     done_ground_expr: Optional[str] = None
     done_bbox: Optional[BoundingBox] = None
 
-    done_ground_recolour: bool = False
+    done_ground_sprite: Optional[LayoutSprite] = None
 
     if cg.completed is not None:
         fl = cg.completed
@@ -198,9 +201,8 @@ def _emit_climate_variant(
         if bs.is_action1:
             sc = sprite_table.get(bs.index)
             done_sprite_sc = sc
-            if bs.has_recolour:
-                done_recolour = True
-        done_ground_expr, done_ground_recolour = _ground_expr(
+            done_bsprite = bs
+        done_ground_expr, done_ground_sprite = _ground_expr(
             fl.ground, f"{ss_prefix}_gd", sprite_table, pcx_path, out,
         )
 
@@ -209,8 +211,8 @@ def _emit_climate_variant(
     # ------------------------------------------------------------------
     # Construction spriteset
     if constr_sprites:
-        rc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_recolour else ""
-        grc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_ground_recolour else ""
+        rc = _recolour_clause(constr_bsprite) if constr_bsprite is not None else ""
+        grc = _recolour_clause(constr_ground_sprite) if constr_ground_sprite is not None else ""
         out.append(f"spriteset({ss_prefix}_c, \"{pcx_path}\") {{")
         for i, sc in enumerate(constr_sprites):
             out.append(f"\t{_sprite_literal(sc)}  /* constr {i} */")
@@ -224,8 +226,8 @@ def _emit_climate_variant(
 
     # Done spriteset
     if done_sprite_sc is not None:
-        rc_d = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if done_recolour else ""
-        grc_d = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if done_ground_recolour else ""
+        rc_d = _recolour_clause(done_bsprite) if done_bsprite is not None else ""
+        grc_d = _recolour_clause(done_ground_sprite) if done_ground_sprite is not None else ""
         out.append(f"spriteset({ss_prefix}_done, \"{pcx_path}\") {{")
         out.append(f"\t{_sprite_literal(done_sprite_sc)}  /* completed */")
         out.append("}")
@@ -236,15 +238,15 @@ def _emit_climate_variant(
         out.append("}")
     elif done_ground_expr is not None and done_ground_expr != "0":
         # Ground-only completed layout (no building sprite) — e.g. a snow corner tile
-        grc_d = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if done_ground_recolour else ""
+        grc_d = _recolour_clause(done_ground_sprite) if done_ground_sprite is not None else ""
         out.append(f"spritelayout {prefix}_done {{")
         out.append(f"\tground   {{ sprite: {done_ground_expr};{grc_d} }}")
         out.append("}")
     elif constr_sprites:
         # Reuse last construction sprite as completed stage
         g_c = constr_ground_expr or "0"
-        rc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_recolour else ""
-        grc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_ground_recolour else ""
+        rc = _recolour_clause(constr_bsprite) if constr_bsprite is not None else ""
+        grc = _recolour_clause(constr_ground_sprite) if constr_ground_sprite is not None else ""
         out.append(f"spritelayout {prefix}_done {{")
         out.append(f"\tground   {{ sprite: {g_c};{grc} }}")
         expr = _build_layout_expr(len(constr_sprites))
@@ -291,9 +293,9 @@ def _emit_animated_variant(
     ss_prefix: str,
     cg: ClimateGraphics,
     constr_sprites: list[Any],
-    constr_recolour: bool,
+    constr_bsprite: Optional[LayoutSprite],
     constr_ground_expr: Optional[str],
-    constr_ground_recolour: bool,
+    constr_ground_sprite: Optional[LayoutSprite],
     constr_bbox: Optional[BoundingBox],
     sprite_table: dict[int, Any],
     pcx_path: str,
@@ -318,27 +320,27 @@ def _emit_animated_variant(
         return prefix
 
     # ---- Ground sprite deduplication ------------------------------------
-    # Key: (action1_flag, sprite_index)  →  (emitted expression, has_recolour)
+    # Key: (action1_flag, sprite_index)  →  (emitted expression, LayoutSprite)
     # For base-game ground sprites we use the literal number, no spriteset.
-    ground_cache: dict[tuple[bool, int], tuple[str, bool]] = {}
+    ground_cache: dict[tuple[bool, int], tuple[str, LayoutSprite]] = {}
 
-    def _get_ground_expr_for_frame(fl: FrameLayout, frame_idx: int) -> tuple[str, bool]:
+    def _get_ground_expr_for_frame(fl: FrameLayout, frame_idx: int) -> tuple[str, LayoutSprite]:
         gs = fl.ground
         cache_key = (gs.is_action1, gs.index)
         if cache_key in ground_cache:
             return ground_cache[cache_key]
         if not gs.is_action1:
-            result = (str(gs.index), False)
+            result = (str(gs.index), gs)
             ground_cache[cache_key] = result
             return result
         sc = sprite_table.get(gs.index)
         if sc is None:
-            result = ("0", False)
+            result = ("0", gs)
             ground_cache[cache_key] = result
             return result
         ss_name = f"{ss_prefix}_gf{frame_idx}"
         out.append(f"spriteset({ss_name}, \"{pcx_path}\") {{ {_sprite_literal(sc)} }}")
-        result = (f"{ss_name}(0)", gs.has_recolour)
+        result = (f"{ss_name}(0)", gs)
         ground_cache[cache_key] = result
         return result
 
@@ -355,40 +357,36 @@ def _emit_animated_variant(
         if sc is None:
             return None
         ss_name = f"{ss_prefix}_f{frame_idx}"
-        rc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if bs.has_recolour else ""
         out.append(f"spriteset({ss_name}, \"{pcx_path}\") {{ {_sprite_literal(sc)} }}")
         bldg_ss_cache[bs.index] = ss_name
         return ss_name
 
     # Pre-pass: emit all unique spriteset declarations
-    g_exprs:  list[str]           = []
-    g_rc_flags: list[bool]        = []
-    ss_names: list[Optional[str]] = []
-    rc_flags: list[bool]          = []
+    g_exprs:  list[str]                       = []
+    g_sprites: list[Optional[LayoutSprite]]    = []
+    ss_names: list[Optional[str]]              = []
 
     for idx, fl in enumerate(all_frames):
         if fl is None:
             g_exprs.append("0")
-            g_rc_flags.append(False)
+            g_sprites.append(None)
             ss_names.append(None)
-            rc_flags.append(False)
             continue
-        g_expr, g_rc = _get_ground_expr_for_frame(fl, idx)
+        g_expr, g_spr = _get_ground_expr_for_frame(fl, idx)
         g_exprs.append(g_expr)
-        g_rc_flags.append(g_rc)
+        g_sprites.append(g_spr)
         ss_names.append(_get_bldg_ss_name(fl, idx))
-        rc_flags.append(fl.building.has_recolour)
 
     # ---- Spritelayout per frame -----------------------------------------
     frame_layout_names: list[Optional[str]] = []
-    for idx, (fl, g_expr, g_rc, ss_name, rc) in enumerate(
-        zip(all_frames, g_exprs, g_rc_flags, ss_names, rc_flags)
+    for idx, (fl, g_expr, g_spr, ss_name) in enumerate(
+        zip(all_frames, g_exprs, g_sprites, ss_names)
     ):
         if ss_name is None:
             frame_layout_names.append(None)
             continue
-        rc_clause = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if rc else ""
-        grc_clause = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if g_rc else ""
+        rc_clause = _recolour_clause(fl.building)
+        grc_clause = _recolour_clause(g_spr) if g_spr is not None else ""
         layout_name = f"{prefix}_frame{idx}"
         out.append(f"spritelayout {layout_name} {{")
         out.append(f"\tground   {{ sprite: {g_expr};{grc_clause} }}")
@@ -418,8 +416,8 @@ def _emit_animated_variant(
 
     # ---- Construction spriteset ----------------------------------------
     if constr_sprites:
-        rc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_recolour else ""
-        grc = " recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT;" if constr_ground_recolour else ""
+        rc = _recolour_clause(constr_bsprite) if constr_bsprite is not None else ""
+        grc = _recolour_clause(constr_ground_sprite) if constr_ground_sprite is not None else ""
         g_c = constr_ground_expr or "0"
         out.append(f"spriteset({ss_prefix}_c, \"{pcx_path}\") {{")
         for i, sc in enumerate(constr_sprites):

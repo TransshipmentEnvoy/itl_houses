@@ -73,10 +73,12 @@ item (FEAT_HOUSES, item_ttrs_00_house_00, 200) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1930, 1950];
+		probability: 2;
 	}
 	graphics {
 		default: sl_ttrs_00;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -128,11 +130,13 @@ item (FEAT_HOUSES, item_ttrs_01_house_01, 201) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1950];
+		probability: 1;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_01;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -451,6 +455,7 @@ item (FEAT_HOUSES, item_ttrs_02_fire_station, 202, HOUSE_SIZE_2X1) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1930, 1980];
+		probability: 2;
 		refresh_multiplier: 3;
 		accepted_cargos: [[MAIL, 1],[GOOD, 1]];
 		/* NFO cargo amount is 0 for: PASS */
@@ -460,7 +465,8 @@ item (FEAT_HOUSES, item_ttrs_02_fire_station, 202, HOUSE_SIZE_2X1) {
 	graphics {
 		graphics_north: sl_ttrs_02;
 		graphics_west: sl_ttrs_03;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -512,10 +518,12 @@ item (FEAT_HOUSES, item_ttrs_04_house_04, 204) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1950];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_04;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -545,11 +553,13 @@ item (FEAT_HOUSES, item_ttrs_05_house_05, 205) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND)];
 		/* NFO availability packed value: 61456 */
 		years_available: [1930, 1980];
+		probability: 1;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_05;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -665,7 +675,7 @@ item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_OUTER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63508 */
 		years_available: [1930, 1950];
-		probability: 2;
+		probability: 1;
 		refresh_multiplier: 8;
 		animation_info: [0, 4];
 		animation_speed: 11;
@@ -676,6 +686,7 @@ item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 		graphics_north: sl_ttrs_06;
 		graphics_east: sl_ttrs_07;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_06_colour;
 	}
 }
@@ -769,11 +780,13 @@ item (FEAT_HOUSES, item_ttrs_08_house_08, 208) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1930, 1950];
-		accepted_cargos: [[GOOD, 2]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 2]];
 	}
 	graphics {
 		default: sl_ttrs_08;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -826,13 +839,14 @@ item (FEAT_HOUSES, item_ttrs_09_house_09, 209) {
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
 		years_available: [1930, 1950];
-		probability: 2;
-		accepted_cargos: [[GOOD, 2]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 2]];
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_09;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_09_colour;
 	}
 }
@@ -902,11 +916,13 @@ item (FEAT_HOUSES, item_ttrs_0a_house_0a, 210) {
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
 		years_available: [1930, 1980];
-		accepted_cargos: [[GOOD, 1]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 1]];
 	}
 	graphics {
 		default: sl_ttrs_0A;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -995,11 +1011,13 @@ item (FEAT_HOUSES, item_ttrs_0b_house_0b, 211) {
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
 		years_available: [1930, 1980];
-		accepted_cargos: [[GOOD, 1]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 1]];
 	}
 	graphics {
 		default: sl_ttrs_0B;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -1049,10 +1067,12 @@ item (FEAT_HOUSES, item_ttrs_0c_house_0c, 212) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_0C;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -1105,13 +1125,15 @@ item (FEAT_HOUSES, item_ttrs_0d_library_planetarium, 213) {
 		availability_mask: [bitmask(TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63500 */
 		years_available: [1930, 1980];
+		probability: 2;
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
 		/* NFO cargo amount is 0 for: GOOD */
 		/* NFO name string-id: DC01; visible name: Library-Planetarium */
 	}
 	graphics {
 		default: sl_ttrs_0D;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -1145,10 +1167,12 @@ item (FEAT_HOUSES, item_ttrs_0e_house_0e, 214) {
 		availability_mask: [bitmask(TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63496 */
 		years_available: [1930, 1950];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_0E;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -1330,6 +1354,7 @@ item (FEAT_HOUSES, item_ttrs_0f_prison, 215, HOUSE_SIZE_2X2) {
 		years_available: [1930, 1980];
 		population: 200;
 		mail_multiplier: 10;
+		probability: 2;
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
 		/* NFO name string-id: DC02; visible name: Prison */
 		/* NFO field 14: 11 */
@@ -1340,7 +1365,8 @@ item (FEAT_HOUSES, item_ttrs_0f_prison, 215, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_10;
 		graphics_west: sl_ttrs_11;
 		graphics_south: sl_ttrs_12;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		colour: switch_ttrs_0f_colour;
 	}
 }
@@ -1374,11 +1400,13 @@ item (FEAT_HOUSES, item_ttrs_13_house_13, 219) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_13;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_13_colour;
 	}
 }
@@ -1432,11 +1460,13 @@ item (FEAT_HOUSES, item_ttrs_14_house_14, 220) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_14;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 		colour: switch_ttrs_14_colour;
 	}
 }
@@ -1569,10 +1599,12 @@ item (FEAT_HOUSES, item_ttrs_15_house_15, 221) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_15;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -1631,11 +1663,13 @@ item (FEAT_HOUSES, item_ttrs_16_house_16, 222) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1950];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_16;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_16_colour;
 	}
 }
@@ -1688,10 +1722,12 @@ item (FEAT_HOUSES, item_ttrs_17_house_17, 223) {
 		availability_mask: [0, 0];
 		/* NFO availability packed value: 0 */
 		years_available: [1930, 2175];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_17;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_17_colour;
 	}
 }
@@ -1745,10 +1781,12 @@ item (FEAT_HOUSES, item_ttrs_18_house_18, 224) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1950];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_18;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_18_colour;
 	}
 }
@@ -1801,11 +1839,13 @@ item (FEAT_HOUSES, item_ttrs_19_house_19, 225) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
+		probability: 1;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_19;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -1837,11 +1877,13 @@ item (FEAT_HOUSES, item_ttrs_1a_house_1a, 226) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
+		probability: 1;
 		/* NFO name string-id: 2014; visible name: house_1A */
 	}
 	graphics {
 		default: sl_ttrs_1A;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -1873,11 +1915,13 @@ item (FEAT_HOUSES, item_ttrs_1b_house_1b, 227) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
+		probability: 1;
 		/* NFO name string-id: 2014; visible name: house_1B */
 	}
 	graphics {
 		default: sl_ttrs_1B;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -1927,12 +1971,14 @@ item (FEAT_HOUSES, item_ttrs_1c_house_1c, 228) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1930, 1980];
-		accepted_cargos: [[PASS, 10],[MAIL, 4],[GOOD, 3]];
+		probability: 1;
+		accepted_cargos: [[PASS, 10],[FOOD, 4],[GOOD, 3]];
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_1C;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -1981,14 +2027,15 @@ item (FEAT_HOUSES, item_ttrs_1d_water_tower, 229) {
 		mail_multiplier: 0;
 		building_class: 1;
 		probability: 3;
-		/* NFO cargo amount is 0 for: PASS, MAIL, GOOD */
+		/* NFO cargo amount is 0 for: TOUR, PASS, PASS */
 		/* NFO name string-id: DC04; visible name: Water tower */
 		/* NFO field 14: 31 */
 		/* NFO field 1D: 04 */
 	}
 	graphics {
 		default: sl_ttrs_1D;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		colour: switch_ttrs_1d_colour;
 	}
 }
@@ -2060,10 +2107,12 @@ item (FEAT_HOUSES, item_ttrs_1e_house_1e, 230) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1950, 1980];
+		probability: 2;
 	}
 	graphics {
 		default: sl_ttrs_1E;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -2115,11 +2164,13 @@ item (FEAT_HOUSES, item_ttrs_1f_house_1f, 231) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_1F;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -2193,6 +2244,7 @@ item (FEAT_HOUSES, item_ttrs_20_house_20, 232) {
 	graphics {
 		default: sl_ttrs_20;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -2429,6 +2481,7 @@ item (FEAT_HOUSES, item_ttrs_21_house_21, 233, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 		accepted_cargos: [[PASS, 6],[MAIL, 2],[GOOD, 4]];
 		/* NFO field 14: 10 */
 	}
@@ -2436,6 +2489,7 @@ item (FEAT_HOUSES, item_ttrs_21_house_21, 233, HOUSE_SIZE_1X2) {
 		graphics_north: sl_ttrs_21;
 		graphics_east: sl_ttrs_22;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_21_colour;
 	}
 }
@@ -2488,11 +2542,13 @@ item (FEAT_HOUSES, item_ttrs_23_house_23, 235) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1950, 2010];
-		accepted_cargos: [[GOOD, 2]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 2]];
 	}
 	graphics {
 		default: sl_ttrs_23;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -2556,12 +2612,14 @@ item (FEAT_HOUSES, item_ttrs_24_house_24, 236) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1950, 2010];
-		accepted_cargos: [[GOOD, 2]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 2]];
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_24;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_24_colour;
 	}
 }
@@ -2636,12 +2694,13 @@ item (FEAT_HOUSES, item_ttrs_25_house_25, 237) {
 		/* NFO availability packed value: 63503 */
 		years_available: [1950, 1980];
 		probability: 1;
-		accepted_cargos: [[GOOD, 2]];
+		accepted_cargos: [[FOOD, 2]];
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_25;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_25_colour;
 	}
 }
@@ -2739,13 +2798,15 @@ item (FEAT_HOUSES, item_ttrs_26_large_block_of_flats, 238, HOUSE_SIZE_2X1) {
 		years_available: [1950, 1980];
 		population: 200;
 		mail_multiplier: 50;
+		probability: 1;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 2]];
 		/* NFO name string-id: DC05; visible name: Large block of flats */
 	}
 	graphics {
 		graphics_north: sl_ttrs_26;
 		graphics_west: sl_ttrs_27;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -2802,7 +2863,8 @@ item (FEAT_HOUSES, item_ttrs_28_luxury_apartments, 240) {
 	}
 	graphics {
 		default: sl_ttrs_28;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -2855,12 +2917,14 @@ item (FEAT_HOUSES, item_ttrs_29_house_29, 241) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
-		accepted_cargos: [[PASS, 10],[MAIL, 4],[GOOD, 6]];
+		probability: 1;
+		accepted_cargos: [[PASS, 10],[TOUR, 4],[GOOD, 6]];
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_29;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 		colour: switch_ttrs_29_colour;
 	}
 }
@@ -2915,12 +2979,14 @@ item (FEAT_HOUSES, item_ttrs_2a_multimedia_offices, 242) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_2A;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_2a_colour;
 	}
 }
@@ -2975,12 +3041,14 @@ item (FEAT_HOUSES, item_ttrs_2b_multimedia_offices, 243) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_2B;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_2b_colour;
 	}
 }
@@ -3033,10 +3101,12 @@ item (FEAT_HOUSES, item_ttrs_2c_house_2c, 244) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_2C;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -3081,12 +3151,14 @@ item (FEAT_HOUSES, item_ttrs_2d_park_avenue_1457, 245) {
 		years_available: [1950, 1980];
 		population: 100;
 		mail_multiplier: 50;
+		probability: 1;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 4]];
 		/* NFO name string-id: DC08; visible name: Park Avenue 1457 */
 	}
 	graphics {
 		default: sl_ttrs_2D;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -3478,6 +3550,7 @@ item (FEAT_HOUSES, item_ttrs_2e_police_station, 246, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1970, 2175];
+		probability: 2;
 		accepted_cargos: [[PASS, 2],[MAIL, 1]];
 		/* NFO cargo amount is 0 for: GOOD */
 		/* NFO name string-id: DC09; visible name: Police station */
@@ -3486,7 +3559,8 @@ item (FEAT_HOUSES, item_ttrs_2e_police_station, 246, HOUSE_SIZE_1X2) {
 	graphics {
 		graphics_north: sl_ttrs_2E;
 		graphics_east: sl_ttrs_2F;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		colour: switch_ttrs_2e_colour;
 	}
 }
@@ -3539,10 +3613,12 @@ item (FEAT_HOUSES, item_ttrs_30_house_30, 248) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 2010];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_30;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -3594,10 +3670,12 @@ item (FEAT_HOUSES, item_ttrs_31_house_31, 249) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
 		years_available: [1950, 1980];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_31;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -3650,11 +3728,13 @@ item (FEAT_HOUSES, item_ttrs_32_house_32, 250) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
 		years_available: [1950, 1980];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_32;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_32_colour;
 	}
 }
@@ -3712,11 +3792,13 @@ item (FEAT_HOUSES, item_ttrs_33_house_33, 251) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_33;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_33_colour;
 	}
 }
@@ -3770,11 +3852,13 @@ item (FEAT_HOUSES, item_ttrs_34_house_34, 252) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_34;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_34_colour;
 	}
 }
@@ -3823,14 +3907,15 @@ item (FEAT_HOUSES, item_ttrs_35_water_tower, 253) {
 		mail_multiplier: 0;
 		building_class: 1;
 		probability: 3;
-		/* NFO cargo amount is 0 for: PASS, MAIL, GOOD */
+		/* NFO cargo amount is 0 for: TOUR, PASS, PASS */
 		/* NFO name string-id: DC04; visible name: Water tower */
 		/* NFO field 14: 21 */
 		/* NFO field 1D: 04 */
 	}
 	graphics {
 		default: sl_ttrs_35;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -3904,12 +3989,14 @@ item (FEAT_HOUSES, item_ttrs_36_z_office_block, 254) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
+		probability: 1;
 		/* NFO name string-id: DC0A; visible name: "Z" office block */
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_36;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_36_colour;
 	}
 }
@@ -3981,10 +4068,12 @@ item (FEAT_HOUSES, item_ttrs_37_house_37, 255) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1980, 2010];
+		probability: 2;
 	}
 	graphics {
 		default: sl_ttrs_37;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -4016,11 +4105,13 @@ item (FEAT_HOUSES, item_ttrs_38_house_38, 256) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_38;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -4211,6 +4302,7 @@ item (FEAT_HOUSES, item_ttrs_39_fire_station, 257, HOUSE_SIZE_2X1) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1980, 2175];
+		probability: 2;
 		refresh_multiplier: 3;
 		accepted_cargos: [[MAIL, 2],[GOOD, 2]];
 		/* NFO cargo amount is 0 for: PASS */
@@ -4220,7 +4312,8 @@ item (FEAT_HOUSES, item_ttrs_39_fire_station, 257, HOUSE_SIZE_2X1) {
 	graphics {
 		graphics_north: sl_ttrs_39;
 		graphics_west: sl_ttrs_3A;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -4292,10 +4385,12 @@ item (FEAT_HOUSES, item_ttrs_3b_house_3b, 259) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_3B;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -4325,11 +4420,13 @@ item (FEAT_HOUSES, item_ttrs_3c_house_3c, 260) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND)];
 		/* NFO availability packed value: 61456 */
 		years_available: [1980, 2175];
+		probability: 1;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_3C;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -4423,12 +4520,14 @@ item (FEAT_HOUSES, item_ttrs_3d_house_3d, 261, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 		accepted_cargos: [[PASS, 6],[MAIL, 2],[GOOD, 4]];
 	}
 	graphics {
 		graphics_north: sl_ttrs_3D;
 		graphics_east: sl_ttrs_3E;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -4479,11 +4578,12 @@ item (FEAT_HOUSES, item_ttrs_3f_house_3f, 263) {
 		/* NFO availability packed value: 63503 */
 		years_available: [1980, 2010];
 		probability: 1;
-		accepted_cargos: [[GOOD, 2]];
+		accepted_cargos: [[FOOD, 2]];
 	}
 	graphics {
 		default: sl_ttrs_3F;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -4573,12 +4673,14 @@ item (FEAT_HOUSES, item_ttrs_40_zimmlocks_house, 264) {
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
 		years_available: [1980, 2175];
-		accepted_cargos: [[GOOD, 1]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 1]];
 		/* NFO name string-id: DC0B; visible name: Zimmlock's house */
 	}
 	graphics {
 		default: sl_ttrs_40;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -4620,12 +4722,14 @@ item (FEAT_HOUSES, item_ttrs_41_house_41, 265) {
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
 		years_available: [1980, 2175];
-		accepted_cargos: [[GOOD, 1]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 1]];
 		/* NFO name string-id: 2037; visible name: house_41 */
 	}
 	graphics {
 		default: sl_ttrs_41;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -4720,6 +4824,7 @@ item (FEAT_HOUSES, item_ttrs_42_large_block_of_flats, 266, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 		accepted_cargos: [[PASS, 6],[MAIL, 3]];
 		/* NFO cargo amount is 0 for: GOOD */
 		/* NFO name string-id: DC05; visible name: Large block of flats */
@@ -4727,7 +4832,8 @@ item (FEAT_HOUSES, item_ttrs_42_large_block_of_flats, 266, HOUSE_SIZE_1X2) {
 	graphics {
 		graphics_north: sl_ttrs_42;
 		graphics_east: sl_ttrs_43;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -4806,11 +4912,13 @@ item (FEAT_HOUSES, item_ttrs_44_house_44, 268) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2175];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_44;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_44_colour;
 	}
 }
@@ -4864,13 +4972,15 @@ item (FEAT_HOUSES, item_ttrs_45_library, 269) {
 		availability_mask: [bitmask(TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63500 */
 		years_available: [1980, 2175];
+		probability: 2;
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
 		/* NFO cargo amount is 0 for: GOOD */
 		/* NFO name string-id: DC0D; visible name: Library */
 	}
 	graphics {
 		default: sl_ttrs_45;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -4923,11 +5033,13 @@ item (FEAT_HOUSES, item_ttrs_46_luxury_apartments, 270) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 		/* NFO name string-id: DC06; visible name: Luxury apartments */
 	}
 	graphics {
 		default: sl_ttrs_46;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -4979,11 +5091,13 @@ item (FEAT_HOUSES, item_ttrs_47_house_47, 271) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
-		accepted_cargos: [[PASS, 10],[MAIL, 4],[GOOD, 6]];
+		probability: 1;
+		accepted_cargos: [[PASS, 10],[TOUR, 4],[GOOD, 6]];
 	}
 	graphics {
 		default: sl_ttrs_47;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -5034,12 +5148,14 @@ item (FEAT_HOUSES, item_ttrs_48_mosque, 272) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1980, 2175];
+		probability: 1;
 		/* NFO name string-id: DC0E; visible name: Mosque */
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_48;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -5093,12 +5209,14 @@ item (FEAT_HOUSES, item_ttrs_49_multimedia_offices, 273) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_49;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_49_colour;
 	}
 }
@@ -5149,10 +5267,12 @@ item (FEAT_HOUSES, item_ttrs_4a_house_4a, 274) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_4A;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -5204,10 +5324,12 @@ item (FEAT_HOUSES, item_ttrs_4b_house_4b, 275) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_4B;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -5243,6 +5365,7 @@ item (FEAT_HOUSES, item_ttrs_4c_park_avenue_1457, 276) {
 		years_available: [1980, 2010];
 		population: 100;
 		mail_multiplier: 50;
+		probability: 1;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 4]];
 		/* NFO name string-id: DC08; visible name: Park Avenue 1457 */
 		/* NFO field 14: 10 */
@@ -5250,6 +5373,7 @@ item (FEAT_HOUSES, item_ttrs_4c_park_avenue_1457, 276) {
 	graphics {
 		default: sl_ttrs_4C;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_4c_colour;
 	}
 }
@@ -5432,6 +5556,7 @@ item (FEAT_HOUSES, item_ttrs_4d_prison, 277, HOUSE_SIZE_2X2) {
 		years_available: [1980, 2175];
 		population: 200;
 		mail_multiplier: 10;
+		probability: 2;
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
 		/* NFO name string-id: DC02; visible name: Prison */
 		/* NFO field 14: 11 */
@@ -5442,7 +5567,8 @@ item (FEAT_HOUSES, item_ttrs_4d_prison, 277, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_4E;
 		graphics_west: sl_ttrs_4F;
 		graphics_south: sl_ttrs_50;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		colour: switch_ttrs_4d_colour;
 	}
 }
@@ -5622,6 +5748,7 @@ item (FEAT_HOUSES, item_ttrs_51_house_51, 281, HOUSE_SIZE_2X2) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
 		years_available: [1980, 2175];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -5630,6 +5757,7 @@ item (FEAT_HOUSES, item_ttrs_51_house_51, 281, HOUSE_SIZE_2X2) {
 		graphics_west: sl_ttrs_53;
 		graphics_south: sl_ttrs_54;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_51_colour;
 	}
 }
@@ -5680,10 +5808,12 @@ item (FEAT_HOUSES, item_ttrs_55_house_55, 285) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
 		years_available: [1980, 2010];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_55;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -5733,10 +5863,12 @@ item (FEAT_HOUSES, item_ttrs_56_house_56, 286) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
 		years_available: [1980, 2010];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_56;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -5793,11 +5925,13 @@ item (FEAT_HOUSES, item_ttrs_57_house_57, 287) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_57;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_57_colour;
 	}
 }
@@ -5852,12 +5986,14 @@ item (FEAT_HOUSES, item_ttrs_58_statue_residence, 288) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2175];
+		probability: 2;
 		/* NFO name string-id: DC03; visible name: Statue residence */
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_58;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 		colour: switch_ttrs_58_colour;
 	}
 }
@@ -5910,10 +6046,12 @@ item (FEAT_HOUSES, item_ttrs_59_house_59, 289) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_59;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -6197,13 +6335,15 @@ item (FEAT_HOUSES, item_ttrs_5a_house_5a, 290) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2175];
+		probability: 1;
 		animation_info: [1, 25];
 		animation_speed: 3;
 		/* NFO field 14: 08 */
 	}
 	graphics {
 		default: sl_ttrs_5A;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -6255,11 +6395,13 @@ item (FEAT_HOUSES, item_ttrs_5b_house_5b, 291) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2175];
-		accepted_cargos: [[PASS, 10],[MAIL, 4],[GOOD, 3]];
+		probability: 1;
+		accepted_cargos: [[PASS, 10],[FOOD, 4],[GOOD, 3]];
 	}
 	graphics {
 		default: sl_ttrs_5B;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -6312,7 +6454,8 @@ item (FEAT_HOUSES, item_ttrs_5c_observatorium, 292) {
 	}
 	graphics {
 		default: sl_ttrs_5C;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		colour: switch_ttrs_5c_colour;
 	}
 }
@@ -6497,6 +6640,7 @@ item (FEAT_HOUSES, item_ttrs_5d_world_trade_center, 293, HOUSE_SIZE_2X2) {
 		population: 255;
 		mail_multiplier: 25;
 		removal_cost_multiplier: 255;
+		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 8],[GOOD, 8]];
 		/* NFO name string-id: DC10; visible name: World Trade Center */
 		/* NFO field 14: 11 */
@@ -6508,7 +6652,8 @@ item (FEAT_HOUSES, item_ttrs_5d_world_trade_center, 293, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_5E;
 		graphics_west: sl_ttrs_5F;
 		graphics_south: sl_ttrs_60;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 		colour: switch_ttrs_5d_colour;
 	}
 }
@@ -6561,10 +6706,12 @@ item (FEAT_HOUSES, item_ttrs_61_house_61, 297) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [2010, 2175];
+		probability: 2;
 	}
 	graphics {
 		default: sl_ttrs_61;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -6852,6 +6999,7 @@ item (FEAT_HOUSES, item_ttrs_62_house_62, 298) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		animation_info: [1, 25];
 		animation_speed: 3;
 		/* NFO field 14: 09 */
@@ -6859,6 +7007,7 @@ item (FEAT_HOUSES, item_ttrs_62_house_62, 298) {
 	graphics {
 		default: sl_ttrs_62;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -6910,10 +7059,12 @@ item (FEAT_HOUSES, item_ttrs_63_house_63, 299) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_63;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -7007,12 +7158,14 @@ item (FEAT_HOUSES, item_ttrs_64_house_64, 300, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		accepted_cargos: [[PASS, 6],[MAIL, 2],[GOOD, 4]];
 	}
 	graphics {
 		graphics_north: sl_ttrs_64;
 		graphics_east: sl_ttrs_65;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -7064,11 +7217,13 @@ item (FEAT_HOUSES, item_ttrs_66_house_66, 302) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [2010, 2175];
-		accepted_cargos: [[GOOD, 2]];
+		probability: 1;
+		accepted_cargos: [[FOOD, 2]];
 	}
 	graphics {
 		default: sl_ttrs_66;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -7138,11 +7293,12 @@ item (FEAT_HOUSES, item_ttrs_67_house_67, 303) {
 		/* NFO availability packed value: 63503 */
 		years_available: [2010, 2175];
 		probability: 1;
-		accepted_cargos: [[GOOD, 2]];
+		accepted_cargos: [[FOOD, 2]];
 	}
 	graphics {
 		default: sl_ttrs_67;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -7186,12 +7342,13 @@ item (FEAT_HOUSES, item_ttrs_68_house_68, 304) {
 		/* NFO availability packed value: 63503 */
 		years_available: [2010, 2175];
 		probability: 1;
-		accepted_cargos: [[GOOD, 2]];
+		accepted_cargos: [[FOOD, 2]];
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_68;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_68_colour;
 	}
 }
@@ -7289,13 +7446,15 @@ item (FEAT_HOUSES, item_ttrs_69_large_block_of_flats, 305, HOUSE_SIZE_2X1) {
 		years_available: [2010, 2175];
 		population: 200;
 		mail_multiplier: 50;
+		probability: 1;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 2]];
 		/* NFO name string-id: DC05; visible name: Large block of flats */
 	}
 	graphics {
 		graphics_north: sl_ttrs_69;
 		graphics_west: sl_ttrs_6A;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -7348,11 +7507,13 @@ item (FEAT_HOUSES, item_ttrs_6b_luxury_apartments, 307) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		/* NFO name string-id: DC06; visible name: Luxury apartments */
 	}
 	graphics {
 		default: sl_ttrs_6B;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -7406,12 +7567,14 @@ item (FEAT_HOUSES, item_ttrs_6c_house_6c, 308) {
 		years_available: [2010, 2175];
 		population: 200;
 		mail_multiplier: 80;
-		accepted_cargos: [[PASS, 10],[MAIL, 4],[GOOD, 8]];
+		probability: 1;
+		accepted_cargos: [[PASS, 10],[TOUR, 4],[GOOD, 8]];
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_6C;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -7465,12 +7628,14 @@ item (FEAT_HOUSES, item_ttrs_6d_multimedia_offices, 309) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_6D;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_6d_colour;
 	}
 }
@@ -7527,6 +7692,7 @@ item (FEAT_HOUSES, item_ttrs_6e_museum_of_modern_arts, 310, HOUSE_SIZE_2X1) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63491 */
 		years_available: [2070, 2175];
+		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 6],[GOOD, 4]];
 		/* NFO name string-id: DC11; visible name: Museum of Modern Arts */
 		/* NFO field 14: 11 */
@@ -7534,7 +7700,8 @@ item (FEAT_HOUSES, item_ttrs_6e_museum_of_modern_arts, 310, HOUSE_SIZE_2X1) {
 	graphics {
 		graphics_north: sl_ttrs_6E;
 		graphics_west: sl_ttrs_6F;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 		colour: switch_ttrs_6e_colour;
 	}
 }
@@ -7588,11 +7755,13 @@ item (FEAT_HOUSES, item_ttrs_70_house_70, 312) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2170];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_70;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_70_colour;
 	}
 }
@@ -7646,11 +7815,13 @@ item (FEAT_HOUSES, item_ttrs_71_house_71, 313) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_71;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_71_colour;
 	}
 }
@@ -7697,6 +7868,7 @@ item (FEAT_HOUSES, item_ttrs_72_park_avenue_1457, 314) {
 		years_available: [2010, 2175];
 		population: 100;
 		mail_multiplier: 50;
+		probability: 1;
 		accepted_cargos: [[PASS, 5],[MAIL, 2],[GOOD, 4]];
 		/* NFO name string-id: DC08; visible name: Park Avenue 1457 */
 		/* NFO field 14: 10 */
@@ -7704,6 +7876,7 @@ item (FEAT_HOUSES, item_ttrs_72_park_avenue_1457, 314) {
 	graphics {
 		default: sl_ttrs_72;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_72_colour;
 	}
 }
@@ -7757,11 +7930,13 @@ item (FEAT_HOUSES, item_ttrs_73_house_73, 315) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_73;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_73_colour;
 	}
 }
@@ -7814,10 +7989,12 @@ item (FEAT_HOUSES, item_ttrs_74_house_74, 316) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
 		years_available: [2010, 2175];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_74;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -7870,11 +8047,13 @@ item (FEAT_HOUSES, item_ttrs_75_house_75, 317) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
 		years_available: [2010, 2175];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_75;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_75_colour;
 	}
 }
@@ -7968,11 +8147,13 @@ item (FEAT_HOUSES, item_ttrs_76_house_76, 318) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_76;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_76_colour;
 	}
 }
@@ -8046,10 +8227,12 @@ item (FEAT_HOUSES, item_ttrs_77_house_77, 319) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 	}
 	graphics {
 		default: sl_ttrs_77;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -8102,11 +8285,13 @@ item (FEAT_HOUSES, item_ttrs_78_z_office_block, 320) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 2175];
+		probability: 1;
 		/* NFO name string-id: DC0A; visible name: "Z" office block */
 	}
 	graphics {
 		default: sl_ttrs_78;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -8159,12 +8344,14 @@ item (FEAT_HOUSES, item_ttrs_79_z_office_block, 321) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
+		probability: 1;
 		/* NFO name string-id: DC0A; visible name: "Z" office block */
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		default: sl_ttrs_79;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -8924,7 +9111,8 @@ item (FEAT_HOUSES, item_ttrs_7a_cathedral, 322, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_7B;
 		graphics_west: sl_ttrs_7C;
 		graphics_south: sl_ttrs_7D;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -9476,8 +9664,11 @@ item (FEAT_HOUSES, item_ttrs_7e_stock_exchange_building, 326, HOUSE_SIZE_2X2) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63519 */
 		years_available: [1930, 2000];
+		probability: 2;
 		refresh_multiplier: 9;
 		animation_info: [0, 24];
+		animation_speed: 2;
+		/* NOTE: ANIMATE flag set but NFO had no animation_speed; defaulting to 2 */
 		accepted_cargos: [[PASS, 6]];
 		/* NFO cargo amount is 0 for: MAIL, GOOD */
 		/* NFO name string-id: DC13; visible name: Stock exchange building */
@@ -9488,7 +9679,8 @@ item (FEAT_HOUSES, item_ttrs_7e_stock_exchange_building, 326, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_7F;
 		graphics_west: sl_ttrs_80;
 		graphics_south: sl_ttrs_81;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -9588,7 +9780,7 @@ item (FEAT_HOUSES, item_ttrs_82_old_town_houses, 330, HOUSE_SIZE_2X2) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
 		years_available: [1930, 1950];
-		probability: 15;
+		probability: 3;
 		refresh_multiplier: 8;
 		/* NFO name string-id: DC14; visible name: Old town houses */
 		/* NFO field 14: 81 */
@@ -9599,7 +9791,8 @@ item (FEAT_HOUSES, item_ttrs_82_old_town_houses, 330, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_83;
 		graphics_west: sl_ttrs_84;
 		graphics_south: sl_ttrs_85;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -10026,7 +10219,12 @@ item (FEAT_HOUSES, item_ttrs_86_endless_flats, 334, HOUSE_SIZE_2X1) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
 		years_available: [1950, 1980];
+		probability: 1;
 		refresh_multiplier: 5;
+		animation_info: [1, 1];
+		/* NOTE: ANIMATE flag set but NFO had no animation_info; using minimal default */
+		animation_speed: 2;
+		/* NOTE: ANIMATE flag set but NFO had no animation_speed; defaulting to 2 */
 		/* NFO name string-id: DC15; visible name: "Endless" flats */
 		/* NFO field 14: F7 */
 		/* NFO field 1D: 04 */
@@ -10034,7 +10232,8 @@ item (FEAT_HOUSES, item_ttrs_86_endless_flats, 334, HOUSE_SIZE_2X1) {
 	graphics {
 		graphics_north: sl_ttrs_86;
 		graphics_west: sl_ttrs_87;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 		colour: switch_ttrs_86_colour;
 	}
 }
@@ -10740,6 +10939,8 @@ item (FEAT_HOUSES, item_ttrs_88_hospital, 336, HOUSE_SIZE_2X2) {
 		probability: 2;
 		refresh_multiplier: 9;
 		animation_info: [0, 24];
+		animation_speed: 2;
+		/* NOTE: ANIMATE flag set but NFO had no animation_speed; defaulting to 2 */
 		/* NFO name string-id: DC16; visible name: Hospital */
 		/* NFO field 14: FF */
 		/* NFO field 1D: 00 */
@@ -10749,7 +10950,8 @@ item (FEAT_HOUSES, item_ttrs_88_hospital, 336, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_89;
 		graphics_west: sl_ttrs_8A;
 		graphics_south: sl_ttrs_8B;
-		construction_check: switch_ttrs_flats;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -10929,6 +11131,7 @@ item (FEAT_HOUSES, item_ttrs_8c_hospital, 340, HOUSE_SIZE_2X2) {
 		/* NFO availability packed value: 63494 */
 		years_available: [1990, 2175];
 		building_class: 2;
+		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 8],[GOOD, 8]];
 		/* NFO name string-id: DC16; visible name: Hospital */
 		/* NFO field 14: 11 */
@@ -10939,7 +11142,8 @@ item (FEAT_HOUSES, item_ttrs_8c_hospital, 340, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_8D;
 		graphics_west: sl_ttrs_8E;
 		graphics_south: sl_ttrs_8F;
-		construction_check: switch_ttrs_flats;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -10979,13 +11183,15 @@ item (FEAT_HOUSES, item_ttrs_90_petrol_station, 344) {
 		mail_multiplier: 0;
 		local_authority_impact: 16;
 		removal_cost_multiplier: 64;
-		accepted_cargos: [[PASS, 6],[MAIL, 3],[GOOD, 1]];
+		probability: 1;
+		accepted_cargos: [[PETR, 6],[GOOD, 3],[PASS, 1]];
 		/* NFO name string-id: DC17; visible name: Petrol station */
 		/* NFO field 14: 11 */
 	}
 	graphics {
 		default: sl_ttrs_90;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 		colour: switch_ttrs_90_colour;
 	}
 }
@@ -11047,7 +11253,7 @@ item (FEAT_HOUSES, item_ttrs_91_petrol_station, 345, HOUSE_SIZE_2X1) {
 		local_authority_impact: 32;
 		removal_cost_multiplier: 128;
 		probability: 1;
-		accepted_cargos: [[PASS, 6],[MAIL, 3],[GOOD, 1]];
+		accepted_cargos: [[PETR, 6],[GOOD, 3],[PASS, 1]];
 		/* NFO name string-id: DC17; visible name: Petrol station */
 		/* NFO field 14: 11 */
 	}
@@ -11055,6 +11261,7 @@ item (FEAT_HOUSES, item_ttrs_91_petrol_station, 345, HOUSE_SIZE_2X1) {
 		graphics_north: sl_ttrs_91;
 		graphics_west: sl_ttrs_92;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -11115,7 +11322,7 @@ item (FEAT_HOUSES, item_ttrs_93_petrol_station, 347, HOUSE_SIZE_1X2) {
 		local_authority_impact: 32;
 		removal_cost_multiplier: 128;
 		probability: 1;
-		accepted_cargos: [[PASS, 8],[MAIL, 4],[GOOD, 1]];
+		accepted_cargos: [[PETR, 8],[GOOD, 4],[PASS, 1]];
 		/* NFO name string-id: DC17; visible name: Petrol station */
 		/* NFO field 14: 11 */
 	}
@@ -11123,6 +11330,7 @@ item (FEAT_HOUSES, item_ttrs_93_petrol_station, 347, HOUSE_SIZE_1X2) {
 		graphics_north: sl_ttrs_93;
 		graphics_east: sl_ttrs_94;
 		construction_check: switch_ttrs_residential;
+		/* classification: residential */
 	}
 }
 
@@ -11206,8 +11414,8 @@ item (FEAT_HOUSES, item_ttrs_95_hotel_zvon, 349) {
 		population: 32;
 		mail_multiplier: 16;
 		removal_cost_multiplier: 191;
-		probability: 5;
-		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 8]];
+		probability: 3;
+		accepted_cargos: [[TOUR, 8],[PASS, 2],[FOOD, 8]];
 		/* NFO name string-id: DC18; visible name: Hotel Zvon */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
@@ -11215,7 +11423,8 @@ item (FEAT_HOUSES, item_ttrs_95_hotel_zvon, 349) {
 	}
 	graphics {
 		default: sl_ttrs_95;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -11322,8 +11531,8 @@ item (FEAT_HOUSES, item_ttrs_96_hotel_praha, 350, HOUSE_SIZE_2X1) {
 		population: 64;
 		mail_multiplier: 16;
 		removal_cost_multiplier: 191;
-		probability: 6;
-		accepted_cargos: [[PASS, 7],[MAIL, 2],[GOOD, 3]];
+		probability: 3;
+		accepted_cargos: [[TOUR, 7],[PASS, 2],[MAIL, 3]];
 		/* NFO name string-id: DC19; visible name: Hotel Praha */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
@@ -11332,7 +11541,8 @@ item (FEAT_HOUSES, item_ttrs_96_hotel_praha, 350, HOUSE_SIZE_2X1) {
 	graphics {
 		graphics_north: sl_ttrs_96;
 		graphics_west: sl_ttrs_97;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -11392,7 +11602,7 @@ item (FEAT_HOUSES, item_ttrs_98_hotel_regent, 352, HOUSE_SIZE_2X1) {
 		mail_multiplier: 20;
 		removal_cost_multiplier: 160;
 		probability: 3;
-		accepted_cargos: [[PASS, 7],[MAIL, 2],[GOOD, 3]];
+		accepted_cargos: [[TOUR, 7],[PASS, 2],[MAIL, 3]];
 		/* NFO name string-id: DC1A; visible name: Hotel Regent */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
@@ -11401,7 +11611,8 @@ item (FEAT_HOUSES, item_ttrs_98_hotel_regent, 352, HOUSE_SIZE_2X1) {
 	graphics {
 		graphics_north: sl_ttrs_98;
 		graphics_west: sl_ttrs_99;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -11660,8 +11871,8 @@ item (FEAT_HOUSES, item_ttrs_9a_hotel_pribaltiskaya, 354, HOUSE_SIZE_2X2) {
 		population: 96;
 		mail_multiplier: 64;
 		removal_cost_multiplier: 255;
-		probability: 8;
-		accepted_cargos: [[PASS, 8],[MAIL, 3],[GOOD, 4]];
+		probability: 3;
+		accepted_cargos: [[TOUR, 8],[PASS, 3],[MAIL, 4]];
 		/* NFO name string-id: DC1B; visible name: Hotel Pribaltiskaya */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
@@ -11672,7 +11883,8 @@ item (FEAT_HOUSES, item_ttrs_9a_hotel_pribaltiskaya, 354, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_9B;
 		graphics_west: sl_ttrs_9C;
 		graphics_south: sl_ttrs_9D;
-		construction_check: switch_ttrs_residential;
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -11736,7 +11948,7 @@ item (FEAT_HOUSES, item_ttrs_9e_bronze_horseman_statue, 358) {
 		removal_cost_multiplier: 255;
 		building_class: 3;
 		probability: 2;
-		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
+		accepted_cargos: [[TOUR, 8],[PASS, 2],[GOOD, 2]];
 		/* NFO name string-id: DC1C; visible name: "Bronze Horseman" statue */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
@@ -11744,7 +11956,8 @@ item (FEAT_HOUSES, item_ttrs_9e_bronze_horseman_statue, 358) {
 	}
 	graphics {
 		default: sl_ttrs_9E;
-		construction_check: switch_ttrs_offices;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -11784,7 +11997,7 @@ item (FEAT_HOUSES, item_ttrs_9f_statue_of_john_batchelor, 359) {
 		removal_cost_multiplier: 255;
 		building_class: 3;
 		probability: 2;
-		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
+		accepted_cargos: [[TOUR, 8],[PASS, 2],[GOOD, 2]];
 		/* NFO name string-id: DC1D; visible name: Statue of John Batchelor */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
@@ -11792,7 +12005,8 @@ item (FEAT_HOUSES, item_ttrs_9f_statue_of_john_batchelor, 359) {
 	}
 	graphics {
 		default: sl_ttrs_9F;
-		construction_check: switch_ttrs_offices;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -11832,7 +12046,7 @@ item (FEAT_HOUSES, item_ttrs_a0_statue_of_v_i_lenin, 360) {
 		removal_cost_multiplier: 255;
 		building_class: 3;
 		probability: 2;
-		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
+		accepted_cargos: [[TOUR, 8],[PASS, 2],[GOOD, 2]];
 		/* NFO name string-id: DC1E; visible name: Statue of V.I. Lenin */
 		/* NFO field 14: 01 */
 		/* NFO field 1D: 02 */
@@ -11840,7 +12054,8 @@ item (FEAT_HOUSES, item_ttrs_a0_statue_of_v_i_lenin, 360) {
 	}
 	graphics {
 		default: sl_ttrs_A0;
-		construction_check: switch_ttrs_offices;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -11881,7 +12096,7 @@ item (FEAT_HOUSES, item_ttrs_a1_statue_of_captain_cook, 361) {
 		removal_cost_multiplier: 255;
 		building_class: 3;
 		probability: 2;
-		accepted_cargos: [[PASS, 8],[MAIL, 2],[GOOD, 2]];
+		accepted_cargos: [[TOUR, 8],[PASS, 2],[GOOD, 2]];
 		/* NFO name string-id: DC1F; visible name: Statue of Captain Cook */
 		/* NFO field 14: 11 */
 		/* NFO field 1D: 02 */
@@ -11889,7 +12104,8 @@ item (FEAT_HOUSES, item_ttrs_a1_statue_of_captain_cook, 361) {
 	}
 	graphics {
 		default: sl_ttrs_A1;
-		construction_check: switch_ttrs_offices;
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 		colour: switch_ttrs_a1_colour;
 	}
 }
