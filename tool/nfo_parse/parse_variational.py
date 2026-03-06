@@ -106,7 +106,7 @@ def parse_variational_node_81(rs: RawSprite) -> VariationalNode | None:
 
     return VariationalNode(
         node_id  = set_id,
-        var_type = 0x81,
+        var_type = b[3],
         variable = variable,
         shift    = shift,
         mask     = mask,

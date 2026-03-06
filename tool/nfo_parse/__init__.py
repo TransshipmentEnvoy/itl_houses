@@ -40,7 +40,7 @@ from .nodes import (
     # Node type enum
     NodeType,
     # Variable constants
-    VAR_ANIMATION_COUNTER,
+    VAR_BUILDING_COUNTS,
     VAR_ANIMATION_FRAME,
     VAR_BUILDING_AGE,
     VAR_CALLBACK_ID,
@@ -104,7 +104,7 @@ __all__ = [
     "ComputationNode",
     "NodeType",
     # Variable constants
-    "VAR_ANIMATION_COUNTER",
+    "VAR_BUILDING_COUNTS",
     "VAR_ANIMATION_FRAME",
     "VAR_BUILDING_AGE",
     "VAR_CALLBACK_ID",

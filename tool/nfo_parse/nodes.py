@@ -48,8 +48,8 @@ VAR_CONSTRUCTION_STATE = 0x40   # build progress 0-3
 VAR_BUILDING_AGE       = 0x41   # age in years
 VAR_TOWN_ZONE          = 0x42   # town zone 0-4
 VAR_TERRAIN_TYPE       = 0x43   # terrain / snow check
-VAR_ANIMATION_FRAME    = 0x44   # animation frame info (also used as counter)
-VAR_ANIMATION_COUNTER  = 0x46   # animation frame by counter (sprite select)
+VAR_BUILDING_COUNTS    = 0x44   # building counts in town/map (DWORD LLllCCcc)
+VAR_ANIMATION_FRAME    = 0x46   # current animation frame being displayed
 VAR_CALLBACK_ID        = 0x0C   # which callback is being invoked
 VAR_CLIMATE            = 0x03   # game climate (0=temp, 1=arctic, 2=tropic, 3=toy)
 
@@ -201,11 +201,11 @@ class VariationalNode:
 
 @dataclass
 class RandomNode:
-    """Type-80 / type-82: random selection among multiple groups."""
+    """Type-80 / type-83: random selection among multiple groups."""
     node_id:  int
     node_type: NodeType = field(default=NodeType.RANDOM, init=False, repr=False)
 
-    rand_type:      int          # 0x80 (simple) or 0x82 (with re-randomisation)
+    rand_type:      int          # 0x80 (self) or 0x83 (related-object)
     triggers:       int          # trigger-bits byte
     rand_bit_start: int          # which random bit to start reading from
     count:          int          # number of entries (already resolved, not the power)

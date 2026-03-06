@@ -425,25 +425,30 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
             if all(v.upper() == "FF" for v in values):
                 is_bulk_disable = True
 
-        # Parse property values for each house
+        # Parse property values for each house.
+        # NFO Action 0 layout: for each property key, num_houses values follow
+        # in sequence (outer=props, inner=houses).  The cursor p must advance
+        # linearly — never reset between houses.
         for h in range(num_houses):
             house_id = first_id + h
             if house_id not in properties:
                 properties[house_id] = {}
 
-            props = properties[house_id]
+        p = 0
+        prop_count = 0
+        while p < len(tokens) and prop_count < num_props:
+            key = tokens[p]
+            p += 1
 
-            p = 0
-            prop_count = 0
-            while p < len(tokens) and prop_count < num_props:
-                key = tokens[p]
-                p += 1
+            if not HEX2_RE.match(key):
+                continue
 
-                if not HEX2_RE.match(key):
-                    continue
+            prop_count += 1
+            key_int = int(key, 16)
 
-                prop_count += 1
-                key_int = int(key, 16)
+            # For each property key, consume one value per house in order.
+            for h in range(num_houses):
+                props = properties[first_id + h]
 
                 # Property 08: substitute type (1 byte)
                 # Keep the first definition - later overrides are typically disables
@@ -571,6 +576,14 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                             props["16"] = f"{val:02X}"
                         p += 1
 
+                # Property 17: four random colours (4*B)
+                elif key_int == 0x17:
+                    if p + 3 < len(tokens):
+                        vals = [parse_token_value(tokens[p + i]) for i in range(4)]
+                        if all(v is not None for v in vals) and "17" not in props:
+                            props["17"] = [f"{v:02X}" for v in vals]
+                        p += 4
+
                 # Property 18: probability
                 elif key_int == 0x18:
                     if p < len(tokens):
@@ -639,16 +652,16 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                 # Unknown property — use size lookup table to skip correctly.
                 # Action0/Houses property sizes (tokens per value):
                 #   08:1  09:1  0A:2  0B:1  0C:1  0D:1  0E:1  0F:1
-                #   10:2  11:1  12:2  13:2  14:1  15:1  16:1  17:2
-                #   18:1  19:1  1A:2  1B:1  1C:1  1D:1  1E:4  1F:2
+                #   10:2  11:1  12:2  13:2  14:1  15:1  16:1  17:4
+                #   18:1  19:1  1A:1  1B:1  1C:1  1D:1  1E:4  1F:1
                 #   20:4  21:2  22:4  23:1  24:1
                 else:
                     _PROP_SIZES: dict[int, int] = {
                         0x08: 1, 0x09: 1, 0x0A: 2, 0x0B: 1, 0x0C: 1,
                         0x0D: 1, 0x0E: 1, 0x0F: 1, 0x10: 2, 0x11: 1,
                         0x12: 2, 0x13: 2, 0x14: 1, 0x15: 1, 0x16: 1,
-                        0x17: 2, 0x18: 1, 0x19: 1, 0x1A: 2, 0x1B: 1,
-                        0x1C: 1, 0x1D: 1, 0x1E: 4, 0x1F: 2,
+                        0x17: 4, 0x18: 1, 0x19: 1, 0x1A: 1, 0x1B: 1,
+                        0x1C: 1, 0x1D: 1, 0x1E: 4, 0x1F: 1,
                         0x20: 4, 0x21: 2, 0x22: 4, 0x23: 1, 0x24: 1,
                     }
                     skip = _PROP_SIZES.get(key_int, 1)

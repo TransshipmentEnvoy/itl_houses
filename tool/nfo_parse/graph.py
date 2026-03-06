@@ -41,7 +41,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .nodes import (
-    VAR_ANIMATION_COUNTER, VAR_ANIMATION_FRAME, VAR_CALLBACK_ID,
+    VAR_BUILDING_COUNTS, VAR_ANIMATION_FRAME, VAR_CALLBACK_ID,
     VAR_CLIMATE, VAR_CONSTRUCTION_STATE, VAR_TERRAIN_TYPE,
     CLIMATE_ARCTIC, CLIMATE_TROPIC,
     TERRAIN_DESERT, TERRAIN_RAINFOREST, TERRAIN_SNOW,
@@ -191,9 +191,9 @@ def _extract_colour_values(
                     colours.append(val)
         return colours
 
-    # Type-82 re-randomise — treated as VariationalNode by the parser.
+    # Type-82/86 re-randomise — treated as VariationalNode by the parser.
     # Extract callback-result values from ranges and default.
-    if isinstance(node, VariationalNode) and node.var_type == 0x82:
+    if isinstance(node, VariationalNode) and node.var_type in (0x82, 0x86):
         colours = []
         seen = set()
         # Check default
@@ -423,7 +423,7 @@ def _traverse(
                             anim_frame, in_random, random_variant_idx, depth + 1)
 
         # 2e. Animation frame (var 0x46)
-        elif var == VAR_ANIMATION_COUNTER:
+        elif var == VAR_ANIMATION_FRAME:
             # Follow each frame range
             for rng in node.ranges:
                 for frame in range(rng.range_lo, rng.range_hi + 1):
@@ -435,14 +435,14 @@ def _traverse(
                     climate, in_constr, constr_idx,
                     None, in_random, random_variant_idx, depth + 1)
 
-        # 2f. Animation info (var 0x44) — used in callbacks; follow default
-        elif var == VAR_ANIMATION_FRAME:
+        # 2f. Building counts (var 0x44) — used in callbacks; follow default
+        elif var == VAR_BUILDING_COUNTS:
             _follow(node.default, node_snapshot, snapshots, final_graph, state,
                     climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
 
-        # 2g. Related-object variational (var_type 0x82) — follow default
-        elif var_type == 0x82:
+        # 2g. Related-object variational (var_type 0x82/0x86) — follow default
+        elif var_type in (0x82, 0x86):
             _follow(node.default, node_snapshot, snapshots, final_graph, state,
                     climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
