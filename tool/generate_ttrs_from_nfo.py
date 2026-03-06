@@ -22,7 +22,7 @@ from typing import Optional
 
 # New graph-based NFO parser (tool/nfo_parse/)
 from tool.nfo_parse import build_all_house_graphics, emit_house_tile_nml
-from tool.nfo_parse.fixups import fixup_food_only_add_pass_mail
+from tool.nfo_parse.fixups import fixup_food_only_add_pass_mail, fixup_remap_year_1930_to_1870
 from tool.nfo_parse.graph import traverse_callback_subgraph
 
 # ============================================================================
@@ -1238,8 +1238,11 @@ def build_item_block(
         y0 = re.sub(r"\\b", "", str(props["0A"][0]))
         y1 = re.sub(r"\\b", "", str(props["0A"][1]))
         if y0.isdigit() and y1.isdigit():
-            y1_fmt = "0xFFFF" if int(y1) >= 2170 else y1
-            lines.append(f"\t\tyears_available: [{y0}, {y1_fmt}];")
+            y0_int, y1_int, year_fixup_applied = fixup_remap_year_1930_to_1870(int(y0), int(y1))
+            y1_fmt = "0xFFFF" if y1_int >= 2170 else str(y1_int)
+            lines.append(f"\t\tyears_available: [{y0_int}, {y1_fmt}];")
+            if year_fixup_applied:
+                lines.append(f"\t\t/* CUSTOM: years_available remapped 1930 → 1870 (orig: [{y0}, {y1}]) */")
             used_props.add("0A")
 
     pop_raw = props.get("0B")

@@ -56,3 +56,33 @@ def fixup_food_only_add_pass_mail(
     ] + list(cargos)
 
     return new_cargos, True
+
+
+START_YEAR_REMAP: dict[int, int] = {
+    1930: 1870,
+}
+
+
+def fixup_remap_year_1930_to_1870(
+    y0: int,
+    y1: int,
+) -> tuple[int, int, bool]:
+    """Remap year 1930 → 1870 in years_available start or end position.
+
+    Parameters
+    ----------
+    y0:
+        Start year of the availability window.
+    y1:
+        End year of the availability window.
+
+    Returns
+    -------
+    (new_y0, new_y1, applied):
+        *new_y0* / *new_y1* are the (possibly remapped) year values.
+        *applied* is ``True`` when at least one endpoint was changed.
+    """
+    new_y0 = START_YEAR_REMAP.get(y0, y0)
+    new_y1 = START_YEAR_REMAP.get(y1, y1)
+    applied = (new_y0 != y0) or (new_y1 != y1)
+    return new_y0, new_y1, applied
