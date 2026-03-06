@@ -456,7 +456,8 @@ def emit_house_tile_nml(
     Returns ``(lines, entry_name, colour_values)`` where *entry_name* is always
     ``sl_ttrs_{house_id_hex}`` — the top-level identifier referenced by the
     ``item`` block graphics section, and *colour_values* is a (possibly empty)
-    list of colour palette indices extracted from the CB 0x1E callback chain.
+    list of 15-bit colour callback results extracted from the CB 0x1E chain.
+    Duplicate colour values are preserved to encode probability weights.
     """
     out: list[str] = []
     entry_name = f"sl_ttrs_{house_id_hex}"
@@ -707,10 +708,23 @@ def _emit_random_switch(
     if not variant_names:
         return
 
-    counts_str = " ".join(f"1: {name};" for name in variant_names)
+    # Use actual weights from entry repetition counts when available.
+    weights = htg.random_weights
+    weight_parts: list[str] = []
+    for i, name in enumerate(variant_names):
+        w = weights[i] if i < len(weights) else 1
+        weight_parts.append(f"{w}: {name};")
+    counts_str = " ".join(weight_parts)
+
+    # Trigger handling: triggers=0x00 means no rerandomisation trigger
+    # (NML default = randomised once on construction).  Non-zero triggers
+    # are emitted as a comment for manual review.
+    trigger_comment = ""
+    if htg.random_triggers != 0:
+        trigger_comment = f" /* NFO triggers: 0x{htg.random_triggers:02X} */"
     out.append(
         f"random_switch (FEAT_HOUSES, SELF, {entry_name}) {{"
-        f" {counts_str} }}"
+        f" {counts_str} }}{trigger_comment}"
     )
 
 

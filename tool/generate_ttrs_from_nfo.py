@@ -22,6 +22,8 @@ from typing import Optional
 
 # New graph-based NFO parser (tool/nfo_parse/)
 from tool.nfo_parse import build_all_house_graphics, emit_house_tile_nml
+from tool.nfo_parse.fixups import fixup_food_only_add_pass_mail
+from tool.nfo_parse.graph import traverse_callback_subgraph
 
 # ============================================================================
 # Regex patterns for NFO parsing
@@ -821,32 +823,167 @@ def classify_ttrs_house(
     return 'residential', 'switch_ttrs_residential', _PROB_DEFAULTS['residential']
 
 
+# ============================================================================
+# NFO Callback ID → NML graphics{} field name mapping
+# ============================================================================
+
+_CB_NML_FIELD: dict[int, str] = {
+    # 0x17 (construction_check) is handled separately — not included here
+    0x1A: "anim_next_frame",
+    0x1B: "anim_control",
+    0x1C: "construction_anim",
+    0x1F: "cargo_amount_accept",
+    0x20: "anim_speed",
+    0x21: "destruction",
+    0x2A: "cargo_type_accept",
+    0x2E: "cargo_production",
+    0x143: "protection",
+    0x148: "watched_cargo_accepted",
+    0x14D: "name",
+    0x14E: "foundations",
+    0x14F: "autoslope",
+}
+
+
+def _translate_callback_handlers(
+    htg_or_htg_list: object,
+    house_id_hex: str,
+    house_graph: dict,
+    final_graph: dict,
+) -> tuple[list[str], dict[str, str]]:
+    """Translate callback handler sub-graphs into NML switch blocks.
+
+    Parameters
+    ----------
+    htg_or_htg_list : HouseTileGraphics
+        The tile graphics object with ``callback_handlers`` populated.
+    house_id_hex : str
+    house_graph : per-house Action2Graph (for node lookup).
+    final_graph : global fallback graph.
+
+    Returns
+    -------
+    (nml_lines, cb_switches)
+        *nml_lines* are NML switch block definitions to be emitted before the
+        item block.  *cb_switches* maps NML graphics-field names (e.g.
+        ``"protection"``) to the top-level switch name for that callback.
+    """
+    from tool.nfo_parse.nodes import HouseTileGraphics as _HTG
+    htg = htg_or_htg_list
+    if not isinstance(htg, _HTG):
+        return [], {}
+
+    all_lines: list[str] = []
+    cb_switches: dict[str, str] = {}
+
+    for cb_id, target_id in sorted(htg.callback_handlers.items()):
+        nml_field = _CB_NML_FIELD.get(cb_id)
+        if nml_field is None:
+            # CB 0x17 = construction_check — handled by dedicated logic;
+            # skip silently.  Other unknown CBs get a note.
+            if cb_id != 0x17:
+                all_lines.append(
+                    f"/* NOTE: NFO callback 0x{cb_id:X} has no NML "
+                    f"graphics-block mapping, skipped */"
+                )
+            continue
+
+        cb_lines, cb_name = traverse_callback_subgraph(
+            target_id, house_graph, final_graph,
+            house_id_hex, cb_id,
+            cb_label=nml_field,
+        )
+
+        # Check if any branch fell through to a layout node (= CB_FAILED).
+        # For callbacks in _SUPPRESS_ON_FALLTHROUGH, this means the generated
+        # switch would lose information (CB_FAILED cannot be expressed as a
+        # return value), so we suppress the entire callback with a warning.
+        has_fallthrough = any(
+            "fell through to layout node" in line for line in cb_lines
+        )
+        if has_fallthrough and nml_field in _SUPPRESS_ON_FALLTHROUGH:
+            all_lines.append(
+                f"/* WARN: {nml_field} (CB 0x{cb_id:X}) sub-graph has branches "
+                f"that fall through to layout nodes (CB_FAILED semantics lost); "
+                f"callback omitted */"
+            )
+            continue
+
+        all_lines.extend(cb_lines)
+
+        if cb_name is not None:
+            cb_switches[nml_field] = cb_name
+        else:
+            all_lines.append(
+                f"/* NOTE: {nml_field} (0x{cb_id:X}) sub-graph could not "
+                f"be fully translated, omitted */"
+            )
+
+    return all_lines, cb_switches
+
+
+# Callbacks where fallthrough to a layout node (= CB_FAILED semantics) cannot
+# be safely approximated by any fixed return value.  When the sub-graph for
+# one of these callbacks contains a fallthrough branch, the entire callback is
+# suppressed and a warning comment is emitted instead.
+_SUPPRESS_ON_FALLTHROUGH: set[str] = {
+    "cargo_amount_accept",
+    "cargo_type_accept",
+}
+
+
+def _compute_colour_weights(colour_values: list[int]) -> tuple[list[int], list[int]]:
+    """Deduplicate colour values and compute per-value weights from repetition counts.
+
+    Returns ``(unique_values, weights)``.
+    """
+    order: list[int] = []
+    counts: dict[int, int] = {}
+    for v in colour_values:
+        if v not in counts:
+            order.append(v)
+            counts[v] = 1
+        else:
+            counts[v] += 1
+    weights = [counts[v] for v in order]
+    return order, weights
+
+
 def emit_colour_switch(
     house_id_hex: str,
     colour_values: list[int],
+    colour_triggers: int = 0,
 ) -> tuple[list[str], str]:
     """Emit NML colour callback block and return (lines, switch_name).
 
     For a single colour value, emits an inline ``return <value>;`` expression.
-    For multiple values, emits a ``random_switch`` that picks among them with
-    equal probability (triggered on tile loop, matching NFO semantics).
+    For multiple values, emits a ``random_switch`` with weights derived from
+    entry repetition counts.  Trigger semantics are preserved: triggers=0x00
+    means no rerandomisation trigger (omit the bitmask clause); non-zero
+    triggers are emitted as a comment for manual review.
     """
     switch_name = f"switch_ttrs_{house_id_hex.lower()}_colour"
     lines: list[str] = []
 
-    if len(colour_values) == 1:
+    unique_vals, weights = _compute_colour_weights(colour_values)
+
+    if len(unique_vals) == 1:
         # Single colour — no need for a random_switch, just inline it.
         # We still emit a switch so the identifier exists.
         lines.append(
             f"switch (FEAT_HOUSES, SELF, {switch_name}, 0) "
-            f"{{ return {colour_values[0]}; }}"
+            f"{{ return {unique_vals[0]}; }}"
         )
     else:
-        # Multiple colours — random_switch with equal weights
-        entries = " ".join(f"1: return {v};" for v in colour_values)
+        # Multiple colours — random_switch with actual weights
+        entries = " ".join(f"{w}: return {v};" for v, w in zip(unique_vals, weights))
+        # Trigger handling
+        trigger_comment = ""
+        if colour_triggers != 0:
+            trigger_comment = f" /* NFO triggers: 0x{colour_triggers:02X} */"
         lines.append(
-            f"random_switch (FEAT_HOUSES, SELF, {switch_name}, "
-            f"bitmask(TRIGGER_HOUSE_TILELOOP)) {{ {entries} }}"
+            f"random_switch (FEAT_HOUSES, SELF, {switch_name}) "
+            f"{{ {entries} }}{trigger_comment}"
         )
 
     return lines, switch_name
@@ -1005,11 +1142,13 @@ def build_item_block(
     colour_switch: Optional[str] = None,
     name_string_id: Optional[str] = None,
     ctt_map: Optional[dict[int, str]] = None,
+    callback_switches: Optional[dict[str, str]] = None,
 ) -> list[str]:
     """Build NML item block for a house.
 
     ``layout_name`` is what goes in ``default:`` when tile_layouts is not given.
     ``colour_switch`` if set, is the NML identifier for the colour callback.
+    ``callback_switches`` if set, maps NML callback field names to switch names.
     ``name_string_id`` if set, emits a ``name: string(...)`` property.
     """
     ident_suffix = sanitize_identifier(display_name)
@@ -1099,7 +1238,8 @@ def build_item_block(
         y0 = re.sub(r"\\b", "", str(props["0A"][0]))
         y1 = re.sub(r"\\b", "", str(props["0A"][1]))
         if y0.isdigit() and y1.isdigit():
-            lines.append(f"\t\tyears_available: [{y0}, {y1}];")
+            y1_fmt = "0xFFFF" if int(y1) >= 2170 else y1
+            lines.append(f"\t\tyears_available: [{y0}, {y1_fmt}];")
             used_props.add("0A")
 
     pop_raw = props.get("0B")
@@ -1202,19 +1342,26 @@ def build_item_block(
                 slot_labels[i] = ctt_map[idx]
         used_props.add("1E")
 
-    cargos: list[str] = []
+    cargo_pairs: list[tuple[str, int]] = []
     zero_cargos: list[str] = []
     for slot_idx, prop_key in enumerate(["0D", "0E", "0F"]):
         if isinstance(props.get(prop_key), str):
             amt = token_to_int(props[prop_key])
             if amt is not None:
                 if amt > 0:
-                    cargos.append(f"[{slot_labels[slot_idx]}, {amt}]")
+                    cargo_pairs.append((slot_labels[slot_idx], amt))
                 else:
                     zero_cargos.append(slot_labels[slot_idx])
                 used_props.add(prop_key)
+
+    # --- CUSTOM fixup: FOOD-only houses also accept PASS and MAIL ---
+    cargo_pairs, food_fixup_applied = fixup_food_only_add_pass_mail(cargo_pairs)
+
+    cargos = [f"[{label}, {amt}]" for label, amt in cargo_pairs]
     if cargos:
         lines.append(f"\t\taccepted_cargos: [{','.join(cargos)}];")
+    if food_fixup_applied:
+        lines.append(f"\t\t/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */")
     if zero_cargos:
         lines.append(f"\t\t/* NFO cargo amount is 0 for: {', '.join(zero_cargos)} */")
 
@@ -1243,6 +1390,9 @@ def build_item_block(
         lines.append(f"\t\tdefault: {default_graphics};")
     lines.append(f"\t\tconstruction_check: {construction_switch};")
     lines.append(f"\t\t/* classification: {category} */")
+    if callback_switches:
+        for cb_field, cb_switch in sorted(callback_switches.items()):
+            lines.append(f"\t\t{cb_field}: {cb_switch};")
     if colour_switch is not None:
         lines.append(f"\t\tcolour: {colour_switch};")
     lines.append("\t}")
@@ -1264,7 +1414,7 @@ def generate_ttrs_nml(
     lines = nfo_text.splitlines()
 
     # Build new graph-based house graphics (tropic / animation / random support)
-    _house_graphics, _ = build_all_house_graphics(lines)
+    _house_graphics, _house_graphs = build_all_house_graphics(lines)
 
     # Sprite data
     action1_blocks = parse_house_action1_blocks(lines)
@@ -1290,6 +1440,11 @@ def generate_ttrs_nml(
     lang_strings = generate_lang_strings(names, action3_ids)
     if lang_dir is not None:
         write_lang_strings(lang_dir, lang_strings)
+
+    # Build a merged global graph for cross-section callback lookups.
+    _global_graph: dict = {}
+    for hg in _house_graphs.values():
+        _global_graph.update(hg)
 
     out: list[str] = []
     out.append("/* Begin TTRS — sprites and item definitions auto-generated from ttrs3wmod.nfo */")
@@ -1330,6 +1485,8 @@ def generate_ttrs_nml(
             size_name, num_tiles = MULTI_TILE_BASES[sub_val]
             tile_layouts: list[str] = []
             multi_colour_values: list[int] = []
+            multi_colour_triggers: int = 0
+            multi_cb_switches: dict[str, str] = {}
 
             for t in range(num_tiles):
                 tile_id = house_id + t
@@ -1341,13 +1498,22 @@ def generate_ttrs_nml(
                 tile_layouts.append(layout_name)
                 if t == 0 and tile_colours:
                     multi_colour_values = tile_colours
+                    multi_colour_triggers = htg.colour_triggers
+                # Translate callback handlers for the primary tile
+                if t == 0 and htg.callback_handlers:
+                    house_g = _house_graphs.get(tile_id, {})
+                    cb_lines, cb_sw = _translate_callback_handlers(
+                        htg, tile_hex, house_g, _global_graph,
+                    )
+                    out.extend(cb_lines)
+                    multi_cb_switches.update(cb_sw)
                 if t > 0:
                     skip_ids.add(tile_id)
 
             colour_switch_name = None
             if multi_colour_values:
                 colour_lines, colour_switch_name = emit_colour_switch(
-                    house_id_hex, multi_colour_values
+                    house_id_hex, multi_colour_values, multi_colour_triggers
                 )
                 out.extend(colour_lines)
 
@@ -1363,6 +1529,7 @@ def generate_ttrs_nml(
                     colour_switch=colour_switch_name,
                     name_string_id=name_str_id,
                     ctt_map=ctt_map,
+                    callback_switches=multi_cb_switches or None,
                 )
             )
 
@@ -1380,9 +1547,18 @@ def generate_ttrs_nml(
             colour_switch_name = None
             if house_colours:
                 colour_lines, colour_switch_name = emit_colour_switch(
-                    house_id_hex, house_colours
+                    house_id_hex, house_colours, htg.colour_triggers
                 )
                 out.extend(colour_lines)
+
+            # Translate callback handlers
+            house_cb_switches: dict[str, str] = {}
+            if htg.callback_handlers:
+                house_g = _house_graphs.get(house_id, {})
+                cb_lines, house_cb_switches = _translate_callback_handlers(
+                    htg, house_id_hex, house_g, _global_graph,
+                )
+                out.extend(cb_lines)
 
             out.extend(
                 build_item_block(
@@ -1394,6 +1570,7 @@ def generate_ttrs_nml(
                     colour_switch=colour_switch_name,
                     name_string_id=name_str_id,
                     ctt_map=ctt_map,
+                    callback_switches=house_cb_switches or None,
                 )
             )
 

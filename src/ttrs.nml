@@ -615,6 +615,12 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_06_snow, construction_state) { 3: sl_ttrs_06_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_06, terrain_type) { TILETYPE_SNOW: sl_ttrs_06_snow; return sl_ttrs_06_nosnow; }
 
+/* WARN: anim_control target 0x1A00 not found in any graph section */
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_1, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_2, 0) { return 253; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_0, animation_frame) { 3: switch_ttrs_06_anim_control_1; return switch_ttrs_06_anim_control_2; }
+/* WARN: destruction target 0x1A00 not found in any graph section */
+/* NOTE: destruction (0x21) sub-graph could not be fully translated, omitted */
 spriteset(ss_ttrs_07_nosnow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [626, 328, 64, 31, -31, 0] }
 spriteset(ss_ttrs_07_nosnow_f0, "src/sprites/pcx/ttrs3w.pcx") { [2, 424, 59, 68, -27, -44] }
 spriteset(ss_ttrs_07_nosnow_f1, "src/sprites/pcx/ttrs3w.pcx") { [66, 424, 59, 68, -27, -44] }
@@ -667,7 +673,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_07_snow, construction_state) { 3: sl_ttrs_07_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_07, terrain_type) { TILETYPE_SNOW: sl_ttrs_07_snow; return sl_ttrs_07_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_06_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 14; 1: return 16; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_06_colour) { 4: return 776; 3: return 782; 3: return 784; 3: return 788; 3: return 789; }
 item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 7;
@@ -687,6 +693,7 @@ item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 		graphics_east: sl_ttrs_07;
 		construction_check: switch_ttrs_residential;
 		/* classification: residential */
+		anim_control: switch_ttrs_06_anim_control_0;
 		colour: switch_ttrs_06_colour;
 	}
 }
@@ -781,7 +788,8 @@ item (FEAT_HOUSES, item_ttrs_08_house_08, 208) {
 		/* NFO availability packed value: 63503 */
 		years_available: [1930, 1950];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 	}
 	graphics {
 		default: sl_ttrs_08;
@@ -832,7 +840,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_09_snow, construction_state) { 3: sl_ttrs_09_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_09, terrain_type) { TILETYPE_SNOW: sl_ttrs_09_snow; return sl_ttrs_09_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_09_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 30; 1: return 31; 1: return 32; 1: return 33; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_09_colour) { 11: return 796; 11: return 797; 11: return 798; 11: return 799; 10: return 800; 10: return 801; }
 item (FEAT_HOUSES, item_ttrs_09_house_09, 209) {
 	property {
 		substitute: 25;
@@ -840,7 +848,8 @@ item (FEAT_HOUSES, item_ttrs_09_house_09, 209) {
 		/* NFO availability packed value: 63489 */
 		years_available: [1930, 1950];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -917,7 +926,8 @@ item (FEAT_HOUSES, item_ttrs_0a_house_0a, 210) {
 		/* NFO availability packed value: 63489 */
 		years_available: [1930, 1980];
 		probability: 1;
-		accepted_cargos: [[FOOD, 1]];
+		accepted_cargos: [[PASS, 1],[MAIL, 1],[FOOD, 1]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 	}
 	graphics {
 		default: sl_ttrs_0A;
@@ -1012,7 +1022,8 @@ item (FEAT_HOUSES, item_ttrs_0b_house_0b, 211) {
 		/* NFO availability packed value: 63489 */
 		years_available: [1930, 1980];
 		probability: 1;
-		accepted_cargos: [[FOOD, 1]];
+		accepted_cargos: [[PASS, 1],[MAIL, 1],[FOOD, 1]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 	}
 	graphics {
 		default: sl_ttrs_0B;
@@ -1344,7 +1355,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_12_snow, construction_state) { 3: sl_ttrs_12_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_12, terrain_type) { TILETYPE_SNOW: sl_ttrs_12_snow; return sl_ttrs_12_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_0f_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_0f_colour) { 1: return 775; 1: return 776; 1: return 777; 1: return 782; 1: return 784; 1: return 785; 1: return 788; 1: return 789; }
 item (FEAT_HOUSES, item_ttrs_0f_prison, 215, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 20;
@@ -1393,7 +1404,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_13_snow, construction_state) { 3: sl_ttrs_13_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_13, terrain_type) { TILETYPE_SNOW: sl_ttrs_13_snow; return sl_ttrs_13_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_13_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 30; 1: return 31; 1: return 32; 1: return 33; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_13_colour) { 6: return 796; 6: return 797; 5: return 798; 5: return 799; 5: return 800; 5: return 801; }
 item (FEAT_HOUSES, item_ttrs_13_house_13, 219) {
 	property {
 		substitute: 29;
@@ -1453,7 +1464,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_14_snow, construction_state) { 3: sl_ttrs_14_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_14, terrain_type) { TILETYPE_SNOW: sl_ttrs_14_snow; return sl_ttrs_14_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_14_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 10; 1: return 12; 1: return 13; 1: return 15; 1: return 18; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_14_colour) { 6: return 778; 6: return 780; 5: return 781; 5: return 783; 5: return 786; 5: return 789; }
 item (FEAT_HOUSES, item_ttrs_14_house_14, 220) {
 	property {
 		substitute: 15;
@@ -1591,7 +1602,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_15_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_15_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_15_rv2_snow; return sl_ttrs_15_rv2_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_15) { 1: sl_ttrs_15_rv0; 1: sl_ttrs_15_rv1; 1: sl_ttrs_15_rv2; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_15) { 6: sl_ttrs_15_rv0; 5: sl_ttrs_15_rv1; 5: sl_ttrs_15_rv2; }
 
 item (FEAT_HOUSES, item_ttrs_15_house_15, 221) {
 	property {
@@ -1654,7 +1665,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_16) { 1: sl_ttrs_16_rv0; 1: sl_ttrs_16_rv1; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_16_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 30; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_16_colour) { 1: return 796; 1: return 798; 1: return 799; 1: return 800; }
 item (FEAT_HOUSES, item_ttrs_16_house_16, 222) {
 	property {
 		substitute: 0;
@@ -1716,12 +1727,12 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_17_snow, construction_state) { 3: sl_ttrs_17_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_17, terrain_type) { TILETYPE_SNOW: sl_ttrs_17_snow; return sl_ttrs_17_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_17_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_17_colour) { 10: return 776; 9: return 777; 9: return 782; 9: return 784; 9: return 785; 9: return 788; 9: return 789; }
 item (FEAT_HOUSES, item_ttrs_17_house_17, 223) {
 	property {
 		availability_mask: [0, 0];
 		/* NFO availability packed value: 0 */
-		years_available: [1930, 2175];
+		years_available: [1930, 0xFFFF];
 		probability: 1;
 	}
 	graphics {
@@ -1774,7 +1785,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_18_snow, construction_state) { 3: sl_ttrs_18_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_18, terrain_type) { TILETYPE_SNOW: sl_ttrs_18_snow; return sl_ttrs_18_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_18_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_18_colour) { 6: return 796; 5: return 799; 5: return 800; }
 item (FEAT_HOUSES, item_ttrs_18_house_18, 224) {
 	property {
 		substitute: 28;
@@ -2015,7 +2026,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_1D_arctic, construction_state) { 3: sl_ttrs_1
 switch (FEAT_HOUSES, SELF, sl_ttrs_1D_clisw, var[0x03, 0, 0xFF]) { 1: sl_ttrs_1D_arctic; return sl_ttrs_1D_nosnow; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_1D, terrain_type) { TILETYPE_SNOW: sl_ttrs_1D_snow; return sl_ttrs_1D_clisw; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_1d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_1d_colour) { 4: return 775; 4: return 776; 3: return 777; 3: return 780; 3: return 781; 3: return 782; 3: return 784; 3: return 785; 3: return 788; 3: return 789; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_1D_cargo_amount_accept_1, 0) { return 4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_1D_cargo_amount_accept_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_1D_cargo_amount_accept_0, var[0x44, 8, 0xFF]) { 1: switch_ttrs_1D_cargo_amount_accept_1; return switch_ttrs_1D_cargo_amount_accept_2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_1D_protection_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_1D_protection_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_1D_protection_0, var[0x44, 8, 0xFF]) { 1: switch_ttrs_1D_protection_1; return switch_ttrs_1D_protection_2; }
 item (FEAT_HOUSES, item_ttrs_1d_water_tower, 229) {
 	property {
 		substitute: 9;
@@ -2036,6 +2053,8 @@ item (FEAT_HOUSES, item_ttrs_1d_water_tower, 229) {
 		default: sl_ttrs_1D;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		cargo_amount_accept: switch_ttrs_1D_cargo_amount_accept_0;
+		protection: switch_ttrs_1D_protection_0;
 		colour: switch_ttrs_1d_colour;
 	}
 }
@@ -2474,7 +2493,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_22_tropic, construction_state) { 3: sl_ttrs_2
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_22, terrain_type) { TILETYPE_SNOW: sl_ttrs_22_snow; TILETYPE_DESERT: sl_ttrs_22_tropic; return sl_ttrs_22_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_21_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 10; 1: return 12; 1: return 13; 1: return 14; 1: return 15; 1: return 16; 1: return 17; 1: return 19; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_21_colour) { 10: return 775; 10: return 776; 9: return 777; 9: return 778; 9: return 780; 9: return 781; 9: return 782; 9: return 783; 9: return 784; 9: return 785; 9: return 787; 9: return 788; 9: return 789; 9: return 790; }
 item (FEAT_HOUSES, item_ttrs_21_house_21, 233, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 7;
@@ -2543,7 +2562,8 @@ item (FEAT_HOUSES, item_ttrs_23_house_23, 235) {
 		/* NFO availability packed value: 63503 */
 		years_available: [1950, 2010];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 	}
 	graphics {
 		default: sl_ttrs_23;
@@ -2605,7 +2625,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_24_tropic, construction_state) { 3: sl_ttrs_2
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_24, terrain_type) { TILETYPE_SNOW: sl_ttrs_24_snow; TILETYPE_DESERT: sl_ttrs_24_tropic; return sl_ttrs_24_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_24_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_24_colour) { 4: return 775; 4: return 776; 3: return 777; 3: return 779; 3: return 780; 3: return 782; 3: return 784; 3: return 785; 3: return 788; 3: return 789; }
 item (FEAT_HOUSES, item_ttrs_24_house_24, 236) {
 	property {
 		substitute: 6;
@@ -2613,7 +2633,8 @@ item (FEAT_HOUSES, item_ttrs_24_house_24, 236) {
 		/* NFO availability packed value: 63503 */
 		years_available: [1950, 2010];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -2686,7 +2707,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_25_tropic, construction_state) { 3: sl_ttrs_2
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_25, terrain_type) { TILETYPE_SNOW: sl_ttrs_25_snow; TILETYPE_DESERT: sl_ttrs_25_tropic; return sl_ttrs_25_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_25_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 10; 1: return 12; 1: return 16; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_25_colour) { 10: return 776; 9: return 777; 9: return 778; 9: return 780; 9: return 784; 9: return 789; 9: return 790; }
 item (FEAT_HOUSES, item_ttrs_25_house_25, 237) {
 	property {
 		substitute: 6;
@@ -2694,7 +2715,8 @@ item (FEAT_HOUSES, item_ttrs_25_house_25, 237) {
 		/* NFO availability packed value: 63503 */
 		years_available: [1950, 1980];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -2910,7 +2932,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_29_snow, construction_state) { 3: sl_ttrs_29_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_29, terrain_type) { TILETYPE_SNOW: sl_ttrs_29_snow; return sl_ttrs_29_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_29_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 18; 1: return 19; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_29_colour) { 5: return 776; 5: return 777; 5: return 778; 5: return 779; 5: return 780; 5: return 781; 5: return 782; 5: return 784; 5: return 786; 5: return 787; 5: return 788; 5: return 789; 4: return 790; }
 item (FEAT_HOUSES, item_ttrs_29_house_29, 241) {
 	property {
 		substitute: 17;
@@ -2971,7 +2993,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2A_snow, construction_state) { 3: sl_ttrs_2A_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_2A, terrain_type) { TILETYPE_SNOW: sl_ttrs_2A_snow; return sl_ttrs_2A_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_2a_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_2a_colour) { 4: return 776; 4: return 777; 3: return 779; 3: return 780; 3: return 781; 3: return 782; 3: return 784; 3: return 785; 3: return 788; 3: return 789; }
 item (FEAT_HOUSES, item_ttrs_2a_multimedia_offices, 242) {
 	property {
 		substitute: 36;
@@ -3033,7 +3055,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2B_snow, construction_state) { 3: sl_ttrs_2B_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_2B, terrain_type) { TILETYPE_SNOW: sl_ttrs_2B_snow; return sl_ttrs_2B_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_2b_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_2b_colour) { 8: return 776; 7: return 777; 7: return 780; 7: return 781; 7: return 782; 7: return 784; 7: return 788; 7: return 789; 7: return 790; }
 item (FEAT_HOUSES, item_ttrs_2b_multimedia_offices, 243) {
 	property {
 		substitute: 13;
@@ -3542,14 +3564,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv3, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_2F) { 1: sl_ttrs_2F_rv0; 1: sl_ttrs_2F_rv1; 1: sl_ttrs_2F_rv2; 1: sl_ttrs_2F_rv3; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_2e_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_2e_colour) { 6: return 775; 6: return 776; 6: return 777; 6: return 779; 6: return 780; 6: return 782; 6: return 784; 6: return 785; 6: return 788; 5: return 789; 5: return 790; }
 item (FEAT_HOUSES, item_ttrs_2e_police_station, 246, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 7;
 		name: string(STR_TTRS_NAME_POLICE_STATION);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
-		years_available: [1970, 2175];
+		years_available: [1970, 0xFFFF];
 		probability: 2;
 		accepted_cargos: [[PASS, 2],[MAIL, 1]];
 		/* NFO cargo amount is 0 for: GOOD */
@@ -3721,7 +3743,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_32_snow, construction_state) { 3: sl_ttrs_32_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_32, terrain_type) { TILETYPE_SNOW: sl_ttrs_32_snow; return sl_ttrs_32_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_32_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 15; 1: return 16; 1: return 17; 1: return 18; 1: return 19; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_32_colour) { 1: return 775; 1: return 776; 1: return 777; 1: return 778; 1: return 779; 1: return 780; 1: return 781; 1: return 782; 1: return 783; 1: return 784; 1: return 785; 1: return 786; 1: return 787; 1: return 788; 1: return 789; 1: return 790; }
 item (FEAT_HOUSES, item_ttrs_32_house_32, 250) {
 	property {
 		substitute: 2;
@@ -3785,7 +3807,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_33) { 1: sl_ttrs_33_rv0; 1: sl_ttrs_33_rv1; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_33_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_33_colour) { 6: return 796; 5: return 799; 5: return 800; }
 item (FEAT_HOUSES, item_ttrs_33_house_33, 251) {
 	property {
 		substitute: 0;
@@ -3845,7 +3867,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_34_snow, construction_state) { 3: sl_ttrs_34_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_34, terrain_type) { TILETYPE_SNOW: sl_ttrs_34_snow; return sl_ttrs_34_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_34_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_34_colour) { 6: return 796; 5: return 799; 5: return 800; }
 item (FEAT_HOUSES, item_ttrs_34_house_34, 252) {
 	property {
 		substitute: 28;
@@ -3896,6 +3918,12 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_35_arctic, construction_state) { 3: sl_ttrs_3
 switch (FEAT_HOUSES, SELF, sl_ttrs_35_clisw, var[0x03, 0, 0xFF]) { 1: sl_ttrs_35_arctic; return sl_ttrs_35_nosnow; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_35, terrain_type) { TILETYPE_SNOW: sl_ttrs_35_snow; return sl_ttrs_35_clisw; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_35_cargo_amount_accept_1, 0) { return 4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_35_cargo_amount_accept_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_35_cargo_amount_accept_0, var[0x44, 8, 0xFF]) { 1: switch_ttrs_35_cargo_amount_accept_1; return switch_ttrs_35_cargo_amount_accept_2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_35_protection_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_35_protection_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_35_protection_0, var[0x44, 8, 0xFF]) { 1: switch_ttrs_35_protection_1; return switch_ttrs_35_protection_2; }
 item (FEAT_HOUSES, item_ttrs_35_water_tower, 253) {
 	property {
 		substitute: 9;
@@ -3916,6 +3944,8 @@ item (FEAT_HOUSES, item_ttrs_35_water_tower, 253) {
 		default: sl_ttrs_35;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		cargo_amount_accept: switch_ttrs_35_cargo_amount_accept_0;
+		protection: switch_ttrs_35_protection_0;
 	}
 }
 
@@ -3981,7 +4011,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_36_tropic, construction_state) { 3: sl_ttrs_3
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_36, terrain_type) { TILETYPE_SNOW: sl_ttrs_36_snow; TILETYPE_DESERT: sl_ttrs_36_tropic; return sl_ttrs_36_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_36_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_36_colour) { 1: return 796; 1: return 797; 1: return 799; 1: return 800; }
 item (FEAT_HOUSES, item_ttrs_36_z_office_block, 254) {
 	property {
 		substitute: 1;
@@ -4203,7 +4233,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3, terrain_type) { TILETYPE_SNOW: sl_ttrs_39_rv3_snow; return sl_ttrs_39_rv3_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_39) { 1: sl_ttrs_39_rv0; 1: sl_ttrs_39_rv1; 1: sl_ttrs_39_rv2; 1: sl_ttrs_39_rv3; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_39) { 1: sl_ttrs_39_rv0; 1: sl_ttrs_39_rv1; 1: sl_ttrs_39_rv2; 1: sl_ttrs_39_rv3; } /* NFO triggers: 0x02 */
 
 spriteset(ss_ttrs_3A_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [338, 5224, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
@@ -4293,7 +4323,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3, terrain_type) { TILETYPE_SNOW: sl_ttrs_3A_rv3_snow; return sl_ttrs_3A_rv3_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_3A) { 1: sl_ttrs_3A_rv0; 1: sl_ttrs_3A_rv1; 1: sl_ttrs_3A_rv2; 1: sl_ttrs_3A_rv3; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_3A) { 1: sl_ttrs_3A_rv0; 1: sl_ttrs_3A_rv1; 1: sl_ttrs_3A_rv2; 1: sl_ttrs_3A_rv3; } /* NFO triggers: 0x02 */
 
 item (FEAT_HOUSES, item_ttrs_39_fire_station, 257, HOUSE_SIZE_2X1) {
 	property {
@@ -4301,7 +4331,7 @@ item (FEAT_HOUSES, item_ttrs_39_fire_station, 257, HOUSE_SIZE_2X1) {
 		name: string(STR_TTRS_NAME_FIRE_STATION);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 2;
 		refresh_multiplier: 3;
 		accepted_cargos: [[MAIL, 2],[GOOD, 2]];
@@ -4419,7 +4449,7 @@ item (FEAT_HOUSES, item_ttrs_3c_house_3c, 260) {
 		substitute: 10;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND)];
 		/* NFO availability packed value: 61456 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 01 */
 	}
@@ -4578,7 +4608,8 @@ item (FEAT_HOUSES, item_ttrs_3f_house_3f, 263) {
 		/* NFO availability packed value: 63503 */
 		years_available: [1980, 2010];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 	}
 	graphics {
 		default: sl_ttrs_3F;
@@ -4672,9 +4703,10 @@ item (FEAT_HOUSES, item_ttrs_40_zimmlocks_house, 264) {
 		name: string(STR_TTRS_NAME_ZIMMLOCKS_HOUSE);
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
-		accepted_cargos: [[FOOD, 1]];
+		accepted_cargos: [[PASS, 1],[MAIL, 1],[FOOD, 1]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 		/* NFO name string-id: DC0B; visible name: Zimmlock's house */
 	}
 	graphics {
@@ -4721,9 +4753,10 @@ item (FEAT_HOUSES, item_ttrs_41_house_41, 265) {
 		substitute: 25;
 		availability_mask: [bitmask(TOWNZONE_EDGE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63489 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
-		accepted_cargos: [[FOOD, 1]];
+		accepted_cargos: [[PASS, 1],[MAIL, 1],[FOOD, 1]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 		/* NFO name string-id: 2037; visible name: house_41 */
 	}
 	graphics {
@@ -4903,15 +4936,15 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_44_rv2_snow; return sl_ttrs_44_rv2_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_44) { 1: sl_ttrs_44_rv0; 1: sl_ttrs_44_rv1; 1: sl_ttrs_44_rv2; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_44) { 6: sl_ttrs_44_rv0; 5: sl_ttrs_44_rv1; 5: sl_ttrs_44_rv2; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_44_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_44_colour) { 1: return 776; 1: return 777; 1: return 780; 1: return 781; 1: return 782; 1: return 784; 1: return 785; 1: return 789; }
 item (FEAT_HOUSES, item_ttrs_44_house_44, 268) {
 	property {
 		substitute: 4;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 10 */
 	}
@@ -4971,7 +5004,7 @@ item (FEAT_HOUSES, item_ttrs_45_library, 269) {
 		name: string(STR_TTRS_NAME_LIBRARY);
 		availability_mask: [bitmask(TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63500 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 2;
 		accepted_cargos: [[PASS, 4],[MAIL, 3]];
 		/* NFO cargo amount is 0 for: GOOD */
@@ -5147,7 +5180,7 @@ item (FEAT_HOUSES, item_ttrs_48_mosque, 272) {
 		name: string(STR_TTRS_NAME_MOSQUE);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
 		/* NFO name string-id: DC0E; visible name: Mosque */
 		/* NFO field 14: 01 */
@@ -5201,7 +5234,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_49_snow, construction_state) { 3: sl_ttrs_49_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_49, terrain_type) { TILETYPE_SNOW: sl_ttrs_49_snow; return sl_ttrs_49_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_49_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_49_colour) { 1: return 796; 1: return 797; 1: return 799; 1: return 800; }
 item (FEAT_HOUSES, item_ttrs_49_multimedia_offices, 273) {
 	property {
 		substitute: 36;
@@ -5355,7 +5388,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_4C_snow, construction_state) { 3: sl_ttrs_4C_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_4C, terrain_type) { TILETYPE_SNOW: sl_ttrs_4C_snow; return sl_ttrs_4C_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_4c_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 14; 1: return 16; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_4c_colour) { 1: return 776; 1: return 777; 1: return 780; 1: return 782; 1: return 784; 1: return 788; 1: return 789; 1: return 790; }
 item (FEAT_HOUSES, item_ttrs_4c_park_avenue_1457, 276) {
 	property {
 		substitute: 12;
@@ -5546,14 +5579,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_50_snow, construction_state) { 3: sl_ttrs_50_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_50, terrain_type) { TILETYPE_SNOW: sl_ttrs_50_snow; return sl_ttrs_50_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_4d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 14; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_4d_colour) { 1: return 776; 1: return 782; 1: return 788; 1: return 789; }
 item (FEAT_HOUSES, item_ttrs_4d_prison, 277, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 20;
 		name: string(STR_TTRS_NAME_PRISON);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		population: 200;
 		mail_multiplier: 10;
 		probability: 2;
@@ -5741,13 +5774,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_54_snow, construction_state) { 3: sl_ttrs_54_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_54, terrain_type) { TILETYPE_SNOW: sl_ttrs_54_snow; return sl_ttrs_54_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_51_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 15; 1: return 16; 1: return 17; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_51_colour) { 5: return 775; 5: return 776; 5: return 777; 5: return 779; 5: return 780; 5: return 781; 5: return 782; 5: return 783; 5: return 784; 5: return 785; 5: return 788; 5: return 789; 4: return 790; }
 item (FEAT_HOUSES, item_ttrs_51_house_51, 281, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 10 */
 	}
@@ -5918,7 +5951,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_57) { 1: sl_ttrs_57_rv0; 1: sl_ttrs_57_rv1; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_57_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 29; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_57_colour) { 1: return 796; 1: return 797; 1: return 799; 1: return 800; }
 item (FEAT_HOUSES, item_ttrs_57_house_57, 287) {
 	property {
 		substitute: 0;
@@ -5978,14 +6011,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_58_snow, construction_state) { 3: sl_ttrs_58_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_58, terrain_type) { TILETYPE_SNOW: sl_ttrs_58_snow; return sl_ttrs_58_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_58_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 19; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_58_colour) { 4: return 776; 4: return 777; 3: return 780; 3: return 781; 3: return 782; 3: return 784; 3: return 785; 3: return 787; 3: return 788; 3: return 789; }
 item (FEAT_HOUSES, item_ttrs_58_statue_residence, 288) {
 	property {
 		substitute: 54;
 		name: string(STR_TTRS_NAME_STATUE_RESIDENCE);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 2;
 		/* NFO name string-id: DC03; visible name: Statue residence */
 		/* NFO field 14: 10 */
@@ -6327,6 +6360,9 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_5A_snow, construction_state) { 3: sl_ttrs_5A_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_5A, terrain_type) { TILETYPE_SNOW: sl_ttrs_5A_snow; return sl_ttrs_5A_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_5A_construction_anim_1, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_5A_construction_anim_2, 0) { return 20; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_5A_construction_anim_0, var[0x40, 0, 0x3]) { 0..2: switch_ttrs_5A_construction_anim_1; return switch_ttrs_5A_construction_anim_2; }
 item (FEAT_HOUSES, item_ttrs_5a_house_5a, 290) {
 	property {
 		substitute: 31;
@@ -6334,7 +6370,7 @@ item (FEAT_HOUSES, item_ttrs_5a_house_5a, 290) {
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
 		animation_info: [1, 25];
 		animation_speed: 3;
@@ -6344,6 +6380,7 @@ item (FEAT_HOUSES, item_ttrs_5a_house_5a, 290) {
 		default: sl_ttrs_5A;
 		construction_check: switch_ttrs_offices;
 		/* classification: offices */
+		construction_anim: switch_ttrs_5A_construction_anim_0;
 	}
 }
 
@@ -6394,7 +6431,7 @@ item (FEAT_HOUSES, item_ttrs_5b_house_5b, 291) {
 		substitute: 18;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		probability: 1;
 		accepted_cargos: [[PASS, 10],[FOOD, 4],[GOOD, 3]];
 	}
@@ -6437,14 +6474,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_5C_tropic, construction_state) { 3: sl_ttrs_5
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_5C, terrain_type) { TILETYPE_SNOW: sl_ttrs_5C_snow; TILETYPE_DESERT: sl_ttrs_5C_tropic; return sl_ttrs_5C_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_5c_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_5c_colour) { 6: return 775; 6: return 776; 6: return 777; 6: return 779; 5: return 780; 5: return 781; 5: return 782; 5: return 784; 5: return 785; 5: return 788; 5: return 789; 5: return 790; }
 item (FEAT_HOUSES, item_ttrs_5c_observatorium, 292) {
 	property {
 		substitute: 39;
 		name: string(STR_TTRS_NAME_OBSERVATORIUM);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63491 */
-		years_available: [1980, 2175];
+		years_available: [1980, 0xFFFF];
 		population: 15;
 		mail_multiplier: 15;
 		probability: 1;
@@ -6502,6 +6539,9 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_5D_snow, construction_state) { 3: sl_ttrs_5D_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_5D, terrain_type) { TILETYPE_SNOW: sl_ttrs_5D_snow; return sl_ttrs_5D_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_5D_protection_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_5D_protection_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_5D_protection_0, age) { 0..30: switch_ttrs_5D_protection_1; return switch_ttrs_5D_protection_2; }
 spriteset(ss_ttrs_5E_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [146, 8296, 64, 31, -31, 0] }
 spriteset(ss_ttrs_5E_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [2, 9320, 64, 31, -31, 0] }
 spriteset(ss_ttrs_5E_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
@@ -6628,7 +6668,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_60_snow, construction_state) { 3: sl_ttrs_60_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_60, terrain_type) { TILETYPE_SNOW: sl_ttrs_60_snow; return sl_ttrs_60_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_5d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 18; 1: return 19; 1: return 20; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_5d_colour) { 8: return 776; 7: return 779; 7: return 780; 7: return 781; 7: return 782; 7: return 784; 7: return 786; 7: return 787; 7: return 788; }
 item (FEAT_HOUSES, item_ttrs_5d_world_trade_center, 293, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
@@ -6636,7 +6676,7 @@ item (FEAT_HOUSES, item_ttrs_5d_world_trade_center, 293, HOUSE_SIZE_2X2) {
 		building_flags: bitmask(HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2000, 2175];
+		years_available: [2000, 0xFFFF];
 		population: 255;
 		mail_multiplier: 25;
 		removal_cost_multiplier: 255;
@@ -6654,6 +6694,7 @@ item (FEAT_HOUSES, item_ttrs_5d_world_trade_center, 293, HOUSE_SIZE_2X2) {
 		graphics_south: sl_ttrs_60;
 		construction_check: switch_ttrs_landmark_unique;
 		/* classification: landmark_unique */
+		protection: switch_ttrs_5D_protection_0;
 		colour: switch_ttrs_5d_colour;
 	}
 }
@@ -6705,7 +6746,7 @@ item (FEAT_HOUSES, item_ttrs_61_house_61, 297) {
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 2;
 	}
 	graphics {
@@ -6991,6 +7032,9 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_62_snow, construction_state) { 3: sl_ttrs_62_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_62, terrain_type) { TILETYPE_SNOW: sl_ttrs_62_snow; return sl_ttrs_62_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_62_construction_anim_1, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_62_construction_anim_2, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_62_construction_anim_0, var[0x40, 0, 0x3]) { 3: switch_ttrs_62_construction_anim_1; return switch_ttrs_62_construction_anim_2; }
 item (FEAT_HOUSES, item_ttrs_62_house_62, 298) {
 	property {
 		substitute: 39;
@@ -6998,7 +7042,7 @@ item (FEAT_HOUSES, item_ttrs_62_house_62, 298) {
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		animation_info: [1, 25];
 		animation_speed: 3;
@@ -7008,6 +7052,7 @@ item (FEAT_HOUSES, item_ttrs_62_house_62, 298) {
 		default: sl_ttrs_62;
 		construction_check: switch_ttrs_residential;
 		/* classification: residential */
+		construction_anim: switch_ttrs_62_construction_anim_0;
 	}
 }
 
@@ -7058,7 +7103,7 @@ item (FEAT_HOUSES, item_ttrs_63_house_63, 299) {
 		substitute: 27;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 	}
 	graphics {
@@ -7157,7 +7202,7 @@ item (FEAT_HOUSES, item_ttrs_64_house_64, 300, HOUSE_SIZE_1X2) {
 		substitute: 7;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		accepted_cargos: [[PASS, 6],[MAIL, 2],[GOOD, 4]];
 	}
@@ -7216,9 +7261,10 @@ item (FEAT_HOUSES, item_ttrs_66_house_66, 302) {
 		substitute: 26;
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 	}
 	graphics {
 		default: sl_ttrs_66;
@@ -7291,9 +7337,10 @@ item (FEAT_HOUSES, item_ttrs_67_house_67, 303) {
 		substitute: 6;
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 	}
 	graphics {
 		default: sl_ttrs_67;
@@ -7334,15 +7381,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_68_tropic, construction_state) { 3: sl_ttrs_6
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_68, terrain_type) { TILETYPE_SNOW: sl_ttrs_68_snow; TILETYPE_DESERT: sl_ttrs_68_tropic; return sl_ttrs_68_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_68_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 19; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_68_colour) { 10: return 775; 10: return 776; 9: return 777; 9: return 778; 9: return 779; 9: return 780; 9: return 781; 9: return 782; 9: return 784; 9: return 785; 9: return 787; 9: return 788; 9: return 789; 9: return 790; }
 item (FEAT_HOUSES, item_ttrs_68_house_68, 304) {
 	property {
 		substitute: 6;
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
-		accepted_cargos: [[FOOD, 2]];
+		accepted_cargos: [[PASS, 2],[MAIL, 2],[FOOD, 2]];
+		/* CUSTOM: FOOD-only house — added equal PASS and MAIL acceptance */
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -7443,7 +7491,7 @@ item (FEAT_HOUSES, item_ttrs_69_large_block_of_flats, 305, HOUSE_SIZE_2X1) {
 		name: string(STR_TTRS_NAME_LARGE_BLOCK_OF_FLATS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		population: 200;
 		mail_multiplier: 50;
 		probability: 1;
@@ -7506,7 +7554,7 @@ item (FEAT_HOUSES, item_ttrs_6b_luxury_apartments, 307) {
 		name: string(STR_TTRS_NAME_LUXURY_APARTMENTS);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO name string-id: DC06; visible name: Luxury apartments */
 	}
@@ -7564,7 +7612,7 @@ item (FEAT_HOUSES, item_ttrs_6c_house_6c, 308) {
 		substitute: 17;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		population: 200;
 		mail_multiplier: 80;
 		probability: 1;
@@ -7620,14 +7668,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_6D_snow, construction_state) { 3: sl_ttrs_6D_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_6D, terrain_type) { TILETYPE_SNOW: sl_ttrs_6D_snow; return sl_ttrs_6D_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_6d_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 12; 1: return 14; 1: return 16; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_6d_colour) { 10: return 775; 9: return 776; 9: return 780; 9: return 782; 9: return 784; 9: return 788; 9: return 789; }
 item (FEAT_HOUSES, item_ttrs_6d_multimedia_offices, 309) {
 	property {
 		substitute: 36;
 		name: string(STR_TTRS_NAME_MULTIMEDIA_OFFICES);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO name string-id: DC07; visible name: Multimedia offices */
 		/* NFO field 14: 10 */
@@ -7684,14 +7732,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_6F_snow, construction_state) { 3: sl_ttrs_6F_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_6F, terrain_type) { TILETYPE_SNOW: sl_ttrs_6F_snow; return sl_ttrs_6F_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_6e_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_6e_colour) { 8: return 776; 7: return 777; 7: return 780; 7: return 781; 7: return 782; 7: return 784; 7: return 785; 7: return 788; 7: return 789; }
 item (FEAT_HOUSES, item_ttrs_6e_museum_of_modern_arts, 310, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 87;
 		name: string(STR_TTRS_NAME_MUSEUM_OF_MODERN_ARTS);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63491 */
-		years_available: [2070, 2175];
+		years_available: [2070, 0xFFFF];
 		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 6],[GOOD, 4]];
 		/* NFO name string-id: DC11; visible name: Museum of Modern Arts */
@@ -7748,13 +7796,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_70_snow, construction_state) { 3: sl_ttrs_70_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_70, terrain_type) { TILETYPE_SNOW: sl_ttrs_70_snow; return sl_ttrs_70_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_70_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 10; 1: return 11; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_70_colour) { 3: return 775; 3: return 776; 3: return 777; 3: return 778; 3: return 779; 3: return 781; 3: return 782; 3: return 784; 3: return 785; 3: return 789; 2: return 790; }
 item (FEAT_HOUSES, item_ttrs_70_house_70, 312) {
 	property {
 		substitute: 13;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2170];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 10 */
 	}
@@ -7808,13 +7856,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_71_snow, construction_state) { 3: sl_ttrs_71_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_71, terrain_type) { TILETYPE_SNOW: sl_ttrs_71_snow; return sl_ttrs_71_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_71_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 17; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_71_colour) { 6: return 775; 6: return 776; 6: return 777; 6: return 778; 5: return 779; 5: return 780; 5: return 781; 5: return 782; 5: return 784; 5: return 785; 5: return 788; 5: return 789; }
 item (FEAT_HOUSES, item_ttrs_71_house_71, 313) {
 	property {
 		substitute: 19;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 10 */
 	}
@@ -7858,14 +7906,14 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_72_tropic, construction_state) { 3: sl_ttrs_7
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_72, terrain_type) { TILETYPE_SNOW: sl_ttrs_72_snow; TILETYPE_DESERT: sl_ttrs_72_tropic; return sl_ttrs_72_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_72_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 14; 1: return 16; 1: return 20; 1: return 21; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_72_colour) { 1: return 776; 1: return 777; 1: return 780; 1: return 782; 1: return 784; 1: return 788; 1: return 789; 1: return 790; }
 item (FEAT_HOUSES, item_ttrs_72_park_avenue_1457, 314) {
 	property {
 		substitute: 12;
 		name: string(STR_TTRS_NAME_PARK_AVENUE_1457);
 		availability_mask: [bitmask(TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63496 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		population: 100;
 		mail_multiplier: 50;
 		probability: 1;
@@ -7923,13 +7971,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_73_snow, construction_state) { 3: sl_ttrs_73_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_73, terrain_type) { TILETYPE_SNOW: sl_ttrs_73_snow; return sl_ttrs_73_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_73_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_73_colour) { 6: return 796; 5: return 799; 5: return 800; }
 item (FEAT_HOUSES, item_ttrs_73_house_73, 315) {
 	property {
 		substitute: 30;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 10 */
 	}
@@ -7988,7 +8036,7 @@ item (FEAT_HOUSES, item_ttrs_74_house_74, 316) {
 		substitute: 2;
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 	}
 	graphics {
@@ -8040,13 +8088,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_75_snow, construction_state) { 3: sl_ttrs_75_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_75, terrain_type) { TILETYPE_SNOW: sl_ttrs_75_snow; return sl_ttrs_75_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_75_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 8; 1: return 9; 1: return 12; 1: return 13; 1: return 14; 1: return 16; 1: return 20; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_75_colour) { 10: return 776; 9: return 777; 9: return 780; 9: return 781; 9: return 782; 9: return 784; 9: return 788; }
 item (FEAT_HOUSES, item_ttrs_75_house_75, 317) {
 	property {
 		substitute: 2;
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 10 */
 	}
@@ -8140,13 +8188,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_76_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_76) { 1: sl_ttrs_76_rv0; 1: sl_ttrs_76_rv1; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_76_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 28; 1: return 31; 1: return 32; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_76_colour) { 6: return 796; 5: return 799; 5: return 800; }
 item (FEAT_HOUSES, item_ttrs_76_house_76, 318) {
 	property {
 		substitute: 0;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO field 14: 10 */
 	}
@@ -8226,7 +8274,7 @@ item (FEAT_HOUSES, item_ttrs_77_house_77, 319) {
 		substitute: 28;
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 	}
 	graphics {
@@ -8284,7 +8332,7 @@ item (FEAT_HOUSES, item_ttrs_78_z_office_block, 320) {
 		name: string(STR_TTRS_NAME_Z_OFFICE_BLOCK);
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
-		years_available: [2010, 2175];
+		years_available: [2010, 0xFFFF];
 		probability: 1;
 		/* NFO name string-id: DC0A; visible name: "Z" office block */
 	}
@@ -8671,7 +8719,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_7B_rv7_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_7B_rv7, terrain_type) { TILETYPE_SNOW: sl_ttrs_7B_rv7_snow; return sl_ttrs_7B_rv7_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_7B) { 1: sl_ttrs_7B_rv0; 1: sl_ttrs_7B_rv1; 1: sl_ttrs_7B_rv2; 1: sl_ttrs_7B_rv3; 1: sl_ttrs_7B_rv4; 1: sl_ttrs_7B_rv5; 1: sl_ttrs_7B_rv6; 1: sl_ttrs_7B_rv7; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_7B) { 11: sl_ttrs_7B_rv0; 1: sl_ttrs_7B_rv1; 1: sl_ttrs_7B_rv2; 1: sl_ttrs_7B_rv3; 11: sl_ttrs_7B_rv4; 5: sl_ttrs_7B_rv5; 11: sl_ttrs_7B_rv6; 5: sl_ttrs_7B_rv7; }
 
 spriteset(ss_ttrs_7C_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [610, 14072, 64, 31, -31, 0] }
 spriteset(ss_ttrs_7C_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
@@ -8879,7 +8927,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_7C_rv7_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_7C_rv7, terrain_type) { TILETYPE_SNOW: sl_ttrs_7C_rv7_snow; return sl_ttrs_7C_rv7_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_7C) { 1: sl_ttrs_7C_rv0; 1: sl_ttrs_7C_rv1; 1: sl_ttrs_7C_rv2; 1: sl_ttrs_7C_rv3; 1: sl_ttrs_7C_rv4; 1: sl_ttrs_7C_rv5; 1: sl_ttrs_7C_rv6; 1: sl_ttrs_7C_rv7; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_7C) { 6: sl_ttrs_7C_rv0; 1: sl_ttrs_7C_rv1; 1: sl_ttrs_7C_rv2; 1: sl_ttrs_7C_rv3; 6: sl_ttrs_7C_rv4; 10: sl_ttrs_7C_rv5; 6: sl_ttrs_7C_rv6; 10: sl_ttrs_7C_rv7; }
 
 spriteset(ss_ttrs_7D_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [530, 14072, 64, 31, -31, 0] }
 spriteset(ss_ttrs_7D_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
@@ -9087,7 +9135,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_7D_rv7_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_7D_rv7, terrain_type) { TILETYPE_SNOW: sl_ttrs_7D_rv7_snow; return sl_ttrs_7D_rv7_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_7D) { 1: sl_ttrs_7D_rv0; 1: sl_ttrs_7D_rv1; 1: sl_ttrs_7D_rv2; 1: sl_ttrs_7D_rv3; 1: sl_ttrs_7D_rv4; 1: sl_ttrs_7D_rv5; 1: sl_ttrs_7D_rv6; 1: sl_ttrs_7D_rv7; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_7D) { 11: sl_ttrs_7D_rv0; 1: sl_ttrs_7D_rv1; 1: sl_ttrs_7D_rv2; 1: sl_ttrs_7D_rv3; 11: sl_ttrs_7D_rv4; 5: sl_ttrs_7D_rv5; 11: sl_ttrs_7D_rv6; 5: sl_ttrs_7D_rv7; }
 
 item (FEAT_HOUSES, item_ttrs_7a_cathedral, 322, HOUSE_SIZE_2X2) {
 	property {
@@ -9096,7 +9144,7 @@ item (FEAT_HOUSES, item_ttrs_7a_cathedral, 322, HOUSE_SIZE_2X2) {
 		building_flags: bitmask(HOUSE_FLAG_ONLY_SE, HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63519 */
-		years_available: [1930, 2175];
+		years_available: [1930, 0xFFFF];
 		population: 250;
 		mail_multiplier: 20;
 		removal_cost_multiplier: 255;
@@ -9251,6 +9299,23 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_7E_snow, construction_state) { 3: sl_ttrs_7E_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_7E, terrain_type) { TILETYPE_SNOW: sl_ttrs_7E_snow; return sl_ttrs_7E_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_1, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_2, 0) { return 4350; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_3, 0) { return 254; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_0, animation_frame) { 0: switch_ttrs_7E_anim_next_frame_1; 1: switch_ttrs_7E_anim_next_frame_2; return switch_ttrs_7E_anim_next_frame_3; }
+/* WARN: anim_control target 0x1A00 not found in any graph section */
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_1, 0) { return 253; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_0, animation_frame) { return switch_ttrs_7E_anim_control_1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_1, 0) { return 6; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_0, animation_frame) { 0: switch_ttrs_7E_cargo_amount_accept_1; return switch_ttrs_7E_cargo_amount_accept_2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_1, 0) { return 32515; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_2, 0) { return 32519; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_3, 0) { return 32520; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_0, animation_frame) { 0..17: switch_ttrs_7E_anim_speed_1; 18: switch_ttrs_7E_anim_speed_2; return switch_ttrs_7E_anim_speed_3; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_1, 0) { return 32513; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_2, 0) { return 32512; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_0, animation_frame) { 23: switch_ttrs_7E_destruction_1; return switch_ttrs_7E_destruction_2; }
 spriteset(ss_ttrs_7F_nosnow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [162, 15080, 64, 31, -31, 0] }
 spriteset(ss_ttrs_7F_nosnow_f0, "src/sprites/pcx/ttrs3w.pcx") { [242, 15080, 57, 63, -31, -34] }
 spriteset(ss_ttrs_7F_nosnow_f1, "src/sprites/pcx/ttrs3w.pcx") { [82, 15512, 64, 147, -31, -116] }
@@ -9681,6 +9746,11 @@ item (FEAT_HOUSES, item_ttrs_7e_stock_exchange_building, 326, HOUSE_SIZE_2X2) {
 		graphics_south: sl_ttrs_81;
 		construction_check: switch_ttrs_landmark_unique;
 		/* classification: landmark_unique */
+		anim_control: switch_ttrs_7E_anim_control_0;
+		anim_next_frame: switch_ttrs_7E_anim_next_frame_0;
+		anim_speed: switch_ttrs_7E_anim_speed_0;
+		cargo_amount_accept: switch_ttrs_7E_cargo_amount_accept_0;
+		destruction: switch_ttrs_7E_destruction_0;
 	}
 }
 
@@ -9706,6 +9776,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_82_snow, construction_state) { 3: sl_ttrs_82_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_82, terrain_type) { TILETYPE_SNOW: sl_ttrs_82_snow; return sl_ttrs_82_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_1, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_2, 0) { return 0; }
+/* WARN: destruction target 0x1A00 not found in any graph section */
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_0, var[0x7F, 0, 0xFF, 1]) { 1: switch_ttrs_82_destruction_1; 5: switch_ttrs_82_destruction_2; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_protection_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_protection_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_protection_0, var[0x7E, 0, 0xFFFF, 240]) { 0..1950: switch_ttrs_82_protection_1; return switch_ttrs_82_protection_2; }
 spriteset(ss_ttrs_83_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [370, 16536, 64, 31, -31, 0] }
 spriteset(ss_ttrs_83_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[690, 16536, 55, 64, -31, -33]  /* completed */
@@ -9793,6 +9870,8 @@ item (FEAT_HOUSES, item_ttrs_82_old_town_houses, 330, HOUSE_SIZE_2X2) {
 		graphics_south: sl_ttrs_85;
 		construction_check: switch_ttrs_landmark_unique;
 		/* classification: landmark_unique */
+		destruction: switch_ttrs_82_destruction_0;
+		protection: switch_ttrs_82_protection_0;
 	}
 }
 
@@ -10003,6 +10082,31 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_86_snow, construction_state) { 3: sl_ttrs_86_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_86, terrain_type) { TILETYPE_SNOW: sl_ttrs_86_snow; return sl_ttrs_86_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_1, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_2, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_3, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_4, 0) { return 4350; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_5, 0) { return 254; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_0, animation_frame) { 0: switch_ttrs_86_anim_next_frame_1; 1: switch_ttrs_86_anim_next_frame_2; 31: switch_ttrs_86_anim_next_frame_3; 2: switch_ttrs_86_anim_next_frame_4; return switch_ttrs_86_anim_next_frame_5; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_2, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_3, 0) { return 255; }
+/* WARN: anim_control target 0x1A00 not found in any graph section */
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_1, var[0x7F, 0, 0xFF, 1]) { 2: switch_ttrs_86_anim_control_2; 5: switch_ttrs_86_anim_control_3; return 0; }
+/* WARN: anim_control target 0x1A00 not found in any graph section */
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_4, 0) { return 253; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_0, animation_frame) { 0: switch_ttrs_86_anim_control_1; return switch_ttrs_86_anim_control_4; }
+/* WARN: cargo_amount_accept (CB 0x1F) sub-graph has branches that fall through to layout nodes (CB_FAILED semantics lost); callback omitted */
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_speed_1, 0) { return 8; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_speed_2, 0) { return 7; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_speed_3, 0) { return 8; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_speed_4, 0) { return 3; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_speed_0, animation_frame) { 2: switch_ttrs_86_anim_speed_1; 26: switch_ttrs_86_anim_speed_2; 27..31: switch_ttrs_86_anim_speed_3; return switch_ttrs_86_anim_speed_4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_destruction_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_destruction_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_destruction_0, animation_frame) { 31: switch_ttrs_86_destruction_1; return switch_ttrs_86_destruction_2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_protection_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_protection_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_protection_0, var[0x7E, 0, 0xFFFF, 240]) { 1980..65535: switch_ttrs_86_protection_1; return switch_ttrs_86_protection_2; }
 spriteset(ss_ttrs_87_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [434, 16728, 64, 31, -31, 0] }
 spriteset(ss_ttrs_87_nosnow_gf1, "src/sprites/pcx/ttrs3w.pcx") { [578, 16856, 64, 31, -31, 0] }
 spriteset(ss_ttrs_87_nosnow_f1, "src/sprites/pcx/ttrs3w.pcx") { [658, 16856, 58, 78, -27, -49] }
@@ -10210,7 +10314,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_87_snow, construction_state) { 3: sl_ttrs_87_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_87, terrain_type) { TILETYPE_SNOW: sl_ttrs_87_snow; return sl_ttrs_87_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_86_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 7; 1: return 8; 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 14; 1: return 15; 1: return 16; 1: return 17; 1: return 18; 1: return 20; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_86_colour) { 3: return 775; 3: return 776; 3: return 777; 3: return 778; 2: return 779; 2: return 780; 2: return 781; 2: return 782; 2: return 783; 2: return 784; 2: return 785; 2: return 786; 2: return 788; 2: return 790; }
 item (FEAT_HOUSES, item_ttrs_86_endless_flats, 334, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
@@ -10234,6 +10338,11 @@ item (FEAT_HOUSES, item_ttrs_86_endless_flats, 334, HOUSE_SIZE_2X1) {
 		graphics_west: sl_ttrs_87;
 		construction_check: switch_ttrs_flats;
 		/* classification: flats */
+		anim_control: switch_ttrs_86_anim_control_0;
+		anim_next_frame: switch_ttrs_86_anim_next_frame_0;
+		anim_speed: switch_ttrs_86_anim_speed_0;
+		destruction: switch_ttrs_86_destruction_0;
+		protection: switch_ttrs_86_protection_0;
 		colour: switch_ttrs_86_colour;
 	}
 }
@@ -10389,6 +10498,36 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_88_snow, construction_state) { 3: sl_ttrs_88_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_88, terrain_type) { TILETYPE_SNOW: sl_ttrs_88_snow; return sl_ttrs_88_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_1, 0) { return 32767; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_2, 0) { return 32767; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_3, 0) { return 4350; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_4, 0) { return 32766; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_0, animation_frame) { 0: switch_ttrs_88_anim_next_frame_1; 5: switch_ttrs_88_anim_next_frame_2; 7..11: switch_ttrs_88_anim_next_frame_3; return switch_ttrs_88_anim_next_frame_4; }
+/* WARN: anim_control target 0x1A00 not found in any graph section */
+/* WARN: anim_control target 0x1A00 not found in any graph section */
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_1, 0) { return 32765; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_0, animation_frame) { return switch_ttrs_88_anim_control_1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_2, 0) { return 32512; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_3, 0) { return 32517; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_1, var[0x7E, 0, 0xFFFF, 240]) { 0..1959: switch_ttrs_88_construction_anim_2; return switch_ttrs_88_construction_anim_3; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_4, 0) { return 32766; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_0, var[0x45, 0, 0x1]) { 1: switch_ttrs_88_construction_anim_1; return switch_ttrs_88_construction_anim_4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_1, 0) { return 1092; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_2, 0) { return 1638; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_3, 0) { return 2184; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_4, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_0, animation_frame) { 0..1: switch_ttrs_88_cargo_amount_accept_1; 5..6: switch_ttrs_88_cargo_amount_accept_2; 23: switch_ttrs_88_cargo_amount_accept_3; return switch_ttrs_88_cargo_amount_accept_4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_1, 0) { return 32514; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_2, 0) { return 32514; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_3, 0) { return 32519; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_4, 0) { return 32515; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_5, 0) { return 32520; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_6, 0) { return 32520; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_7, 0) { return 32523; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_0, animation_frame) { 0: switch_ttrs_88_anim_speed_1; 5: switch_ttrs_88_anim_speed_2; 7: switch_ttrs_88_anim_speed_3; 8..17: switch_ttrs_88_anim_speed_4; 18: switch_ttrs_88_anim_speed_5; 19: switch_ttrs_88_anim_speed_6; return switch_ttrs_88_anim_speed_7; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_1, 0) { return 32513; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_2, 0) { return 32512; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_0, animation_frame) { 20: switch_ttrs_88_destruction_1; return switch_ttrs_88_destruction_2; }
 spriteset(ss_ttrs_89_nosnow_gf2, "src/sprites/pcx/ttrs3w.pcx") { [242, 17960, 63, 30, -31, 0] }
 spriteset(ss_ttrs_89_nosnow_f2, "src/sprites/pcx/ttrs3w.pcx") { [322, 17960, 64, 61, -31, -30] }
 spriteset(ss_ttrs_89_nosnow_gf3, "src/sprites/pcx/ttrs3w.pcx") { [402, 17960, 64, 31, -31, 0] }
@@ -10952,6 +11091,12 @@ item (FEAT_HOUSES, item_ttrs_88_hospital, 336, HOUSE_SIZE_2X2) {
 		graphics_south: sl_ttrs_8B;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		anim_control: switch_ttrs_88_anim_control_0;
+		anim_next_frame: switch_ttrs_88_anim_next_frame_0;
+		anim_speed: switch_ttrs_88_anim_speed_0;
+		cargo_amount_accept: switch_ttrs_88_cargo_amount_accept_0;
+		construction_anim: switch_ttrs_88_construction_anim_0;
+		destruction: switch_ttrs_88_destruction_0;
 	}
 }
 
@@ -11129,7 +11274,7 @@ item (FEAT_HOUSES, item_ttrs_8c_hospital, 340, HOUSE_SIZE_2X2) {
 		name: string(STR_TTRS_NAME_HOSPITAL);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63494 */
-		years_available: [1990, 2175];
+		years_available: [1990, 0xFFFF];
 		building_class: 2;
 		probability: 2;
 		accepted_cargos: [[PASS, 8],[MAIL, 8],[GOOD, 8]];
@@ -11169,7 +11314,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_90_snow, construction_state) { 3: sl_ttrs_90_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_90, terrain_type) { TILETYPE_SNOW: sl_ttrs_90_snow; return sl_ttrs_90_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_90_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 9; 1: return 10; 1: return 11; 1: return 12; 1: return 13; 1: return 18; 1: return 19; 1: return 22; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_90_colour) { 1: return 777; 1: return 778; 1: return 779; 1: return 780; 1: return 781; 1: return 786; 1: return 787; 1: return 790; }
 item (FEAT_HOUSES, item_ttrs_90_petrol_station, 344) {
 	property {
 		substitute: 9;
@@ -11316,7 +11461,7 @@ item (FEAT_HOUSES, item_ttrs_93_petrol_station, 347, HOUSE_SIZE_1X2) {
 		building_flags: bitmask(HOUSE_FLAG_NOT_SLOPED);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63502 */
-		years_available: [1990, 2175];
+		years_available: [1990, 0xFFFF];
 		population: 8;
 		mail_multiplier: 0;
 		local_authority_impact: 32;
@@ -11400,8 +11545,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_95_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_95_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_95_rv2_snow; return sl_ttrs_95_rv2_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_95) { 1: sl_ttrs_95_rv0; 1: sl_ttrs_95_rv1; 1: sl_ttrs_95_rv2; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_95) { 2: sl_ttrs_95_rv0; 1: sl_ttrs_95_rv1; 1: sl_ttrs_95_rv2; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_95_cargo_production_1, 0) { return 771; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_95_cargo_production_2, 0) { return 5; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_95_cargo_production_3, 0) { return 514; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_95_cargo_production_4, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_95_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_95_cargo_production_1; 1: switch_ttrs_95_cargo_production_2; 2: switch_ttrs_95_cargo_production_3; return switch_ttrs_95_cargo_production_4; }
 item (FEAT_HOUSES, item_ttrs_95_hotel_zvon, 349) {
 	property {
 		substitute: 9;
@@ -11425,6 +11575,7 @@ item (FEAT_HOUSES, item_ttrs_95_hotel_zvon, 349) {
 		default: sl_ttrs_95;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		cargo_production: switch_ttrs_95_cargo_production_0;
 	}
 }
 
@@ -11474,6 +11625,11 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_96_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_96) { 1: sl_ttrs_96_rv0; 1: sl_ttrs_96_rv1; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_96_cargo_production_1, 0) { return 772; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_96_cargo_production_2, 0) { return 5; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_96_cargo_production_3, 0) { return 515; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_96_cargo_production_4, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_96_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_96_cargo_production_1; 1: switch_ttrs_96_cargo_production_2; 2: switch_ttrs_96_cargo_production_3; return switch_ttrs_96_cargo_production_4; }
 spriteset(ss_ttrs_97_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [82, 19592, 64, 31, -31, 0] }
 spriteset(ss_ttrs_97_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[242, 19592, 64, 75, -31, -44]  /* completed */
@@ -11543,6 +11699,7 @@ item (FEAT_HOUSES, item_ttrs_96_hotel_praha, 350, HOUSE_SIZE_2X1) {
 		graphics_west: sl_ttrs_97;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		cargo_production: switch_ttrs_96_cargo_production_0;
 	}
 }
 
@@ -11568,6 +11725,11 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_98_snow, construction_state) { 3: sl_ttrs_98_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_98, terrain_type) { TILETYPE_SNOW: sl_ttrs_98_snow; return sl_ttrs_98_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_98_cargo_production_1, 0) { return 773; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_98_cargo_production_2, 0) { return 6; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_98_cargo_production_3, 0) { return 514; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_98_cargo_production_4, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_98_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_98_cargo_production_1; 1: switch_ttrs_98_cargo_production_2; 2: switch_ttrs_98_cargo_production_3; return switch_ttrs_98_cargo_production_4; }
 spriteset(ss_ttrs_99_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [562, 19592, 64, 31, -31, 0] }
 spriteset(ss_ttrs_99_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[722, 19592, 64, 75, -31, -44]  /* completed */
@@ -11613,6 +11775,7 @@ item (FEAT_HOUSES, item_ttrs_98_hotel_regent, 352, HOUSE_SIZE_2X1) {
 		graphics_west: sl_ttrs_99;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		cargo_production: switch_ttrs_98_cargo_production_0;
 	}
 }
 
@@ -11682,8 +11845,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_9A_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_9A_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_9A_rv2_snow; return sl_ttrs_9A_rv2_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_9A) { 1: sl_ttrs_9A_rv0; 1: sl_ttrs_9A_rv1; 1: sl_ttrs_9A_rv2; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_9A) { 1: sl_ttrs_9A_rv0; 1: sl_ttrs_9A_rv1; 2: sl_ttrs_9A_rv2; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_9A_cargo_production_1, 0) { return 778; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9A_cargo_production_2, 0) { return 4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9A_cargo_production_3, 0) { return 517; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9A_cargo_production_4, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9A_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_9A_cargo_production_1; 1: switch_ttrs_9A_cargo_production_2; 2: switch_ttrs_9A_cargo_production_3; return switch_ttrs_9A_cargo_production_4; }
 spriteset(ss_ttrs_9B_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [242, 19688, 64, 31, -31, 0] }
 spriteset(ss_ttrs_9B_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[450, 19768, 32, 111, 1, -88]  /* completed */
@@ -11750,7 +11918,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_9B_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_9B_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_9B_rv2_snow; return sl_ttrs_9B_rv2_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_9B) { 1: sl_ttrs_9B_rv0; 1: sl_ttrs_9B_rv1; 1: sl_ttrs_9B_rv2; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_9B) { 1: sl_ttrs_9B_rv0; 1: sl_ttrs_9B_rv1; 2: sl_ttrs_9B_rv2; }
 
 spriteset(ss_ttrs_9C_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [82, 19688, 64, 31, -31, 0] }
 spriteset(ss_ttrs_9C_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
@@ -11818,7 +11986,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_9C_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_9C_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_9C_rv2_snow; return sl_ttrs_9C_rv2_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_9C) { 1: sl_ttrs_9C_rv0; 1: sl_ttrs_9C_rv1; 1: sl_ttrs_9C_rv2; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_9C) { 1: sl_ttrs_9C_rv0; 1: sl_ttrs_9C_rv1; 2: sl_ttrs_9C_rv2; }
 
 spriteset(ss_ttrs_9D_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 20120, 64, 31, -31, 0] }
 spritelayout sl_ttrs_9D_snow_done {
@@ -11856,7 +12024,7 @@ spritelayout sl_ttrs_9D_rv2_done {
 }
 switch (FEAT_HOUSES, SELF, sl_ttrs_9D_rv2, construction_state) { 3: sl_ttrs_9D_rv2_done; return sl_ttrs_9D_rv2_done; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_9D_nosnow) { 1: sl_ttrs_9D_rv0; 1: sl_ttrs_9D_rv1; 1: sl_ttrs_9D_rv2; }
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_9D_nosnow) { 1: sl_ttrs_9D_rv0; 1: sl_ttrs_9D_rv1; 2: sl_ttrs_9D_rv2; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_9D, terrain_type) { TILETYPE_SNOW: sl_ttrs_9D_snow; return sl_ttrs_9D_nosnow; }
 
@@ -11867,7 +12035,7 @@ item (FEAT_HOUSES, item_ttrs_9a_hotel_pribaltiskaya, 354, HOUSE_SIZE_2X2) {
 		building_flags: bitmask(HOUSE_FLAG_PROTECTED);
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63490 */
-		years_available: [1978, 2175];
+		years_available: [1978, 0xFFFF];
 		population: 96;
 		mail_multiplier: 64;
 		removal_cost_multiplier: 255;
@@ -11885,6 +12053,7 @@ item (FEAT_HOUSES, item_ttrs_9a_hotel_pribaltiskaya, 354, HOUSE_SIZE_2X2) {
 		graphics_south: sl_ttrs_9D;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		cargo_production: switch_ttrs_9A_cargo_production_0;
 	}
 }
 
@@ -11934,6 +12103,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_9E_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_9E) { 1: sl_ttrs_9E_rv0; 1: sl_ttrs_9E_rv1; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_9E_cargo_production_1, 0) { return 769; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9E_cargo_production_2, 0) { return 2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9E_cargo_production_3, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9E_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_9E_cargo_production_1; 1: switch_ttrs_9E_cargo_production_2; return switch_ttrs_9E_cargo_production_3; }
 item (FEAT_HOUSES, item_ttrs_9e_bronze_horseman_statue, 358) {
 	property {
 		substitute: 9;
@@ -11942,7 +12115,7 @@ item (FEAT_HOUSES, item_ttrs_9e_bronze_horseman_statue, 358) {
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
-		years_available: [1930, 2175];
+		years_available: [1930, 0xFFFF];
 		population: 1;
 		mail_multiplier: 0;
 		removal_cost_multiplier: 255;
@@ -11958,6 +12131,7 @@ item (FEAT_HOUSES, item_ttrs_9e_bronze_horseman_statue, 358) {
 		default: sl_ttrs_9E;
 		construction_check: switch_ttrs_landmark_unique;
 		/* classification: landmark_unique */
+		cargo_production: switch_ttrs_9E_cargo_production_0;
 	}
 }
 
@@ -11983,6 +12157,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_9F_snow, construction_state) { 3: sl_ttrs_9F_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_9F, terrain_type) { TILETYPE_SNOW: sl_ttrs_9F_snow; return sl_ttrs_9F_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_9F_cargo_production_1, 0) { return 769; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9F_cargo_production_2, 0) { return 2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9F_cargo_production_3, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_9F_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_9F_cargo_production_1; 1: switch_ttrs_9F_cargo_production_2; return switch_ttrs_9F_cargo_production_3; }
 item (FEAT_HOUSES, item_ttrs_9f_statue_of_john_batchelor, 359) {
 	property {
 		substitute: 9;
@@ -11991,7 +12169,7 @@ item (FEAT_HOUSES, item_ttrs_9f_statue_of_john_batchelor, 359) {
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
-		years_available: [1930, 2175];
+		years_available: [1930, 0xFFFF];
 		population: 1;
 		mail_multiplier: 0;
 		removal_cost_multiplier: 255;
@@ -12007,6 +12185,7 @@ item (FEAT_HOUSES, item_ttrs_9f_statue_of_john_batchelor, 359) {
 		default: sl_ttrs_9F;
 		construction_check: switch_ttrs_landmark_unique;
 		/* classification: landmark_unique */
+		cargo_production: switch_ttrs_9F_cargo_production_0;
 	}
 }
 
@@ -12032,6 +12211,10 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_A0_snow, construction_state) { 3: sl_ttrs_A0_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_A0, terrain_type) { TILETYPE_SNOW: sl_ttrs_A0_snow; return sl_ttrs_A0_nosnow; }
 
+switch (FEAT_HOUSES, SELF, switch_ttrs_A0_cargo_production_1, 0) { return 769; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_A0_cargo_production_2, 0) { return 4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_A0_cargo_production_3, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_A0_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_A0_cargo_production_1; 1: switch_ttrs_A0_cargo_production_2; return switch_ttrs_A0_cargo_production_3; }
 item (FEAT_HOUSES, item_ttrs_a0_statue_of_v_i_lenin, 360) {
 	property {
 		substitute: 9;
@@ -12040,7 +12223,7 @@ item (FEAT_HOUSES, item_ttrs_a0_statue_of_v_i_lenin, 360) {
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
-		years_available: [1930, 2175];
+		years_available: [1930, 0xFFFF];
 		population: 1;
 		mail_multiplier: 0;
 		removal_cost_multiplier: 255;
@@ -12056,6 +12239,7 @@ item (FEAT_HOUSES, item_ttrs_a0_statue_of_v_i_lenin, 360) {
 		default: sl_ttrs_A0;
 		construction_check: switch_ttrs_landmark_unique;
 		/* classification: landmark_unique */
+		cargo_production: switch_ttrs_A0_cargo_production_0;
 	}
 }
 
@@ -12081,7 +12265,11 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_A1_snow, construction_state) { 3: sl_ttrs_A1_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_A1, terrain_type) { TILETYPE_SNOW: sl_ttrs_A1_snow; return sl_ttrs_A1_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, switch_ttrs_a1_colour, bitmask(TRIGGER_HOUSE_TILELOOP)) { 1: return 10; 1: return 14; 1: return 20; 1: return 21; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_a1_colour) { 1: return 778; 1: return 782; 1: return 788; 1: return 789; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_A1_cargo_production_1, 0) { return 769; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_A1_cargo_production_2, 0) { return 2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_A1_cargo_production_3, 0) { return 8447; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_A1_cargo_production_0, var[0x10, 0, 0xFF]) { 0: switch_ttrs_A1_cargo_production_1; 1: switch_ttrs_A1_cargo_production_2; return switch_ttrs_A1_cargo_production_3; }
 item (FEAT_HOUSES, item_ttrs_a1_statue_of_captain_cook, 361) {
 	property {
 		substitute: 9;
@@ -12090,7 +12278,7 @@ item (FEAT_HOUSES, item_ttrs_a1_statue_of_captain_cook, 361) {
 		/* NFO building_flags extra bits: 1 */
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
-		years_available: [1930, 2175];
+		years_available: [1930, 0xFFFF];
 		population: 1;
 		mail_multiplier: 0;
 		removal_cost_multiplier: 255;
@@ -12106,6 +12294,7 @@ item (FEAT_HOUSES, item_ttrs_a1_statue_of_captain_cook, 361) {
 		default: sl_ttrs_A1;
 		construction_check: switch_ttrs_landmark_unique;
 		/* classification: landmark_unique */
+		cargo_production: switch_ttrs_A1_cargo_production_0;
 		colour: switch_ttrs_a1_colour;
 	}
 }

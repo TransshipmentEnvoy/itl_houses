@@ -161,57 +161,50 @@ def _extract_colour_values(
     target_id: int,
     resolve_graph: Action2Graph,
     final_graph: Action2Graph,
-) -> list[int]:
+) -> tuple[list[int], int]:
     """Follow *target_id* and extract colour callback return values.
 
     The NFO colour callback branch typically points to a type-80 random node
     whose entries are all callback-result sentinels (bit 15 set).  We extract
-    the low byte of each unique entry as a colour palette index.
+    the 15-bit callback result of each entry.  Duplicates are **preserved** so
+    that downstream code can derive probability weights from entry repetition.
 
     Also handles the case of a type-82 (re-randomise) node which contains
     ranges that are callback results, and the case of a direct callback result.
+
+    Returns ``(colour_values, triggers)`` where *triggers* is the NFO trigger
+    byte from a RandomNode (0 when the source is not random).
     """
     if is_callback_result(target_id):
-        return [target_id & 0xFF]
+        return [target_id & 0x7FFF], 0
 
     node = resolve_graph.get(target_id)
     if node is None:
         node = final_graph.get(target_id)
     if node is None:
-        return []
+        return [], 0
 
     if isinstance(node, RandomNode):
         colours: list[int] = []
-        seen: set[int] = set()
         for entry_id in node.entries:
             if is_callback_result(entry_id):
-                val = entry_id & 0xFF
-                if val not in seen:
-                    seen.add(val)
-                    colours.append(val)
-        return colours
+                colours.append(entry_id & 0x7FFF)
+        return colours, node.triggers
 
     # Type-82/86 re-randomise — treated as VariationalNode by the parser.
     # Extract callback-result values from ranges and default.
     if isinstance(node, VariationalNode) and node.var_type in (0x82, 0x86):
         colours = []
-        seen = set()
         # Check default
         if is_callback_result(node.default):
-            val = node.default & 0xFF
-            if val not in seen:
-                seen.add(val)
-                colours.append(val)
+            colours.append(node.default & 0x7FFF)
         # Check range results
         for rng in node.ranges:
             if is_callback_result(rng.result_id):
-                val = rng.result_id & 0xFF
-                if val not in seen:
-                    seen.add(val)
-                    colours.append(val)
-        return colours
+                colours.append(rng.result_id & 0x7FFF)
+        return colours, 0
 
-    return []
+    return [], 0
 
 
 # ============================================================================
@@ -313,22 +306,29 @@ def _traverse(
         var_type = node.var_type
 
         # 2a. Callback router (var 0x0C) — follow the *default* branch
-        #     (= the graphics chain) and also extract colour values from
-        #     the CB 0x1E branch if present.
+        #     (= the graphics chain); extract colour values from CB 0x1E;
+        #     store all other callback handler targets for later translation.
         if var == VAR_CALLBACK_ID:
             _follow(node.default, node_snapshot, snapshots, final_graph, state,
                     climate, in_constr, constr_idx,
                     anim_frame, in_random, random_variant_idx, depth + 1)
-            # Extract colour callback values (CB 0x1E)
-            if not state.result.colour_values:
-                for rng in node.ranges:
-                    if rng.range_lo <= _CBID_HOUSE_COLOUR <= rng.range_hi:
-                        colours = _extract_colour_values(
+            # Extract colour callback values (CB 0x1E) and record other CBs
+            for rng in node.ranges:
+                cb_lo, cb_hi = rng.range_lo, rng.range_hi
+                if cb_lo <= _CBID_HOUSE_COLOUR <= cb_hi:
+                    if not state.result.colour_values:
+                        colours, col_triggers = _extract_colour_values(
                             rng.result_id, node_snapshot, final_graph,
                         )
                         if colours:
                             state.result.colour_values = colours
-                        break
+                            state.result.colour_triggers = col_triggers
+                else:
+                    # Record other callback handler targets (e.g. CB 0x17,
+                    # 0x1B, 0x1F, 0x21, 0x2E, 0x143, …).
+                    cb_id = cb_lo if cb_lo == cb_hi else cb_lo
+                    if cb_id not in state.result.callback_handlers:
+                        state.result.callback_handlers[cb_id] = rng.result_id
 
         # 2b. Climate split (var 0x03)
         elif var == VAR_CLIMATE:
@@ -468,24 +468,45 @@ def _traverse(
     #    variant slots instead of overwriting slots 0-1 twice.
     # ------------------------------------------------------------------
     if isinstance(node, RandomNode):
-        # Deduplicate entries, preserving order
+        # Deduplicate entries for graph traversal, but also count occurrences
+        # to derive per-variant probability weights.
         seen_entries: dict[int, int] = {}   # entry_id → local_index
         unique_order: list[int] = []
+        entry_counts: dict[int, int] = {}   # entry_id → occurrence count
         for entry_id in node.entries:
             if is_callback_result(entry_id):
                 continue
             if entry_id not in seen_entries:
                 seen_entries[entry_id] = len(unique_order)
                 unique_order.append(entry_id)
+                entry_counts[entry_id] = 1
+            else:
+                entry_counts[entry_id] += 1
 
         num_branches = len(unique_order)
+
+        # Store random triggers from the outermost random node.
+        if not in_random:
+            state.result.random_triggers = node.triggers
+
+        # Build per-variant weights from entry repetition counts.
         for entry_id in unique_order:
             local_idx = seen_entries[entry_id]
+            weight = entry_counts[entry_id]
             if in_random and random_variant_idx is not None:
                 # Nested random: compose multiplicatively
                 effective_idx = random_variant_idx * num_branches + local_idx
             else:
                 effective_idx = local_idx
+            # Extend random_weights list to cover effective_idx
+            while len(state.result.random_weights) <= effective_idx:
+                state.result.random_weights.append(1)
+            if in_random and random_variant_idx is not None:
+                # Nested: multiply outer weight by inner count
+                outer_weight = state.result.random_weights[random_variant_idx] if random_variant_idx < len(state.result.random_weights) else 1
+                state.result.random_weights[effective_idx] = outer_weight * weight
+            else:
+                state.result.random_weights[effective_idx] = weight
             _follow(entry_id, node_snapshot, snapshots, final_graph, state,
                     climate, in_constr, constr_idx,
                     anim_frame, True, effective_idx, depth + 1)
@@ -641,6 +662,255 @@ def _fixup_snow_construction_fallback(result: HouseTileGraphics) -> None:
                 cg = getattr(rvg, attr)
                 if _has_content(cg) and not _has_constr(cg):
                     cg.construction_stages = list(rvg.temperate.construction_stages)  # type: ignore[union-attr]
+
+
+# ============================================================================
+# Callback sub-graph traversal
+# ============================================================================
+
+# Mapping from NFO variable byte to a human-readable NML expression.
+_VAR_EXPR_MAP: dict[int, str] = {
+    0x40: "construction_state",
+    0x41: "age",
+    0x42: "town_zone",
+    0x43: "terrain_type",
+    0x44: "var[0x44, 0, 0xFFFFFFFF]",   # building counts — raw
+    0x46: "animation_frame",
+    0x47: "var[0x47, 0, 0xFF]",          # xy coordinate of building
+    0x60: "var[0x60, 0, 0xFFFFFFFF]",
+    0x61: "var[0x61, 0, 0xFFFFFFFF]",
+    0x7D: "var[0x7D, 0, 0xFFFFFFFF]",    # temp register
+}
+
+
+def _nml_var_expr(variable: int, shift: int, mask: int, param: int | None = None) -> str:
+    """Build an NML variable expression from NFO variable / shift / mask.
+
+    For variables in the 0x60-0x7F range that require an extra parameter byte,
+    *param* is included as the **fourth** argument:
+    ``var[0xNN, shift, mask, param]`` (matching nmlc's Variable(num, shift, mask, param) constructor).
+    """
+    if variable in _VAR_EXPR_MAP and shift == 0 and mask in (0xFF, 0xFFFF, 0xFFFFFFFF) and param is None:
+        return _VAR_EXPR_MAP[variable]
+    if param is not None:
+        return f"var[0x{variable:02X}, {shift}, 0x{mask:X}, {param}]"
+    return f"var[0x{variable:02X}, {shift}, 0x{mask:X}]"
+
+
+def traverse_callback_subgraph(
+    root_id: int,
+    resolve_graph: Action2Graph,
+    final_graph: Action2Graph,
+    house_id_hex: str,
+    cb_id: int,
+    *,
+    cb_label: str | None = None,
+    _depth: int = 0,
+    _visited: set[int] | None = None,
+    _counter: list[int] | None = None,
+) -> tuple[list[str], str | None]:
+    """Recursively translate a callback decision-tree into NML switch blocks.
+
+    Callback sub-graphs are pure decision trees whose leaf nodes are callback-
+    result sentinels (``is_callback_result() == True``).  They never reach
+    layout nodes.
+
+    Parameters
+    ----------
+    root_id : int
+        Entry node ID (or callback-result sentinel) to translate.
+    resolve_graph, final_graph : Action2Graph
+        Per-section and global graph for node lookup.
+    house_id_hex : str
+        Used for naming emitted switches.
+    cb_id : int
+        NFO callback ID (for naming).
+    cb_label : str or None
+        Human-readable label for the callback (e.g. ``"anim_speed"``).
+        When provided, switch names use this label instead of ``cb{hex}``.
+    _depth, _visited, _counter : internal recursion state.
+
+    Returns
+    -------
+    (lines, switch_name)
+        *lines* is a list of NML code lines; *switch_name* is the top-level
+        identifier (or ``None`` if translation failed).
+    """
+    if _counter is None:
+        _counter = [0]
+    if _visited is None:
+        _visited = set()
+    name_tag = cb_label or f"cb{cb_id:X}"
+    if _depth > 20:
+        return [f"/* WARN: {name_tag} sub-graph depth limit reached */"], None
+
+    # -- Callback-result terminal ------------------------------------------
+    if is_callback_result(root_id):
+        val = root_id & 0x7FFF
+        name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
+        _counter[0] += 1
+        lines = [
+            f"switch (FEAT_HOUSES, SELF, {name}, 0) {{ return {val}; }}"
+        ]
+        return lines, name
+
+    # -- Look up node ------------------------------------------------------
+    node = resolve_graph.get(root_id)
+    if node is None:
+        node = final_graph.get(root_id)
+    if node is None:
+        return [f"/* WARN: {name_tag} target 0x{root_id:02X} not found in any graph section */"], None
+
+    node_ident = id(node)
+    if node_ident in _visited:
+        return [f"/* WARN: {name_tag} cycle at 0x{root_id:02X} */"], None
+    _visited.add(node_ident)
+
+    # -- VariationalNode: emit switch with ranges --------------------------
+    if isinstance(node, VariationalNode):
+        var_expr = _nml_var_expr(node.variable, node.shift_count, node.mask, getattr(node, 'param', None))
+        switch_name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
+        _counter[0] += 1
+        all_lines: list[str] = []
+
+        # Build cases
+        cases: list[str] = []
+        for rng in node.ranges:
+            child_lines, child_name = traverse_callback_subgraph(
+                rng.result_id, resolve_graph, final_graph,
+                house_id_hex, cb_id,
+                cb_label=cb_label, _depth=_depth + 1, _visited=_visited, _counter=_counter,
+            )
+            all_lines.extend(child_lines)
+            if child_name is None:
+                continue
+            if rng.range_lo == rng.range_hi:
+                cases.append(f"{rng.range_lo}: {child_name}")
+            else:
+                cases.append(f"{rng.range_lo}..{rng.range_hi}: {child_name}")
+
+        # Default branch
+        def_lines, def_name = traverse_callback_subgraph(
+            node.default, resolve_graph, final_graph,
+            house_id_hex, cb_id,
+            cb_label=cb_label, _depth=_depth + 1, _visited=_visited, _counter=_counter,
+        )
+        all_lines.extend(def_lines)
+        def_ref = def_name or "0"
+
+        cases_str = "; ".join(cases)
+        if cases_str:
+            cases_str += "; "
+        all_lines.append(
+            f"switch (FEAT_HOUSES, SELF, {switch_name}, {var_expr}) {{ {cases_str}return {def_ref}; }}"
+        )
+        _visited.discard(node_ident)
+        return all_lines, switch_name
+
+    # -- RandomNode: emit random_switch with weights -----------------------
+    if isinstance(node, RandomNode):
+        switch_name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
+        _counter[0] += 1
+        all_lines: list[str] = []
+
+        # Count entry occurrences for weights
+        entry_order: list[int] = []
+        entry_weights: dict[int, int] = {}
+        for entry_id in node.entries:
+            if entry_id not in entry_weights:
+                entry_order.append(entry_id)
+                entry_weights[entry_id] = 1
+            else:
+                entry_weights[entry_id] += 1
+
+        weight_parts: list[str] = []
+        for entry_id in entry_order:
+            w = entry_weights[entry_id]
+            if is_callback_result(entry_id):
+                val = entry_id & 0x7FFF
+                weight_parts.append(f"{w}: return {val}")
+            else:
+                child_lines, child_name = traverse_callback_subgraph(
+                    entry_id, resolve_graph, final_graph,
+                    house_id_hex, cb_id,
+                    cb_label=cb_label, _depth=_depth + 1, _visited=_visited, _counter=_counter,
+                )
+                all_lines.extend(child_lines)
+                if child_name is not None:
+                    weight_parts.append(f"{w}: {child_name}")
+
+        if not weight_parts:
+            _visited.discard(node_ident)
+            return [f"/* WARN: {name_tag} random node 0x{root_id:02X} empty */"], None
+
+        entries_str = "; ".join(weight_parts)
+        # Map trigger byte
+        trigger_clause = ""
+        if node.triggers != 0:
+            trigger_clause = f" /* NFO triggers: 0x{node.triggers:02X} */"
+        all_lines.append(
+            f"random_switch (FEAT_HOUSES, SELF, {switch_name}) {{ {entries_str}; }}{trigger_clause}"
+        )
+        _visited.discard(node_ident)
+        return all_lines, switch_name
+
+    # -- ComputationNode: best-effort — follow default / subroutine calls --
+    if isinstance(node, ComputationNode):
+        # For computation nodes, try to resolve the result from ranges/default
+        all_lines: list[str] = []
+        if node.ranges:
+            # Has ranges — treat like a variational node
+            switch_name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
+            _counter[0] += 1
+            cases = []
+            for rng in node.ranges:
+                child_lines, child_name = traverse_callback_subgraph(
+                    rng.result_id, resolve_graph, final_graph,
+                    house_id_hex, cb_id,
+                    cb_label=cb_label, _depth=_depth + 1, _visited=_visited, _counter=_counter,
+                )
+                all_lines.extend(child_lines)
+                if child_name is None:
+                    continue
+                if rng.range_lo == rng.range_hi:
+                    cases.append(f"{rng.range_lo}: {child_name}")
+                else:
+                    cases.append(f"{rng.range_lo}..{rng.range_hi}: {child_name}")
+
+            def_lines, def_name = traverse_callback_subgraph(
+                node.default, resolve_graph, final_graph,
+                house_id_hex, cb_id,
+                cb_label=cb_label, _depth=_depth + 1, _visited=_visited, _counter=_counter,
+            )
+            all_lines.extend(def_lines)
+            def_ref = def_name or "0"
+
+            # Use a generic expression — computation semantics are approximated
+            cases_str = "; ".join(cases)
+            if cases_str:
+                cases_str += "; "
+            all_lines.append(
+                f"switch (FEAT_HOUSES, SELF, {switch_name}, 0) "
+                f"{{ {cases_str}return {def_ref}; }}"
+                f" /* NOTE: computation node 0x{root_id:02X}, result approximated */"
+            )
+            _visited.discard(node_ident)
+            return all_lines, switch_name
+        else:
+            # No ranges — just follow default
+            _visited.discard(node_ident)
+            return traverse_callback_subgraph(
+                node.default, resolve_graph, final_graph,
+                house_id_hex, cb_id,
+                cb_label=cb_label, _depth=_depth + 1, _visited=_visited, _counter=_counter,
+            )
+
+    # -- LayoutNode: callback chain falls through to default graphics ------
+    # In NFO, reaching a layout node from a callback means "use the default
+    # graphics result" — equivalent to CB_FAILED.  We omit this branch so the
+    # callback is simply not listed in the NML graphics block.
+    _visited.discard(node_ident)
+    return [f"/* NOTE: {name_tag} fell through to layout node 0x{root_id:02X} (default graphics) */"], None
 
 
 # ============================================================================

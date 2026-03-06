@@ -179,6 +179,7 @@ class VariationalNode:
     variable: int               # e.g. VAR_TERRAIN_TYPE, VAR_ANIMATION_COUNTER …
     shift:    int               # raw shift byte (kept for backward compat)
     mask:     int               # AND mask applied after shift
+    param:    Optional[int] = None  # extra parameter byte for vars 0x60-0x7F
 
     ranges:  list[VariationalRange] = field(default_factory=list)
     default: int = 0            # default result when no range matches
@@ -297,6 +298,24 @@ class HouseTileGraphics:
     snow:           Optional[ClimateGraphics]           = None
     tropic:         Optional[ClimateGraphics]           = None
     arctic_v2:      Optional[ClimateGraphics]           = None
-    random_variants: list[RandomVariantGraphics]        = field(default_factory=list)    # Colour callback values extracted from CB 0x1E random results.
-    # Each int is a company-colour palette index (0–255).
+    random_variants: list[RandomVariantGraphics]        = field(default_factory=list)
+
+    # Colour callback values extracted from CB 0x1E random results.
+    # Each int is a 15-bit colour callback result (0–0x7FFF).
+    # Duplicates are preserved to encode probability weights.
     colour_values:   list[int]                          = field(default_factory=list)
+
+    # Callback handlers extracted from the var 0x0C callback router.
+    # Maps NFO callback ID (e.g. 0x17, 0x1B, 0x2E, 0x143) → target node ID.
+    callback_handlers: dict[int, int]                   = field(default_factory=dict)
+
+    # Random variant weights derived from entry repetition counts.
+    # Parallel to random_variants — random_weights[i] is the weight for variant i.
+    # Empty when there are no random variants or weights were not resolved.
+    random_weights:  list[int]                          = field(default_factory=list)
+
+    # NFO triggers byte from the outermost RandomNode (0x00 = no trigger).
+    random_triggers: int                                = 0
+
+    # NFO triggers byte specifically for the colour random node.
+    colour_triggers: int                                = 0

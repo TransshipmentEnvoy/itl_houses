@@ -90,10 +90,15 @@ from .graph import (
     build_graph_from_lines,
     build_house_tile_graphics,
     build_all_house_graphics,
+    traverse_callback_subgraph,
 )
 
 from .nml_emit import (
     emit_house_tile_nml,
+)
+
+from .fixups import (
+    fixup_food_only_add_pass_mail,
 )
 
 __all__ = [
@@ -138,6 +143,9 @@ __all__ = [
     "build_graph_from_lines",
     "build_house_tile_graphics",
     "build_all_house_graphics",
+    "traverse_callback_subgraph",
     # NML emission
     "emit_house_tile_nml",
+    # Fixups
+    "fixup_food_only_add_pass_mail",
 ]

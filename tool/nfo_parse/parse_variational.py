@@ -65,8 +65,18 @@ def parse_variational_node_81(rs: RawSprite) -> VariationalNode | None:
 
     set_id     = b[2]
     variable   = b[4]
-    shift      = b[5]
-    mask       = b[6]
+
+    # Variables in 0x60-0x7F range require an extra parameter byte
+    param: int | None = None
+    p = 5
+    if 0x60 <= variable <= 0x7F:
+        if p >= len(b):
+            return None
+        param = b[p]
+        p += 1
+
+    shift      = b[p]; p += 1
+    mask       = b[p]; p += 1
 
     # Decompose shift byte: bits 0-4 = shift count, bit 5 = chain, bit 6 = sign
     has_chain = bool(shift & 0x20)
@@ -79,18 +89,17 @@ def parse_variational_node_81(rs: RawSprite) -> VariationalNode | None:
             set_id, shift,
         )
 
-    num_ranges = b[7]
+    num_ranges = b[p]; p += 1
 
     # Minimum byte check for ranges + default
     # Each range: 4 bytes (2 result + 2 range bounds).  Default: 2 bytes.
-    needed = 8 + num_ranges * 4 + 2
+    needed = p + num_ranges * 4 + 2
     if len(b) < needed:
         # Try to parse what we have — emit a partial node
-        num_ranges = max(0, (len(b) - 10) // 4)
-        needed     = 8 + num_ranges * 4 + 2
+        num_ranges = max(0, (len(b) - p - 2) // 4)
+        needed     = p + num_ranges * 4 + 2
 
     ranges: list[VariationalRange] = []
-    p = 8
     for _ in range(num_ranges):
         if p + 3 >= len(b):
             break
@@ -110,6 +119,7 @@ def parse_variational_node_81(rs: RawSprite) -> VariationalNode | None:
         variable = variable,
         shift    = shift,
         mask     = mask,
+        param    = param,
         ranges   = ranges,
         default  = default_id,
     )
@@ -142,8 +152,18 @@ def parse_variational_node_85(rs: RawSprite) -> VariationalNode | None:
     set_id     = b[2]
     var_type   = b[3]
     variable   = b[4]
-    shift      = b[5]
-    mask       = b[6] | (b[7] << 8)   # 16-bit mask
+
+    # Variables in 0x60-0x7F range require an extra parameter byte
+    param: int | None = None
+    p = 5
+    if 0x60 <= variable <= 0x7F:
+        if p >= len(b):
+            return None
+        param = b[p]
+        p += 1
+
+    shift      = b[p]; p += 1
+    mask       = b[p] | (b[p + 1] << 8); p += 2   # 16-bit mask
 
     # Decompose shift byte: bits 0-4 = shift count, bit 5 = chain, bit 6 = sign
     has_chain = bool(shift & 0x20)
@@ -156,16 +176,15 @@ def parse_variational_node_85(rs: RawSprite) -> VariationalNode | None:
             set_id, shift,
         )
 
-    num_ranges = b[8]
+    num_ranges = b[p]; p += 1
 
     # Each word range: 6 bytes (2 result + 4 range bounds).  Default: 2 bytes.
-    needed = 9 + num_ranges * 6 + 2
+    needed = p + num_ranges * 6 + 2
     if len(b) < needed:
-        num_ranges = max(0, (len(b) - 11) // 6)
-        needed     = 9 + num_ranges * 6 + 2
+        num_ranges = max(0, (len(b) - p - 2) // 6)
+        needed     = p + num_ranges * 6 + 2
 
     ranges: list[VariationalRange] = []
-    p = 9
     for _ in range(num_ranges):
         if p + 5 >= len(b):
             break
@@ -185,6 +204,7 @@ def parse_variational_node_85(rs: RawSprite) -> VariationalNode | None:
         variable = variable,
         shift    = shift,
         mask     = mask,
+        param    = param,
         ranges   = ranges,
         default  = default_id,
     )
