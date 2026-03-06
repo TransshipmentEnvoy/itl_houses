@@ -7,6 +7,7 @@ switch (FEAT_HOUSES, SELF, switch_ttrs_flats, CheckValue(4,255) && CheckFlatsSpr
 switch (FEAT_HOUSES, SELF, switch_ttrs_offices, CheckOfficeSprawl(1000) && CheckValue(7,255) && (HasSameClassNearby(2) || IsFirstHouseOfClass())) {return;}
 switch (FEAT_HOUSES, SELF, switch_ttrs_landmark, CheckValue(5,255)) {return;}
 switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}
+switch (FEAT_HOUSES, SELF, switch_ttrs_utility, CheckValue(1,255) && IsNotDesertTile() && IsUniqueInRadius(8)) {return;}
 
 spriteset(ss_ttrs_00_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [626, 72, 64, 31, -31, 0] }
 spriteset(ss_ttrs_00_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
@@ -132,13 +133,13 @@ item (FEAT_HOUSES, item_ttrs_01_house_01, 201) {
 		/* NFO availability packed value: 63504 */
 		years_available: [1870, 1950];
 		/* CUSTOM: years_available remapped 1930 → 1870 (orig: [1930, 1950]) */
-		probability: 1;
+		probability: 2;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_01;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -526,8 +527,8 @@ item (FEAT_HOUSES, item_ttrs_04_house_04, 204) {
 	}
 	graphics {
 		default: sl_ttrs_04;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -563,8 +564,8 @@ item (FEAT_HOUSES, item_ttrs_05_house_05, 205) {
 	}
 	graphics {
 		default: sl_ttrs_05;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 	}
 }
 
@@ -687,7 +688,7 @@ item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 		/* NFO availability packed value: 63508 */
 		years_available: [1870, 1950];
 		/* CUSTOM: years_available remapped 1930 → 1870 (orig: [1930, 1950]) */
-		probability: 1;
+		probability: 2;
 		refresh_multiplier: 8;
 		animation_info: [0, 4];
 		animation_speed: 11;
@@ -697,8 +698,8 @@ item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 	graphics {
 		graphics_north: sl_ttrs_06;
 		graphics_east: sl_ttrs_07;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		anim_control: switch_ttrs_06_anim_control_0;
 		colour: switch_ttrs_06_colour;
 	}
@@ -1093,8 +1094,8 @@ item (FEAT_HOUSES, item_ttrs_0c_house_0c, 212) {
 	}
 	graphics {
 		default: sl_ttrs_0C;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -1195,8 +1196,8 @@ item (FEAT_HOUSES, item_ttrs_0e_house_0e, 214) {
 	}
 	graphics {
 		default: sl_ttrs_0E;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 	}
 }
 
@@ -1431,8 +1432,8 @@ item (FEAT_HOUSES, item_ttrs_13_house_13, 219) {
 	}
 	graphics {
 		default: sl_ttrs_13;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_13_colour;
 	}
 }
@@ -1697,8 +1698,8 @@ item (FEAT_HOUSES, item_ttrs_16_house_16, 222) {
 	}
 	graphics {
 		default: sl_ttrs_16;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_16_colour;
 	}
 }
@@ -1816,8 +1817,8 @@ item (FEAT_HOUSES, item_ttrs_18_house_18, 224) {
 	}
 	graphics {
 		default: sl_ttrs_18;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_18_colour;
 	}
 }
@@ -1871,13 +1872,13 @@ item (FEAT_HOUSES, item_ttrs_19_house_19, 225) {
 		/* NFO availability packed value: 63504 */
 		years_available: [1870, 1980];
 		/* CUSTOM: years_available remapped 1930 → 1870 (orig: [1930, 1980]) */
-		probability: 1;
+		probability: 2;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_19;
-		construction_check: switch_ttrs_offices;
-		/* classification: offices */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -1915,8 +1916,8 @@ item (FEAT_HOUSES, item_ttrs_1a_house_1a, 226) {
 	}
 	graphics {
 		default: sl_ttrs_1A;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -2012,8 +2013,8 @@ item (FEAT_HOUSES, item_ttrs_1c_house_1c, 228) {
 	}
 	graphics {
 		default: sl_ttrs_1C;
-		construction_check: switch_ttrs_flats;
-		/* classification: flats */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 	}
 }
 
@@ -2208,13 +2209,13 @@ item (FEAT_HOUSES, item_ttrs_1f_house_1f, 231) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
-		probability: 1;
+		probability: 2;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_1F;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -2287,8 +2288,8 @@ item (FEAT_HOUSES, item_ttrs_20_house_20, 232) {
 	}
 	graphics {
 		default: sl_ttrs_20;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -2525,15 +2526,15 @@ item (FEAT_HOUSES, item_ttrs_21_house_21, 233, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1950, 1980];
-		probability: 1;
+		probability: 2;
 		accepted_cargos: [[PASS, 6],[MAIL, 2],[GOOD, 4]];
 		/* NFO field 14: 10 */
 	}
 	graphics {
 		graphics_north: sl_ttrs_21;
 		graphics_east: sl_ttrs_22;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		colour: switch_ttrs_21_colour;
 	}
 }
@@ -2970,8 +2971,8 @@ item (FEAT_HOUSES, item_ttrs_29_house_29, 241) {
 	}
 	graphics {
 		default: sl_ttrs_29;
-		construction_check: switch_ttrs_flats;
-		/* classification: flats */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_29_colour;
 	}
 }
@@ -3204,8 +3205,8 @@ item (FEAT_HOUSES, item_ttrs_2d_park_avenue_1457, 245) {
 	}
 	graphics {
 		default: sl_ttrs_2D;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -3721,8 +3722,8 @@ item (FEAT_HOUSES, item_ttrs_31_house_31, 249) {
 	}
 	graphics {
 		default: sl_ttrs_31;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -3780,8 +3781,8 @@ item (FEAT_HOUSES, item_ttrs_32_house_32, 250) {
 	}
 	graphics {
 		default: sl_ttrs_32;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 		colour: switch_ttrs_32_colour;
 	}
 }
@@ -3844,8 +3845,8 @@ item (FEAT_HOUSES, item_ttrs_33_house_33, 251) {
 	}
 	graphics {
 		default: sl_ttrs_33;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_33_colour;
 	}
 }
@@ -3904,8 +3905,8 @@ item (FEAT_HOUSES, item_ttrs_34_house_34, 252) {
 	}
 	graphics {
 		default: sl_ttrs_34;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_34_colour;
 	}
 }
@@ -4160,13 +4161,13 @@ item (FEAT_HOUSES, item_ttrs_38_house_38, 256) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
-		probability: 1;
+		probability: 2;
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_38;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -4444,8 +4445,8 @@ item (FEAT_HOUSES, item_ttrs_3b_house_3b, 259) {
 	}
 	graphics {
 		default: sl_ttrs_3B;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -4480,8 +4481,8 @@ item (FEAT_HOUSES, item_ttrs_3c_house_3c, 260) {
 	}
 	graphics {
 		default: sl_ttrs_3C;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 	}
 }
 
@@ -4575,14 +4576,14 @@ item (FEAT_HOUSES, item_ttrs_3d_house_3d, 261, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 2010];
-		probability: 1;
+		probability: 2;
 		accepted_cargos: [[PASS, 6],[MAIL, 2],[GOOD, 4]];
 	}
 	graphics {
 		graphics_north: sl_ttrs_3D;
 		graphics_east: sl_ttrs_3E;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -4975,8 +4976,8 @@ item (FEAT_HOUSES, item_ttrs_44_house_44, 268) {
 	}
 	graphics {
 		default: sl_ttrs_44;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_44_colour;
 	}
 }
@@ -5154,8 +5155,8 @@ item (FEAT_HOUSES, item_ttrs_47_house_47, 271) {
 	}
 	graphics {
 		default: sl_ttrs_47;
-		construction_check: switch_ttrs_flats;
-		/* classification: flats */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -5206,14 +5207,14 @@ item (FEAT_HOUSES, item_ttrs_48_mosque, 272) {
 		availability_mask: [bitmask(TOWNZONE_EDGE, TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63503 */
 		years_available: [1980, 0xFFFF];
-		probability: 1;
+		probability: 2;
 		/* NFO name string-id: DC0E; visible name: Mosque */
 		/* NFO field 14: 01 */
 	}
 	graphics {
 		default: sl_ttrs_48;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark_unique;
+		/* classification: landmark_unique */
 	}
 }
 
@@ -5430,8 +5431,8 @@ item (FEAT_HOUSES, item_ttrs_4c_park_avenue_1457, 276) {
 	}
 	graphics {
 		default: sl_ttrs_4C;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 		colour: switch_ttrs_4c_colour;
 	}
 }
@@ -5806,7 +5807,7 @@ item (FEAT_HOUSES, item_ttrs_51_house_51, 281, HOUSE_SIZE_2X2) {
 		availability_mask: [bitmask(TOWNZONE_OUTSKIRT, TOWNZONE_OUTER_SUBURB, TOWNZONE_INNER_SUBURB, TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63518 */
 		years_available: [1980, 0xFFFF];
-		probability: 1;
+		probability: 2;
 		/* NFO field 14: 10 */
 	}
 	graphics {
@@ -5814,8 +5815,8 @@ item (FEAT_HOUSES, item_ttrs_51_house_51, 281, HOUSE_SIZE_2X2) {
 		graphics_east: sl_ttrs_52;
 		graphics_west: sl_ttrs_53;
 		graphics_south: sl_ttrs_54;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		colour: switch_ttrs_51_colour;
 	}
 }
@@ -5870,8 +5871,8 @@ item (FEAT_HOUSES, item_ttrs_55_house_55, 285) {
 	}
 	graphics {
 		default: sl_ttrs_55;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -5925,8 +5926,8 @@ item (FEAT_HOUSES, item_ttrs_56_house_56, 286) {
 	}
 	graphics {
 		default: sl_ttrs_56;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -5988,8 +5989,8 @@ item (FEAT_HOUSES, item_ttrs_57_house_57, 287) {
 	}
 	graphics {
 		default: sl_ttrs_57;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_57_colour;
 	}
 }
@@ -6108,8 +6109,8 @@ item (FEAT_HOUSES, item_ttrs_59_house_59, 289) {
 	}
 	graphics {
 		default: sl_ttrs_59;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -6396,15 +6397,15 @@ item (FEAT_HOUSES, item_ttrs_5a_house_5a, 290) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [1980, 0xFFFF];
-		probability: 1;
+		probability: 2;
 		animation_info: [1, 25];
 		animation_speed: 3;
 		/* NFO field 14: 08 */
 	}
 	graphics {
 		default: sl_ttrs_5A;
-		construction_check: switch_ttrs_offices;
-		/* classification: offices */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		construction_anim: switch_ttrs_5A_construction_anim_0;
 	}
 }
@@ -6462,8 +6463,8 @@ item (FEAT_HOUSES, item_ttrs_5b_house_5b, 291) {
 	}
 	graphics {
 		default: sl_ttrs_5B;
-		construction_check: switch_ttrs_flats;
-		/* classification: flats */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 	}
 }
 
@@ -7068,15 +7069,15 @@ item (FEAT_HOUSES, item_ttrs_62_house_62, 298) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 0xFFFF];
-		probability: 1;
+		probability: 2;
 		animation_info: [1, 25];
 		animation_speed: 3;
 		/* NFO field 14: 09 */
 	}
 	graphics {
 		default: sl_ttrs_62;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 		construction_anim: switch_ttrs_62_construction_anim_0;
 	}
 }
@@ -7133,8 +7134,8 @@ item (FEAT_HOUSES, item_ttrs_63_house_63, 299) {
 	}
 	graphics {
 		default: sl_ttrs_63;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -7228,14 +7229,14 @@ item (FEAT_HOUSES, item_ttrs_64_house_64, 300, HOUSE_SIZE_1X2) {
 		availability_mask: [bitmask(TOWNZONE_CENTRE), bitmask(CLIMATE_TEMPERATE, CLIMATE_ARCTIC, CLIMATE_TROPIC, CLIMATE_TOYLAND, ABOVE_SNOWLINE)];
 		/* NFO availability packed value: 63504 */
 		years_available: [2010, 0xFFFF];
-		probability: 1;
+		probability: 2;
 		accepted_cargos: [[PASS, 6],[MAIL, 2],[GOOD, 4]];
 	}
 	graphics {
 		graphics_north: sl_ttrs_64;
 		graphics_east: sl_ttrs_65;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_landmark;
+		/* classification: landmark */
 	}
 }
 
@@ -7646,8 +7647,8 @@ item (FEAT_HOUSES, item_ttrs_6c_house_6c, 308) {
 	}
 	graphics {
 		default: sl_ttrs_6C;
-		construction_check: switch_ttrs_flats;
-		/* classification: flats */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -7948,8 +7949,8 @@ item (FEAT_HOUSES, item_ttrs_72_park_avenue_1457, 314) {
 	}
 	graphics {
 		default: sl_ttrs_72;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 		colour: switch_ttrs_72_colour;
 	}
 }
@@ -8066,8 +8067,8 @@ item (FEAT_HOUSES, item_ttrs_74_house_74, 316) {
 	}
 	graphics {
 		default: sl_ttrs_74;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 	}
 }
 
@@ -8125,8 +8126,8 @@ item (FEAT_HOUSES, item_ttrs_75_house_75, 317) {
 	}
 	graphics {
 		default: sl_ttrs_75;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_flats;
+		/* classification: flats */
 		colour: switch_ttrs_75_colour;
 	}
 }
@@ -8225,8 +8226,8 @@ item (FEAT_HOUSES, item_ttrs_76_house_76, 318) {
 	}
 	graphics {
 		default: sl_ttrs_76;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 		colour: switch_ttrs_76_colour;
 	}
 }
@@ -8304,8 +8305,8 @@ item (FEAT_HOUSES, item_ttrs_77_house_77, 319) {
 	}
 	graphics {
 		default: sl_ttrs_77;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_offices;
+		/* classification: offices */
 	}
 }
 
@@ -11365,8 +11366,8 @@ item (FEAT_HOUSES, item_ttrs_90_petrol_station, 344) {
 	}
 	graphics {
 		default: sl_ttrs_90;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 		colour: switch_ttrs_90_colour;
 	}
 }
@@ -11435,8 +11436,8 @@ item (FEAT_HOUSES, item_ttrs_91_petrol_station, 345, HOUSE_SIZE_2X1) {
 	graphics {
 		graphics_north: sl_ttrs_91;
 		graphics_west: sl_ttrs_92;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 	}
 }
 
@@ -11504,8 +11505,8 @@ item (FEAT_HOUSES, item_ttrs_93_petrol_station, 347, HOUSE_SIZE_1X2) {
 	graphics {
 		graphics_north: sl_ttrs_93;
 		graphics_east: sl_ttrs_94;
-		construction_check: switch_ttrs_residential;
-		/* classification: residential */
+		construction_check: switch_ttrs_utility;
+		/* classification: utility */
 	}
 }
 

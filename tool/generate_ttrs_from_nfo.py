@@ -731,23 +731,29 @@ def decode_animation_info(value: int) -> tuple[int, int]:
 # ============================================================================
 
 # Substitute IDs that are clearly office buildings in vanilla OpenTTD
-OFFICE_SUBSTITUTES = {13, 19, 30, 31, 36}
+OFFICE_SUBSTITUTES = {0, 1, 4, 5, 13, 17, 19, 28, 29, 30, 36}
 # Substitute IDs that are tall residential / flats
-FLAT_SUBSTITUTES = {15, 16, 17, 18}
+FLAT_SUBSTITUTES = {2, 15, 16, 27}
 # Substitute IDs for landmark / special buildings
-LANDMARK_SPECIAL_SUBSTITUTES = {9, 20, 40, 54, 87}
+LANDMARK_SPECIAL_SUBSTITUTES = {3, 9, 10, 20, 32, 54, 87}
+# Substitute IDs that default to landmark (unless name overrides to something else)
+LANDMARK_SUBSTITUTES = {7, 8, 31, 39, 40, 66}
+# Substitute IDs for utility buildings (petrol stations, etc.)
+UTILITY_SUBSTITUTES = {10, 11, 12, 18}
 
 # Name-based keyword sets for classification
 _OFFICE_NAME_KW = {'office', 'z_office', 'z block'}
-_FLAT_NAME_KW = {'flat', 'apartment', 'endless'}
+_FLAT_NAME_KW = {'flat', 'flats', 'apartment', 'endless', 'park'}
 _LANDMARK_UNIQUE_NAME_KW = {
     'cathedral', 'statue', 'stock exchange', 'world trade',
-    'museum', 'old town',
+    'museum', 'old town', 'mosque',
 }
 _LANDMARK_NAME_KW = {
     'hospital', 'fire station', 'police', 'prison', 'library',
-    'planetarium', 'observatorium', 'hotel', 'water tower',
+    'planetarium', 'observatorium', 'hotel', 'water tower', 'shopping centre'
 }
+# Utility buildings — appear at most once per nearby area (e.g. petrol stations)
+_UTILITY_NAME_KW = {'petrol', 'gas station', 'garage'}
 # Probability caps per category
 _PROB_CAPS = {
     'residential': 1,
@@ -755,6 +761,7 @@ _PROB_CAPS = {
     'offices': 1,
     'landmark': 3,
     'landmark_unique': 3,
+    'utility': 1,
 }
 # Default probability per category (when NFO does not provide one)
 _PROB_DEFAULTS = {
@@ -763,6 +770,13 @@ _PROB_DEFAULTS = {
     'offices': 1,
     'landmark': 2,
     'landmark_unique': 2,
+    'utility': 1,
+}
+# Per-house-ID classification overrides (GRF house ID → category).
+# Use this to force a specific category regardless of name/substitute heuristics.
+_HOUSE_ID_OVERRIDES: dict[int, str] = {
+    0x105: 'landmark',   # house 261 — hotel
+    0x119: 'landmark',   # house 281 — large 2x2 block, too prominent to be residential
 }
 
 
@@ -771,18 +785,29 @@ def classify_ttrs_house(
     building_class: Optional[int],
     display_name: str,
     building_flags_mask: int,
+    house_id: Optional[int] = None,
 ) -> tuple[str, str, int]:
     """Classify a TTRS house and return (category, construction_switch, default_probability).
 
     Classification priority:
+      0. Per-ID override (_HOUSE_ID_OVERRIDES)
       1. Church flag → landmark_unique
       2. Name-based landmark_unique keywords
       3. Name-based landmark keywords
       4. Name-based office / flat keywords
+      4c. Name-based utility keywords (petrol stations, etc.)
       5. Protected + special substitute → landmark_unique
-      6. Substitute-based office / flat classification
+      6a. Substitute-based office classification
+      6b. Substitute-based flat classification
+      6c. Substitute-based landmark classification (e.g. sub 7)
+      6d. Substitute-based utility classification
       7. Default → residential
     """
+    # 0) Per-ID overrides take absolute precedence
+    if house_id is not None and house_id in _HOUSE_ID_OVERRIDES:
+        cat = _HOUSE_ID_OVERRIDES[house_id]
+        return cat, f'switch_ttrs_{cat}', _PROB_DEFAULTS[cat]
+
     name_lower = display_name.lower().replace('"', '').replace("'", '')
     is_protected = bool(building_flags_mask & (1 << 9))  # HOUSE_FLAG_PROTECTED
     is_church = bool(building_flags_mask & (1 << 6))     # HOUSE_FLAG_CHURCH
@@ -807,6 +832,10 @@ def classify_ttrs_house(
     if any(kw in name_lower for kw in _FLAT_NAME_KW):
         return 'flats', 'switch_ttrs_flats', _PROB_DEFAULTS['flats']
 
+    # 4c) Utility buildings (by name) — e.g. petrol stations
+    if any(kw in name_lower for kw in _UTILITY_NAME_KW):
+        return 'utility', 'switch_ttrs_utility', _PROB_DEFAULTS['utility']
+
     # 5) Protected buildings with special substitute → landmark_unique
     if is_protected and substitute in LANDMARK_SPECIAL_SUBSTITUTES:
         return 'landmark_unique', 'switch_ttrs_landmark_unique', _PROB_DEFAULTS['landmark_unique']
@@ -818,6 +847,14 @@ def classify_ttrs_house(
     # 6b) Flats (by substitute type)
     if substitute in FLAT_SUBSTITUTES:
         return 'flats', 'switch_ttrs_flats', _PROB_DEFAULTS['flats']
+
+    # 6c) Landmark (by substitute type, e.g. sub 7 — tall public buildings)
+    if substitute in LANDMARK_SUBSTITUTES:
+        return 'landmark', 'switch_ttrs_landmark', _PROB_DEFAULTS['landmark']
+
+    # 6d) Utility (by substitute type)
+    if substitute in UTILITY_SUBSTITUTES:
+        return 'utility', 'switch_ttrs_utility', _PROB_DEFAULTS['utility']
 
     # 7) Default → residential
     return 'residential', 'switch_ttrs_residential', _PROB_DEFAULTS['residential']
@@ -1169,7 +1206,7 @@ def build_item_block(
     # --- Classify house ---
     sub_for_class = token_to_int(props["08"]) if isinstance(props.get("08"), str) else None
     category, construction_switch, default_prob = classify_ttrs_house(
-        sub_for_class, building_class, display_name, building_flags_mask,
+        sub_for_class, building_class, display_name, building_flags_mask, house_id=item_id,
     )
 
     lines: list[str] = []
@@ -1463,6 +1500,10 @@ def generate_ttrs_nml(
     out.append("switch (FEAT_HOUSES, SELF, switch_ttrs_landmark, CheckValue(5,255)) {return;}")
     out.append(
         "switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}"
+    )
+    out.append(
+        "switch (FEAT_HOUSES, SELF, switch_ttrs_utility, "
+        "CheckValue(1,255) && IsNotDesertTile() && IsUniqueInRadius(8)) {return;}"
     )
     out.append("")
 
