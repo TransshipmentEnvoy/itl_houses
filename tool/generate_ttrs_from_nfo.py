@@ -1497,9 +1497,11 @@ def generate_ttrs_nml(
         "switch (FEAT_HOUSES, SELF, switch_ttrs_offices, "
         "CheckOfficeSprawl(1000) && CheckValue(7,255) && (HasSameClassNearby(2) || IsFirstHouseOfClass())) {return;}"
     )
-    out.append("switch (FEAT_HOUSES, SELF, switch_ttrs_landmark, CheckValue(5,255)) {return;}")
     out.append(
-        "switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}"
+        "switch (FEAT_HOUSES, SELF, switch_ttrs_landmark, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}"
+    )
+    out.append(
+        "switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(32)) {return;}"
     )
     out.append(
         "switch (FEAT_HOUSES, SELF, switch_ttrs_utility, "

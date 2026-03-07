@@ -5,8 +5,8 @@
 switch (FEAT_HOUSES, SELF, switch_ttrs_residential, CheckValue(1,255) && IsNotDesertTile()) {return;}
 switch (FEAT_HOUSES, SELF, switch_ttrs_flats, CheckValue(4,255) && CheckFlatsSprawl()) {return;}
 switch (FEAT_HOUSES, SELF, switch_ttrs_offices, CheckOfficeSprawl(1000) && CheckValue(7,255) && (HasSameClassNearby(2) || IsFirstHouseOfClass())) {return;}
-switch (FEAT_HOUSES, SELF, switch_ttrs_landmark, CheckValue(5,255)) {return;}
-switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}
+switch (FEAT_HOUSES, SELF, switch_ttrs_landmark, CheckValue(5,255) && IsUniqueInRadius(10)) {return;}
+switch (FEAT_HOUSES, SELF, switch_ttrs_landmark_unique, CheckValue(5,255) && IsUniqueInRadius(32)) {return;}
 switch (FEAT_HOUSES, SELF, switch_ttrs_utility, CheckValue(1,255) && IsNotDesertTile() && IsUniqueInRadius(8)) {return;}
 
 spriteset(ss_ttrs_00_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [626, 72, 64, 31, -31, 0] }
