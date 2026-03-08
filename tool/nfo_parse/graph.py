@@ -4,8 +4,9 @@ graph.py — Build the Action 2 directed graph and traverse it to produce
 
 Building the graph
 ------------------
-    :func:`build_graph` combines all parsed node types into a single
-    ``dict[int, Action2Node]`` keyed by set ID.
+    :func:`build_all_house_graphics` iterates over every house section,
+    builds a position-aware graph via :func:`_build_graph_positional`, and
+    calls :func:`build_house_tile_graphics` for each house.
 
 Traversal
 ---------
@@ -49,58 +50,14 @@ from .nodes import (
     Action2Node, ClimateGraphics, ComputationNode, FrameLayout,
     HouseTileGraphics, LayoutNode, RandomNode, RandomVariantGraphics,
     VariationalNode,
+    cb_result_value,
     is_callback_result,
 )
-from .parse_layout import parse_all_layout_nodes
-from .parse_variational import parse_all_variational_nodes
-from .parse_random import parse_all_random_nodes
-from .parse_computation import parse_all_computation_nodes
 from .parse_raw import (
     RawSprite,
-    collect_action2_house_entries,
     collect_action2_in_range,
-    collect_action3_entries,
     collect_house_section_ranges,
 )
-
-
-# ============================================================================
-# Graph construction
-# ============================================================================
-
-
-def build_graph(sprites: list[RawSprite]) -> Action2Graph:
-    """
-    Merge all parsed Action 2 node types into one lookup dict.
-
-    When more than one parser claims the same set ID (shouldn't happen for a
-    valid NFO but can occur when two types share an ID) the priority order is:
-        layout > variational > random (80) > computation
-    """
-    graph: Action2Graph = {}
-
-    # Lowest priority first so higher-priority parsers overwrite.
-    comp_nodes = parse_all_computation_nodes(sprites)
-    rand_nodes = parse_all_random_nodes(sprites)
-    var_nodes  = parse_all_variational_nodes(sprites)
-    lay_nodes  = parse_all_layout_nodes(sprites)
-
-    for nid, node in comp_nodes.items():
-        graph[nid] = node
-    for nid, node in rand_nodes.items():
-        graph[nid] = node
-    for nid, node in var_nodes.items():
-        graph[nid] = node
-    for nid, node in lay_nodes.items():
-        graph[nid] = node
-
-    return graph
-
-
-def build_graph_from_lines(lines: list[str]) -> Action2Graph:
-    """Convenience: collect raw sprites from NFO lines then build the graph."""
-    sprites = collect_action2_house_entries(lines)
-    return build_graph(sprites)
 
 
 # ============================================================================
@@ -176,7 +133,7 @@ def _extract_colour_values(
     byte from a RandomNode (0 when the source is not random).
     """
     if is_callback_result(target_id):
-        return [target_id & 0x7FFF], 0
+        return [cb_result_value(target_id)], 0
 
     node = resolve_graph.get(target_id)
     if node is None:
@@ -188,7 +145,7 @@ def _extract_colour_values(
         colours: list[int] = []
         for entry_id in node.entries:
             if is_callback_result(entry_id):
-                colours.append(entry_id & 0x7FFF)
+                colours.append(cb_result_value(entry_id))
         return colours, node.triggers
 
     # Type-82/86 re-randomise — treated as VariationalNode by the parser.
@@ -197,11 +154,11 @@ def _extract_colour_values(
         colours = []
         # Check default
         if is_callback_result(node.default):
-            colours.append(node.default & 0x7FFF)
+            colours.append(cb_result_value(node.default))
         # Check range results
         for rng in node.ranges:
             if is_callback_result(rng.result_id):
-                colours.append(rng.result_id & 0x7FFF)
+                colours.append(cb_result_value(rng.result_id))
         return colours, 0
 
     return [], 0
@@ -746,7 +703,7 @@ def traverse_callback_subgraph(
 
     # -- Callback-result terminal ------------------------------------------
     if is_callback_result(root_id):
-        val = root_id & 0x7FFF
+        val = cb_result_value(root_id)
         name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
         _counter[0] += 1
         lines = [
@@ -827,7 +784,7 @@ def traverse_callback_subgraph(
         for entry_id in entry_order:
             w = entry_weights[entry_id]
             if is_callback_result(entry_id):
-                val = entry_id & 0x7FFF
+                val = cb_result_value(entry_id)
                 weight_parts.append(f"{w}: return {val}")
             else:
                 child_lines, child_name = traverse_callback_subgraph(

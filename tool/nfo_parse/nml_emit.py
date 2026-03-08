@@ -718,19 +718,44 @@ def _emit_random_switch(
 
     # Trigger handling: triggers=0x00 means no rerandomisation trigger
     # (NML default = randomised once on construction).  Non-zero triggers
-    # are emitted as a comment for manual review.
-    trigger_comment = ""
-    if htg.random_triggers != 0:
-        trigger_comment = f" /* NFO triggers: 0x{htg.random_triggers:02X} */"
+    # are mapped to NML trigger constants.
+    trigger_param = _nfo_trigger_to_nml(htg.random_triggers)
+    trigger_sep = f", {trigger_param}" if trigger_param else ""
     out.append(
-        f"random_switch (FEAT_HOUSES, SELF, {entry_name}) {{"
-        f" {counts_str} }}{trigger_comment}"
+        f"random_switch (FEAT_HOUSES, SELF, {entry_name}{trigger_sep}) {{"
+        f" {counts_str} }}"
     )
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+# NFO trigger byte → NML trigger constant mapping (houses)
+_NFO_HOUSE_TRIGGER_BITS: dict[int, str] = {
+    0: "TRIGGER_HOUSE_TILELOOP",       # bit 0
+    1: "TRIGGER_HOUSE_TOP_TILELOOP",   # bit 1
+}
+
+
+def _nfo_trigger_to_nml(trigger_byte: int) -> str:
+    """Convert an NFO random-trigger byte to an NML trigger expression.
+
+    Returns an empty string when *trigger_byte* is 0x00 (no trigger).
+    """
+    if trigger_byte == 0:
+        return ""
+    low7 = trigger_byte & 0x7F
+    names: list[str] = []
+    for bit, name in _NFO_HOUSE_TRIGGER_BITS.items():
+        if low7 & (1 << bit):
+            names.append(name)
+    if not names:
+        # Unknown trigger bits — emit raw value as comment for manual review
+        return f"0 /* unknown NFO triggers: 0x{trigger_byte:02X} */"
+    if len(names) == 1:
+        return names[0]
+    return f"bitmask({', '.join(names)})"
 
 
 def _cg_has_content(cg: ClimateGraphics) -> bool:

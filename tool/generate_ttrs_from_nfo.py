@@ -1014,13 +1014,13 @@ def emit_colour_switch(
     else:
         # Multiple colours — random_switch with actual weights
         entries = " ".join(f"{w}: return {v};" for v, w in zip(unique_vals, weights))
-        # Trigger handling
-        trigger_comment = ""
-        if colour_triggers != 0:
-            trigger_comment = f" /* NFO triggers: 0x{colour_triggers:02X} */"
+        # Trigger handling — convert NFO trigger byte to NML trigger parameter
+        from tool.nfo_parse.nml_emit import _nfo_trigger_to_nml
+        trigger_param = _nfo_trigger_to_nml(colour_triggers)
+        trigger_sep = f", {trigger_param}" if trigger_param else ""
         lines.append(
-            f"random_switch (FEAT_HOUSES, SELF, {switch_name}) "
-            f"{{ {entries} }}{trigger_comment}"
+            f"random_switch (FEAT_HOUSES, SELF, {switch_name}{trigger_sep}) "
+            f"{{ {entries} }}"
         )
 
     return lines, switch_name

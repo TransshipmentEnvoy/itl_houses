@@ -86,8 +86,6 @@ from .parse_computation import (
 )
 
 from .graph import (
-    build_graph,
-    build_graph_from_lines,
     build_house_tile_graphics,
     build_all_house_graphics,
     traverse_callback_subgraph,
@@ -139,8 +137,6 @@ __all__ = [
     "parse_computation_node",
     "parse_all_computation_nodes",
     # Graph
-    "build_graph",
-    "build_graph_from_lines",
     "build_house_tile_graphics",
     "build_all_house_graphics",
     "traverse_callback_subgraph",

@@ -4259,7 +4259,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3, terrain_type) { TILETYPE_SNOW: sl_ttrs_39_rv3_snow; return sl_ttrs_39_rv3_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_39) { 1: sl_ttrs_39_rv0; 1: sl_ttrs_39_rv1; 1: sl_ttrs_39_rv2; 1: sl_ttrs_39_rv3; } /* NFO triggers: 0x02 */
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_39, TRIGGER_HOUSE_TOP_TILELOOP) { 1: sl_ttrs_39_rv0; 1: sl_ttrs_39_rv1; 1: sl_ttrs_39_rv2; 1: sl_ttrs_39_rv3; }
 
 spriteset(ss_ttrs_3A_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [338, 5224, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
@@ -4349,7 +4349,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3, terrain_type) { TILETYPE_SNOW: sl_ttrs_3A_rv3_snow; return sl_ttrs_3A_rv3_nosnow; }
 
-random_switch (FEAT_HOUSES, SELF, sl_ttrs_3A) { 1: sl_ttrs_3A_rv0; 1: sl_ttrs_3A_rv1; 1: sl_ttrs_3A_rv2; 1: sl_ttrs_3A_rv3; } /* NFO triggers: 0x02 */
+random_switch (FEAT_HOUSES, SELF, sl_ttrs_3A, TRIGGER_HOUSE_TOP_TILELOOP) { 1: sl_ttrs_3A_rv0; 1: sl_ttrs_3A_rv1; 1: sl_ttrs_3A_rv2; 1: sl_ttrs_3A_rv3; }
 
 item (FEAT_HOUSES, item_ttrs_39_fire_station, 257, HOUSE_SIZE_2X1) {
 	property {
@@ -9336,12 +9336,12 @@ switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_0, animation_frame) { ret
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_1, 0) { return 6; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_2, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_0, animation_frame) { 0: switch_ttrs_7E_cargo_amount_accept_1; return switch_ttrs_7E_cargo_amount_accept_2; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_1, 0) { return 32515; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_2, 0) { return 32519; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_3, 0) { return 32520; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_1, 0) { return 3; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_2, 0) { return 7; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_3, 0) { return 8; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_speed_0, animation_frame) { 0..17: switch_ttrs_7E_anim_speed_1; 18: switch_ttrs_7E_anim_speed_2; return switch_ttrs_7E_anim_speed_3; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_1, 0) { return 32513; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_2, 0) { return 32512; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_2, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_destruction_0, animation_frame) { 23: switch_ttrs_7E_destruction_1; return switch_ttrs_7E_destruction_2; }
 spriteset(ss_ttrs_7F_nosnow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [162, 15080, 64, 31, -31, 0] }
 spriteset(ss_ttrs_7F_nosnow_f0, "src/sprites/pcx/ttrs3w.pcx") { [242, 15080, 57, 63, -31, -34] }
@@ -10527,35 +10527,35 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_88_snow, construction_state) { 3: sl_ttrs_88_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_88, terrain_type) { TILETYPE_SNOW: sl_ttrs_88_snow; return sl_ttrs_88_nosnow; }
 
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_1, 0) { return 32767; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_2, 0) { return 32767; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_1, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_2, 0) { return 255; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_3, 0) { return 4350; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_4, 0) { return 32766; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_4, 0) { return 254; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_0, animation_frame) { 0: switch_ttrs_88_anim_next_frame_1; 5: switch_ttrs_88_anim_next_frame_2; 7..11: switch_ttrs_88_anim_next_frame_3; return switch_ttrs_88_anim_next_frame_4; }
 /* WARN: anim_control target 0x1A00 not found in any graph section */
 /* WARN: anim_control target 0x1A00 not found in any graph section */
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_1, 0) { return 32765; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_1, 0) { return 253; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_0, animation_frame) { return switch_ttrs_88_anim_control_1; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_2, 0) { return 32512; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_3, 0) { return 32517; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_2, 0) { return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_3, 0) { return 5; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_1, var[0x7E, 0, 0xFFFF, 240]) { 0..1959: switch_ttrs_88_construction_anim_2; return switch_ttrs_88_construction_anim_3; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_4, 0) { return 32766; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_4, 0) { return 254; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_0, var[0x45, 0, 0x1]) { 1: switch_ttrs_88_construction_anim_1; return switch_ttrs_88_construction_anim_4; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_1, 0) { return 1092; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_2, 0) { return 1638; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_3, 0) { return 2184; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_4, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_cargo_amount_accept_0, animation_frame) { 0..1: switch_ttrs_88_cargo_amount_accept_1; 5..6: switch_ttrs_88_cargo_amount_accept_2; 23: switch_ttrs_88_cargo_amount_accept_3; return switch_ttrs_88_cargo_amount_accept_4; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_1, 0) { return 32514; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_2, 0) { return 32514; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_3, 0) { return 32519; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_4, 0) { return 32515; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_5, 0) { return 32520; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_6, 0) { return 32520; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_7, 0) { return 32523; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_1, 0) { return 2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_2, 0) { return 2; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_3, 0) { return 7; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_4, 0) { return 3; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_5, 0) { return 8; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_6, 0) { return 8; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_7, 0) { return 11; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_speed_0, animation_frame) { 0: switch_ttrs_88_anim_speed_1; 5: switch_ttrs_88_anim_speed_2; 7: switch_ttrs_88_anim_speed_3; 8..17: switch_ttrs_88_anim_speed_4; 18: switch_ttrs_88_anim_speed_5; 19: switch_ttrs_88_anim_speed_6; return switch_ttrs_88_anim_speed_7; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_1, 0) { return 32513; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_2, 0) { return 32512; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_1, 0) { return 1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_2, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_destruction_0, animation_frame) { 20: switch_ttrs_88_destruction_1; return switch_ttrs_88_destruction_2; }
 spriteset(ss_ttrs_89_nosnow_gf2, "src/sprites/pcx/ttrs3w.pcx") { [242, 17960, 63, 30, -31, 0] }
 spriteset(ss_ttrs_89_nosnow_f2, "src/sprites/pcx/ttrs3w.pcx") { [322, 17960, 64, 61, -31, -30] }

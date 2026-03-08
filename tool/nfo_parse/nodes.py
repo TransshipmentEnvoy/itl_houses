@@ -39,7 +39,7 @@ from typing import Optional, Union
 class NodeType(Enum):
     LAYOUT = auto()        # type-00 sprite layout
     VARIATIONAL = auto()   # type-81 / type-85
-    RANDOM = auto()        # type-80 / type-82
+    RANDOM = auto()        # type-80 / type-83
     COMPUTATION = auto()   # type-89
 
 
@@ -73,6 +73,19 @@ CALLBACK_RESULT_MASK = 0x8000   # result_id with this bit = callback return
 def is_callback_result(result_id: int) -> bool:
     """True when result_id is a callback return value, not a node reference."""
     return bool(result_id & CALLBACK_RESULT_MASK)
+
+
+def cb_result_value(result_id: int) -> int:
+    """Extract the callback return value from a result sentinel.
+
+    For GRFv≤7 compatibility, ``0xFF`` in the high byte is equivalent to
+    ``0x80`` (both mark a callback result).  When the high byte is ``0xFF``
+    the actual value is only the low byte (8-bit).
+    """
+    hi = (result_id >> 8) & 0xFF
+    if hi == 0xFF:
+        return result_id & 0xFF
+    return result_id & 0x7FFF
 
 
 # ============================================================================
@@ -171,7 +184,7 @@ class VariationalRange:
 
 @dataclass
 class VariationalNode:
-    """Type-81 / type-85: conditional routing based on a variable."""
+    """Type-81 / type-82 / type-85 / type-86: conditional routing based on a variable."""
     node_id:  int
     node_type: NodeType = field(default=NodeType.VARIATIONAL, init=False, repr=False)
 
