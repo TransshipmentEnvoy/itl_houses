@@ -621,12 +621,43 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_06_snow, construction_state) { 3: sl_ttrs_06_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_06, terrain_type) { TILETYPE_SNOW: sl_ttrs_06_snow; return sl_ttrs_06_nosnow; }
 
-/* WARN: anim_control target 0x1A00 not found in any graph section */
-switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_1, 0) { return 255; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_2, 0) { return 253; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_0, animation_frame) { 3: switch_ttrs_06_anim_control_1; return switch_ttrs_06_anim_control_2; }
-/* WARN: destruction target 0x1A00 not found in any graph section */
-/* NOTE: destruction (0x21) sub-graph could not be fully translated, omitted */
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_1, var[0x00, 0, 0xFFFF]) { 7300..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_2, var[0x00, 0, 0xFFFF]) { 7330..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_3, var[0x00, 0, 0xFFFF]) { 7360..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_4, var[0x00, 0, 0xFFFF]) { 7390..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_5, var[0x00, 0, 0xFFFF]) { 7420..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_6, var[0x00, 0, 0xFFFF]) { 7450..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_7, var[0x00, 0, 0xFFFF]) { 7480..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_8, var[0x00, 0, 0xFFFF]) { 7510..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_9, var[0x00, 0, 0xFFFF]) { 7540..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_10, var[0x00, 0, 0xFFFF]) { 7570..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_11, var[0x00, 0, 0xFFFF]) { 7600..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_12, var[0x00, 0, 0xFFFF]) { 7630..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_13, var[0x00, 0, 0xFFFF]) { 7660..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_14, var[0x00, 0, 0xFFFF]) { 7690..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_15, var[0x00, 0, 0xFFFF]) { 7720..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_16, var[0x00, 0, 0xFFFF]) { 7750..65535: return 1; return 255; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_17) { 1: switch_ttrs_06_anim_control_1; 1: switch_ttrs_06_anim_control_2; 1: switch_ttrs_06_anim_control_3; 1: switch_ttrs_06_anim_control_4; 1: switch_ttrs_06_anim_control_5; 1: switch_ttrs_06_anim_control_6; 1: switch_ttrs_06_anim_control_7; 1: switch_ttrs_06_anim_control_8; 1: switch_ttrs_06_anim_control_9; 1: switch_ttrs_06_anim_control_10; 1: switch_ttrs_06_anim_control_11; 1: switch_ttrs_06_anim_control_12; 1: switch_ttrs_06_anim_control_13; 1: switch_ttrs_06_anim_control_14; 1: switch_ttrs_06_anim_control_15; 1: switch_ttrs_06_anim_control_16; } /* computation: random delay trigger, sub=0x20, mult=30, offset=7300 */
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_18, 0) { return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_19, 0) { return 253; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_anim_control_0, animation_frame) { 0: switch_ttrs_06_anim_control_17; 3: switch_ttrs_06_anim_control_18; return switch_ttrs_06_anim_control_19; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_0, var[0x00, 0, 0xFFFF]) { 12775..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_1, var[0x00, 0, 0xFFFF]) { 12805..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_2, var[0x00, 0, 0xFFFF]) { 12835..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_3, var[0x00, 0, 0xFFFF]) { 12865..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_4, var[0x00, 0, 0xFFFF]) { 12895..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_5, var[0x00, 0, 0xFFFF]) { 12925..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_6, var[0x00, 0, 0xFFFF]) { 12955..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_7, var[0x00, 0, 0xFFFF]) { 12985..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_8, var[0x00, 0, 0xFFFF]) { 13015..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_9, var[0x00, 0, 0xFFFF]) { 13045..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_10, var[0x00, 0, 0xFFFF]) { 13075..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_11, var[0x00, 0, 0xFFFF]) { 13105..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_12, var[0x00, 0, 0xFFFF]) { 13135..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_13, var[0x00, 0, 0xFFFF]) { 13165..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_14, var[0x00, 0, 0xFFFF]) { 13195..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_15, var[0x00, 0, 0xFFFF]) { 13225..65535: return 1; return 0; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_06_destruction_16) { 1: switch_ttrs_06_destruction_0; 1: switch_ttrs_06_destruction_1; 1: switch_ttrs_06_destruction_2; 1: switch_ttrs_06_destruction_3; 1: switch_ttrs_06_destruction_4; 1: switch_ttrs_06_destruction_5; 1: switch_ttrs_06_destruction_6; 1: switch_ttrs_06_destruction_7; 1: switch_ttrs_06_destruction_8; 1: switch_ttrs_06_destruction_9; 1: switch_ttrs_06_destruction_10; 1: switch_ttrs_06_destruction_11; 1: switch_ttrs_06_destruction_12; 1: switch_ttrs_06_destruction_13; 1: switch_ttrs_06_destruction_14; 1: switch_ttrs_06_destruction_15; } /* computation: random delay trigger, sub=0x20, mult=30, offset=12775 */
 spriteset(ss_ttrs_07_nosnow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [626, 328, 64, 31, -31, 0] }
 spriteset(ss_ttrs_07_nosnow_f0, "src/sprites/pcx/ttrs3w.pcx") { [2, 424, 59, 68, -27, -44] }
 spriteset(ss_ttrs_07_nosnow_f1, "src/sprites/pcx/ttrs3w.pcx") { [66, 424, 59, 68, -27, -44] }
@@ -701,6 +732,7 @@ item (FEAT_HOUSES, item_ttrs_06_house_06, 206, HOUSE_SIZE_1X2) {
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
 		anim_control: switch_ttrs_06_anim_control_0;
+		destruction: switch_ttrs_06_destruction_16;
 		colour: switch_ttrs_06_colour;
 	}
 }
@@ -9330,9 +9362,25 @@ switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_1, 0) { return 255; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_2, 0) { return 4350; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_3, 0) { return 254; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_next_frame_0, animation_frame) { 0: switch_ttrs_7E_anim_next_frame_1; 1: switch_ttrs_7E_anim_next_frame_2; return switch_ttrs_7E_anim_next_frame_3; }
-/* WARN: anim_control target 0x1A00 not found in any graph section */
-switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_1, 0) { return 253; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_0, animation_frame) { return switch_ttrs_7E_anim_control_1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_1, var[0x00, 0, 0xFFFF]) { 29200..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_2, var[0x00, 0, 0xFFFF]) { 29230..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_3, var[0x00, 0, 0xFFFF]) { 29260..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_4, var[0x00, 0, 0xFFFF]) { 29290..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_5, var[0x00, 0, 0xFFFF]) { 29320..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_6, var[0x00, 0, 0xFFFF]) { 29350..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_7, var[0x00, 0, 0xFFFF]) { 29380..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_8, var[0x00, 0, 0xFFFF]) { 29410..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_9, var[0x00, 0, 0xFFFF]) { 29440..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_10, var[0x00, 0, 0xFFFF]) { 29470..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_11, var[0x00, 0, 0xFFFF]) { 29500..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_12, var[0x00, 0, 0xFFFF]) { 29530..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_13, var[0x00, 0, 0xFFFF]) { 29560..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_14, var[0x00, 0, 0xFFFF]) { 29590..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_15, var[0x00, 0, 0xFFFF]) { 29620..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_16, var[0x00, 0, 0xFFFF]) { 29650..65535: return 1; return 255; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_17) { 1: switch_ttrs_7E_anim_control_1; 1: switch_ttrs_7E_anim_control_2; 1: switch_ttrs_7E_anim_control_3; 1: switch_ttrs_7E_anim_control_4; 1: switch_ttrs_7E_anim_control_5; 1: switch_ttrs_7E_anim_control_6; 1: switch_ttrs_7E_anim_control_7; 1: switch_ttrs_7E_anim_control_8; 1: switch_ttrs_7E_anim_control_9; 1: switch_ttrs_7E_anim_control_10; 1: switch_ttrs_7E_anim_control_11; 1: switch_ttrs_7E_anim_control_12; 1: switch_ttrs_7E_anim_control_13; 1: switch_ttrs_7E_anim_control_14; 1: switch_ttrs_7E_anim_control_15; 1: switch_ttrs_7E_anim_control_16; } /* computation: random delay trigger, sub=0xE1, mult=30, offset=29200 */
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_18, 0) { return 253; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_7E_anim_control_0, animation_frame) { 0: switch_ttrs_7E_anim_control_17; return switch_ttrs_7E_anim_control_18; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_1, 0) { return 6; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_2, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_7E_cargo_amount_accept_0, animation_frame) { 0: switch_ttrs_7E_cargo_amount_accept_1; return switch_ttrs_7E_cargo_amount_accept_2; }
@@ -9806,8 +9854,24 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_82, terrain_type) { TILETYPE_SNOW: sl_ttrs_82
 
 switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_1, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_2, 0) { return 0; }
-/* WARN: destruction target 0x1A00 not found in any graph section */
-switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_0, var[0x7F, 0, 0xFF, 1]) { 1: switch_ttrs_82_destruction_1; 5: switch_ttrs_82_destruction_2; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_3, var[0x00, 0, 0xFFFF]) { 10950..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_4, var[0x00, 0, 0xFFFF]) { 11070..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_5, var[0x00, 0, 0xFFFF]) { 11190..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_6, var[0x00, 0, 0xFFFF]) { 11310..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_7, var[0x00, 0, 0xFFFF]) { 11430..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_8, var[0x00, 0, 0xFFFF]) { 11550..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_9, var[0x00, 0, 0xFFFF]) { 11670..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_10, var[0x00, 0, 0xFFFF]) { 11790..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_11, var[0x00, 0, 0xFFFF]) { 11910..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_12, var[0x00, 0, 0xFFFF]) { 12030..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_13, var[0x00, 0, 0xFFFF]) { 12150..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_14, var[0x00, 0, 0xFFFF]) { 12270..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_15, var[0x00, 0, 0xFFFF]) { 12390..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_16, var[0x00, 0, 0xFFFF]) { 12510..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_17, var[0x00, 0, 0xFFFF]) { 12630..65535: return 1; return 0; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_18, var[0x00, 0, 0xFFFF]) { 12750..65535: return 1; return 0; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_19) { 1: switch_ttrs_82_destruction_3; 1: switch_ttrs_82_destruction_4; 1: switch_ttrs_82_destruction_5; 1: switch_ttrs_82_destruction_6; 1: switch_ttrs_82_destruction_7; 1: switch_ttrs_82_destruction_8; 1: switch_ttrs_82_destruction_9; 1: switch_ttrs_82_destruction_10; 1: switch_ttrs_82_destruction_11; 1: switch_ttrs_82_destruction_12; 1: switch_ttrs_82_destruction_13; 1: switch_ttrs_82_destruction_14; 1: switch_ttrs_82_destruction_15; 1: switch_ttrs_82_destruction_16; 1: switch_ttrs_82_destruction_17; 1: switch_ttrs_82_destruction_18; } /* computation: random delay trigger, sub=0x20, mult=120, offset=10950 */
+switch (FEAT_HOUSES, SELF, switch_ttrs_82_destruction_0, var[0x7F, 0, 0xFF, 1]) { 1: switch_ttrs_82_destruction_1; 5: switch_ttrs_82_destruction_2; return switch_ttrs_82_destruction_19; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_82_protection_1, 0) { return 1; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_82_protection_2, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_82_protection_0, var[0x7E, 0, 0xFFFF, 240]) { 0..1950: switch_ttrs_82_protection_1; return switch_ttrs_82_protection_2; }
@@ -10119,11 +10183,27 @@ switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_5, 0) { return 254; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_next_frame_0, animation_frame) { 0: switch_ttrs_86_anim_next_frame_1; 1: switch_ttrs_86_anim_next_frame_2; 31: switch_ttrs_86_anim_next_frame_3; 2: switch_ttrs_86_anim_next_frame_4; return switch_ttrs_86_anim_next_frame_5; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_2, 0) { return 255; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_3, 0) { return 255; }
-/* WARN: anim_control target 0x1A00 not found in any graph section */
-switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_1, var[0x7F, 0, 0xFF, 1]) { 2: switch_ttrs_86_anim_control_2; 5: switch_ttrs_86_anim_control_3; return 0; }
-/* WARN: anim_control target 0x1A00 not found in any graph section */
-switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_4, 0) { return 253; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_0, animation_frame) { 0: switch_ttrs_86_anim_control_1; return switch_ttrs_86_anim_control_4; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_4, var[0x00, 0, 0xFFFF]) { 21900..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_5, var[0x00, 0, 0xFFFF]) { 22140..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_6, var[0x00, 0, 0xFFFF]) { 22380..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_7, var[0x00, 0, 0xFFFF]) { 22620..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_8, var[0x00, 0, 0xFFFF]) { 22860..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_9, var[0x00, 0, 0xFFFF]) { 23100..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_10, var[0x00, 0, 0xFFFF]) { 23340..65535: return 1; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_11, var[0x00, 0, 0xFFFF]) { 23580..65535: return 1; return 255; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_12) { 1: switch_ttrs_86_anim_control_4; 1: switch_ttrs_86_anim_control_5; 1: switch_ttrs_86_anim_control_6; 1: switch_ttrs_86_anim_control_7; 1: switch_ttrs_86_anim_control_8; 1: switch_ttrs_86_anim_control_9; 1: switch_ttrs_86_anim_control_10; 1: switch_ttrs_86_anim_control_11; } /* computation: random delay trigger, sub=0xE0, mult=240, offset=21900 */
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_1, var[0x7F, 0, 0xFF, 1]) { 2: switch_ttrs_86_anim_control_2; 5: switch_ttrs_86_anim_control_3; return switch_ttrs_86_anim_control_12; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_13, var[0x00, 0, 0xFFFF]) { 32850..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_14, var[0x00, 0, 0xFFFF]) { 33090..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_15, var[0x00, 0, 0xFFFF]) { 33330..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_16, var[0x00, 0, 0xFFFF]) { 33570..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_17, var[0x00, 0, 0xFFFF]) { 33810..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_18, var[0x00, 0, 0xFFFF]) { 34050..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_19, var[0x00, 0, 0xFFFF]) { 34290..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_20, var[0x00, 0, 0xFFFF]) { 34530..65535: return 2; return 255; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_21) { 1: switch_ttrs_86_anim_control_13; 1: switch_ttrs_86_anim_control_14; 1: switch_ttrs_86_anim_control_15; 1: switch_ttrs_86_anim_control_16; 1: switch_ttrs_86_anim_control_17; 1: switch_ttrs_86_anim_control_18; 1: switch_ttrs_86_anim_control_19; 1: switch_ttrs_86_anim_control_20; } /* computation: random delay trigger, sub=0xE0, mult=240, offset=32850 */
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_22, 0) { return 253; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_control_0, animation_frame) { 0: switch_ttrs_86_anim_control_1; 1: switch_ttrs_86_anim_control_21; return switch_ttrs_86_anim_control_22; }
 /* WARN: cargo_amount_accept (CB 0x1F) sub-graph has branches that fall through to layout nodes (CB_FAILED semantics lost); callback omitted */
 switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_speed_1, 0) { return 8; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_86_anim_speed_2, 0) { return 7; }
@@ -10532,10 +10612,42 @@ switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_2, 0) { return 255; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_3, 0) { return 4350; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_4, 0) { return 254; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_next_frame_0, animation_frame) { 0: switch_ttrs_88_anim_next_frame_1; 5: switch_ttrs_88_anim_next_frame_2; 7..11: switch_ttrs_88_anim_next_frame_3; return switch_ttrs_88_anim_next_frame_4; }
-/* WARN: anim_control target 0x1A00 not found in any graph section */
-/* WARN: anim_control target 0x1A00 not found in any graph section */
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_1, 0) { return 253; }
-switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_0, animation_frame) { return switch_ttrs_88_anim_control_1; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_1, var[0x00, 0, 0xFFFF]) { 14600..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_2, var[0x00, 0, 0xFFFF]) { 14840..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_3, var[0x00, 0, 0xFFFF]) { 15080..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_4, var[0x00, 0, 0xFFFF]) { 15320..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_5, var[0x00, 0, 0xFFFF]) { 15560..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_6, var[0x00, 0, 0xFFFF]) { 15800..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_7, var[0x00, 0, 0xFFFF]) { 16040..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_8, var[0x00, 0, 0xFFFF]) { 16280..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_9, var[0x00, 0, 0xFFFF]) { 16520..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_10, var[0x00, 0, 0xFFFF]) { 16760..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_11, var[0x00, 0, 0xFFFF]) { 17000..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_12, var[0x00, 0, 0xFFFF]) { 17240..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_13, var[0x00, 0, 0xFFFF]) { 17480..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_14, var[0x00, 0, 0xFFFF]) { 17720..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_15, var[0x00, 0, 0xFFFF]) { 17960..65535: return 2; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_16, var[0x00, 0, 0xFFFF]) { 18200..65535: return 2; return 255; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_17) { 1: switch_ttrs_88_anim_control_1; 1: switch_ttrs_88_anim_control_2; 1: switch_ttrs_88_anim_control_3; 1: switch_ttrs_88_anim_control_4; 1: switch_ttrs_88_anim_control_5; 1: switch_ttrs_88_anim_control_6; 1: switch_ttrs_88_anim_control_7; 1: switch_ttrs_88_anim_control_8; 1: switch_ttrs_88_anim_control_9; 1: switch_ttrs_88_anim_control_10; 1: switch_ttrs_88_anim_control_11; 1: switch_ttrs_88_anim_control_12; 1: switch_ttrs_88_anim_control_13; 1: switch_ttrs_88_anim_control_14; 1: switch_ttrs_88_anim_control_15; 1: switch_ttrs_88_anim_control_16; } /* computation: random delay trigger, sub=0xE0, mult=240, offset=14600 */
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_18, var[0x00, 0, 0xFFFF]) { 25550..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_19, var[0x00, 0, 0xFFFF]) { 25790..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_20, var[0x00, 0, 0xFFFF]) { 26030..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_21, var[0x00, 0, 0xFFFF]) { 26270..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_22, var[0x00, 0, 0xFFFF]) { 26510..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_23, var[0x00, 0, 0xFFFF]) { 26750..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_24, var[0x00, 0, 0xFFFF]) { 26990..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_25, var[0x00, 0, 0xFFFF]) { 27230..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_26, var[0x00, 0, 0xFFFF]) { 27470..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_27, var[0x00, 0, 0xFFFF]) { 27710..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_28, var[0x00, 0, 0xFFFF]) { 27950..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_29, var[0x00, 0, 0xFFFF]) { 28190..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_30, var[0x00, 0, 0xFFFF]) { 28430..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_31, var[0x00, 0, 0xFFFF]) { 28670..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_32, var[0x00, 0, 0xFFFF]) { 28910..65535: return 7; return 255; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_33, var[0x00, 0, 0xFFFF]) { 29150..65535: return 7; return 255; }
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_34) { 1: switch_ttrs_88_anim_control_18; 1: switch_ttrs_88_anim_control_19; 1: switch_ttrs_88_anim_control_20; 1: switch_ttrs_88_anim_control_21; 1: switch_ttrs_88_anim_control_22; 1: switch_ttrs_88_anim_control_23; 1: switch_ttrs_88_anim_control_24; 1: switch_ttrs_88_anim_control_25; 1: switch_ttrs_88_anim_control_26; 1: switch_ttrs_88_anim_control_27; 1: switch_ttrs_88_anim_control_28; 1: switch_ttrs_88_anim_control_29; 1: switch_ttrs_88_anim_control_30; 1: switch_ttrs_88_anim_control_31; 1: switch_ttrs_88_anim_control_32; 1: switch_ttrs_88_anim_control_33; } /* computation: random delay trigger, sub=0xE0, mult=240, offset=25550 */
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_35, 0) { return 253; }
+switch (FEAT_HOUSES, SELF, switch_ttrs_88_anim_control_0, animation_frame) { 0: switch_ttrs_88_anim_control_17; 5: switch_ttrs_88_anim_control_34; return switch_ttrs_88_anim_control_35; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_2, 0) { return 0; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_3, 0) { return 5; }
 switch (FEAT_HOUSES, SELF, switch_ttrs_88_construction_anim_1, var[0x7E, 0, 0xFFFF, 240]) { 0..1959: switch_ttrs_88_construction_anim_2; return switch_ttrs_88_construction_anim_3; }

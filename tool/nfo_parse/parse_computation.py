@@ -6,7 +6,7 @@ Type-89 format
     02 07 <set_id> 89
     <computation_chain>          ← variable-length; terminated by \\2 escape
     <num_ranges>                 (1 byte)
-    [ <result_lo> <result_hi>  <lo_lo> <lo_hi>  <hi_lo> <hi_hi> ]  × num_ranges
+    [ <result_lo> <result_hi>  <lo_b0..b3>  <hi_b0..b3> ]  × num_ranges  (DWORD ranges)
     <default_lo> <default_hi>
 
 The computation chain consists of steps separated by ``\\2`` *operation* bytes
@@ -62,11 +62,14 @@ from .parse_raw import RawSprite
 # Inter-step operation byte values (come AFTER each step's 10 bytes)
 # ---------------------------------------------------------------------------
 
-_OP_ADD = ord("+")   # 0x2B
-_OP_SUB = ord("-")   # 0x2D
-_OP_MUL = ord("*")   # 0x2A
-_OP_DIV = ord("/")   # 0x2F
-_OP_MOD = ord("%")   # 0x25
+# GRFCodec binary operator byte values for type-89 inter-step operations.
+# These are the actual bytes in the binary stream after escape resolution
+# (\2+ → 0x00, \2- → 0x01, \2* → 0x10, etc.).
+_OP_ADD = 0x00
+_OP_SUB = 0x01
+_OP_MUL = 0x10
+_OP_DIV = 0x02
+_OP_MOD = 0x03
 
 _OP_NAMES = {
     _OP_ADD: "add",
@@ -76,8 +79,12 @@ _OP_NAMES = {
     _OP_MOD: "mod",
 }
 
-# In raw binary the operation byte shows up as the ASCII character.
-# Type 89 itself is signalled by byte 0x89 at position [3] in the sprite.
+# All known operator byte values (used for step-termination heuristic).
+_ALL_OP_BYTES = frozenset(_OP_NAMES) | {
+    0x04, 0x05, 0x06, 0x07, 0x08, 0x09,  # <, >, u<, u>, u/, u%
+    0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,  # sto, ror, cmp, rst, psto, ucmp
+    0x11, 0x12, 0x13, 0x14, 0x15, 0x16,   # &, |, ^, <<, u>>, >>
+}
 
 
 # ---------------------------------------------------------------------------
@@ -92,57 +99,52 @@ def _le32(b: list[int], offset: int) -> int:
             | (b[offset + 3] << 24))
 
 
-def _parse_steps(b: list[int], start: int) -> tuple[list[ComputationStep], int]:
+def _parse_steps(b: list[int], start: int, chain_end: int) -> list[ComputationStep]:
     """
-    Parse the computation chain starting at *start*.
+    Parse the computation chain between ``b[start]`` and ``b[chain_end]``.
 
-    Returns ``(steps, cursor)`` where *cursor* is the byte position just
-    after the last consumed byte of the chain.
+    Type-89 computation chain format::
 
-    .. note::
+        <var_access_1> <op_1> <var_access_2> <op_2> … <var_access_N>
 
-       Variables in the 0x60–0x7F range require an extra parameter byte
-       after the variable byte.  This parser detects them and adjusts the
-       step offset accordingly.
+    Each variable access: ``var(1) [param(1) for 0x60-0x7F] shift(1) and_mask(4)``
+    Each operator: single byte (``0x00``=add, ``0x01``=sub, ``0x10``=mul, …).
+    The operator follows the step it applies to (i.e. between step and next).
+    The last step has no trailing operator.
     """
     steps: list[ComputationStep] = []
     p = start
 
-    while True:
-        # Each step: var(1) [param(1)] shift(1) and_mask(4) add_val(4)
-        if p >= len(b):
-            break
-
+    while p < chain_end:
+        # --- Read variable access ---
         var = b[p]
         p += 1
 
         # 60+x variables carry an extra parameter byte
         param: int | None = None
         if 0x60 <= var <= 0x7F:
-            if p >= len(b):
+            if p >= chain_end:
                 break
             param = b[p]
             p += 1
 
-        # Remaining fixed part: shift(1) + and_mask(4) + add_val(4) = 9 bytes
-        if p + 8 >= len(b):
+        # Fixed part: shift(1) + and_mask(4) = 5 bytes
+        if p + 4 >= chain_end + 1:  # need exactly 5 bytes
             break
 
         shift    = b[p]
         and_mask = _le32(b, p + 1)
-        add_val  = _le32(b, p + 5)
-        p += 9
+        p += 5
 
-        # Determine operation (comes after the 10-byte step block)
-        op = "var"
-        if p < len(b) and b[p] in _OP_NAMES:
-            op = _OP_NAMES[b[p]]
-            p += 1   # consume the operation byte
-        elif p < len(b) and b[p] == 0x7E:
-            # Next step starts with 0x7E (subroutine call) — no explicit op
-            op = "call"
-        elif p < len(b) and b[p] == 0x1A:
-            op = "add"   # implicit add when loading a constant next
+        # --- Read operator (or mark as last step) ---
+        op = "var"  # sentinel: last step in chain
+        if p < chain_end:
+            op_byte = b[p]
+            op = _OP_NAMES.get(op_byte, f"op_{op_byte:02x}")
+            p += 1
+
+        # For var 0x7E calls, store param as add_val (subroutine set-id)
+        add_val = param if param is not None else 0
 
         steps.append(ComputationStep(
             operation = op,
@@ -152,18 +154,7 @@ def _parse_steps(b: list[int], start: int) -> tuple[list[ComputationStep], int]:
             add_val   = add_val,
         ))
 
-        # Stop if the next byte looks like num_ranges (i.e. the chain has ended).
-        # We detect this heuristically: if the byte is small (0-32 ranges is
-        # plausible) AND it is followed by a coherent range payload, stop.
-        # A simpler heuristic: stop when the next byte is NOT a known var or op.
-        if p >= len(b):
-            break
-        next_byte = b[p]
-        if next_byte not in _OP_NAMES and next_byte not in (0x7E, 0x1A):
-            # Looks like num_ranges — end of chain
-            break
-
-    return steps, p
+    return steps
 
 
 # ---------------------------------------------------------------------------
@@ -190,25 +181,43 @@ def parse_computation_node(rs: RawSprite) -> ComputationNode | None:
 
     set_id = b[2]
 
-    # Chain starts at byte 4
-    steps, p = _parse_steps(b, 4)
+    # ---- Locate the chain/range boundary by scanning from the end ----
+    # Layout: … <chain> <num_ranges(1)> [result(2)+range_lo(4)+range_hi(4)]*N <default(2)>
+    # Solve: chain_end = len(b) - 2 - 10*N - 1, where b[chain_end] == N.
+    chain_end: int | None = None
+    for nr in range(256):
+        pos = len(b) - 2 - 10 * nr - 1
+        if pos < 4:
+            break
+        if b[pos] == nr:
+            chain_end = pos
+            break
 
-    # Now parse num_ranges + range table
+    if chain_end is None:
+        # Fallback: assume entire payload after header is chain (no ranges)
+        chain_end = len(b)
+
+    # ---- Parse computation chain ----
+    steps = _parse_steps(b, 4, chain_end)
+
+    # ---- Parse ranges & default ----
+    p = chain_end
     if p >= len(b):
         return ComputationNode(node_id=set_id, steps=steps)
 
     num_ranges = b[p]
     p += 1
 
+    # Type-89/8A uses DWORD ranges: result(W) range_lo(DW) range_hi(DW) = 10 bytes
     ranges: list[VariationalRange] = []
     for _ in range(num_ranges):
-        if p + 5 >= len(b):
+        if p + 9 >= len(b):
             break
         result_id = b[p] | (b[p + 1] << 8)
-        range_lo  = b[p + 2] | (b[p + 3] << 8)
-        range_hi  = b[p + 4] | (b[p + 5] << 8)
+        range_lo  = _le32(b, p + 2)
+        range_hi  = _le32(b, p + 6)
         ranges.append(VariationalRange(result_id, range_lo, range_hi))
-        p += 6
+        p += 10
 
     default_id = 0
     if p + 1 < len(b):

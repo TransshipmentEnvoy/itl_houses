@@ -654,6 +654,70 @@ def _nml_var_expr(variable: int, shift: int, mask: int, param: int | None = None
     return f"var[0x{variable:02X}, {shift}, 0x{mask:X}]"
 
 
+# ---------------------------------------------------------------------------
+# Computation-node pattern detection
+# ---------------------------------------------------------------------------
+
+def _detect_random_delay_trigger(
+    node: ComputationNode,
+    resolve_graph: Action2Graph | None = None,
+    final_graph: Action2Graph | None = None,
+) -> tuple[int, int, int, int, int, int] | None:
+    """Detect the "random delay trigger" pattern in a ComputationNode.
+
+    Pattern::
+
+        (call_random(SUB) & 0xFF) * MULT + OFFSET - (date & 0xFFFF)
+        range [0x80000000, 0xFFFFFFFF] → range_result
+        default → default_result
+
+    Returns ``(sub_id, multiplier, offset, nrand, range_result, default_result)``
+    or ``None`` if the pattern doesn't match.  *nrand* is the number of
+    random entries in the called subroutine.
+    """
+    if len(node.steps) != 4:
+        return None
+    s0, s1, s2, s3 = node.steps
+
+    # Step 0: call subroutine, mask 0xFF, op = mul
+    if s0.var != 0x7E or s0.and_mask != 0xFF or s0.operation != "mul":
+        return None
+    sub_id = s0.add_val  # procedure set-id
+
+    # Step 1: constant (var 0x1A), op = add  →  multiplier
+    if s1.var != 0x1A or s1.operation != "add":
+        return None
+    multiplier = s1.and_mask
+
+    # Step 2: constant (var 0x1A), op = sub  →  offset
+    if s2.var != 0x1A or s2.operation != "sub":
+        return None
+    offset = s2.and_mask
+
+    # Step 3: var 0x00 (date), mask 0xFFFF, last step
+    if s3.var != 0x00 or s3.and_mask != 0xFFFF or s3.operation != "var":
+        return None
+
+    # Exactly 1 range [0x80000000, 0xFFFFFFFF]
+    if len(node.ranges) != 1:
+        return None
+    rng = node.ranges[0]
+    if rng.range_lo != 0x80000000 or rng.range_hi != 0xFFFFFFFF:
+        return None
+
+    # Determine nrand from the called random subroutine
+    nrand = 16  # fallback
+    sub_node = None
+    if resolve_graph:
+        sub_node = resolve_graph.get(sub_id)
+    if sub_node is None and final_graph:
+        sub_node = final_graph.get(sub_id)
+    if isinstance(sub_node, RandomNode):
+        nrand = len(sub_node.entries)
+
+    return sub_id, multiplier, offset, nrand, rng.result_id, node.default
+
+
 def traverse_callback_subgraph(
     root_id: int,
     resolve_graph: Action2Graph,
@@ -811,12 +875,57 @@ def traverse_callback_subgraph(
         _visited.discard(node_ident)
         return all_lines, switch_name
 
-    # -- ComputationNode: best-effort — follow default / subroutine calls --
+    # -- ComputationNode: detect known patterns & translate to NML ----------
     if isinstance(node, ComputationNode):
-        # For computation nodes, try to resolve the result from ranges/default
         all_lines: list[str] = []
+
+        # --- Pattern: random-delay trigger ---
+        # (call_random() & 0xFF) * MULT + OFFSET - (date & 0xFFFF)
+        # range [0x80000000, 0xFFFFFFFF] → cb_result (date exceeded target)
+        # default → CB_FAILED or zero
+        rdt = _detect_random_delay_trigger(node, resolve_graph, final_graph)
+        if rdt is not None:
+            sub_id, multiplier, offset, nrand, range_result, default_result = rdt
+            result_val = cb_result_value(range_result) if is_callback_result(range_result) else range_result
+            # Emit NML: one date-check switch per random slot, wrapped in random_switch
+            date_switches: list[str] = []
+            for slot in range(nrand):
+                threshold = slot * multiplier + offset
+                sw_name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
+                _counter[0] += 1
+                # If threshold > 0xFFFF, always true (date masked to 16 bits)
+                if threshold > 0xFFFF:
+                    all_lines.append(
+                        f"switch (FEAT_HOUSES, SELF, {sw_name}, 0) "
+                        f"{{ return {result_val}; }}"
+                    )
+                else:
+                    # Default for non-matching: use the computation's default
+                    if is_callback_result(default_result):
+                        def_val = str(cb_result_value(default_result))
+                    else:
+                        def_val = str(default_result)
+                    all_lines.append(
+                        f"switch (FEAT_HOUSES, SELF, {sw_name}, var[0x00, 0, 0xFFFF]) "
+                        f"{{ {threshold}..65535: return {result_val}; return {def_val}; }}"
+                    )
+                date_switches.append(sw_name)
+
+            # Wrap in random_switch
+            top_name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
+            _counter[0] += 1
+            entries_str = "; ".join(f"1: {s}" for s in date_switches)
+            all_lines.append(
+                f"random_switch (FEAT_HOUSES, SELF, {top_name}) "
+                f"{{ {entries_str}; }}"
+                f" /* computation: random delay trigger, sub=0x{sub_id:02X}, "
+                f"mult={multiplier}, offset={offset} */"
+            )
+            _visited.discard(node_ident)
+            return all_lines, top_name
+
+        # --- Fallback: best-effort (ranges/default) ---
         if node.ranges:
-            # Has ranges — treat like a variational node
             switch_name = f"switch_ttrs_{house_id_hex}_{name_tag}_{_counter[0]}"
             _counter[0] += 1
             cases = []
@@ -842,7 +951,6 @@ def traverse_callback_subgraph(
             all_lines.extend(def_lines)
             def_ref = def_name or "0"
 
-            # Use a generic expression — computation semantics are approximated
             cases_str = "; ".join(cases)
             if cases_str:
                 cases_str += "; "
@@ -854,7 +962,6 @@ def traverse_callback_subgraph(
             _visited.discard(node_ident)
             return all_lines, switch_name
         else:
-            # No ranges — just follow default
             _visited.discard(node_ident)
             return traverse_callback_subgraph(
                 node.default, resolve_graph, final_graph,

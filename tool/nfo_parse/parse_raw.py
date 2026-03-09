@@ -35,9 +35,23 @@ _SPRITE_HEADER_RE = re.compile(
     r"^\s*\d+\s+\*\s+(\d+)\s+(.*)"
 )
 
-# Matches any 2-hex-char token.  Backslash escapes and NFO string literals
-# are intentionally ignored here — they never appear in Action 2 payloads.
+# Matches any 2-hex-char token.
 _HEX_TOKEN_RE = re.compile(r"\b[0-9A-Fa-f]{2}\b")
+
+# GRFCodec \2<op> escape sequences used in type-89 Action 2 computation chains.
+# Each escape encodes a single operator byte in the binary stream.
+_NFO_ESCAPE_RE = re.compile(
+    r"\\2(?:u>>|u<<|u<|u>|u/|u%|<<|>>|sto|rst|psto|ror|cmp|ucmp"
+    r"|[+\-*/<>%&|^])"
+)
+_NFO_ESCAPE_MAP: dict[str, int] = {
+    r"\2+": 0x00,   r"\2-":  0x01,  r"\2<":    0x04,  r"\2>": 0x05,
+    r"\2u<": 0x06,  r"\2u>": 0x07,  r"\2/":    0x02,  r"\2%": 0x03,
+    r"\2u/": 0x08,  r"\2u%": 0x09,  r"\2*":    0x10,  r"\2&": 0x11,
+    r"\2|": 0x12,   r"\2^": 0x13,   r"\2sto":  0x0A,  r"\2rst": 0x0D,
+    r"\2psto": 0x0E, r"\2ror": 0x0B, r"\2cmp":  0x0C, r"\2ucmp": 0x0F,
+    r"\2<<": 0x14,  r"\2u>>": 0x15, r"\2>>": 0x16,
+}
 
 # A line that starts a new pseudo-sprite (used to detect end of continuation).
 _NEW_SPRITE_RE = re.compile(r"^\s*\d+\s+\*\s+\d+")
@@ -49,9 +63,25 @@ def _strip_comment(line: str) -> str:
     return line[:idx] if idx >= 0 else line
 
 
+# Combined pattern: match either an NFO escape or a hex token, in order.
+_TOKEN_RE = re.compile(
+    r"(?:" + _NFO_ESCAPE_RE.pattern + r")"
+    r"|(?:\b[0-9A-Fa-f]{2}\b)"
+)
+
+
 def _hex_bytes_from(text: str) -> list[int]:
-    """Extract all 2-hex-char tokens from *text* as integers."""
-    return [int(m.group(), 16) for m in _HEX_TOKEN_RE.finditer(text)]
+    """Extract all hex tokens and NFO escape sequences from *text* as bytes."""
+    result: list[int] = []
+    for m in _TOKEN_RE.finditer(text):
+        tok = m.group()
+        if tok.startswith("\\"):
+            val = _NFO_ESCAPE_MAP.get(tok)
+            if val is not None:
+                result.append(val)
+        else:
+            result.append(int(tok, 16))
+    return result
 
 
 # ---------------------------------------------------------------------------
