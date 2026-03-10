@@ -74,6 +74,7 @@ class _TraversalState:
     result:   HouseTileGraphics
     visited:  set[int]  = field(default_factory=set)
     max_depth: int = 40
+    global_graph: Action2Graph | None = None
 
 
 def _climate_graphics(result: HouseTileGraphics, climate: str) -> ClimateGraphics:
@@ -118,6 +119,8 @@ def _extract_colour_values(
     target_id: int,
     resolve_graph: Action2Graph,
     final_graph: Action2Graph,
+    *,
+    global_graph: Action2Graph | None = None,
 ) -> tuple[list[int], int]:
     """Follow *target_id* and extract colour callback return values.
 
@@ -129,6 +132,9 @@ def _extract_colour_values(
     Also handles the case of a type-82 (re-randomise) node which contains
     ranges that are callback results, and the case of a direct callback result.
 
+    *global_graph* is an optional cross-section fallback graph used when
+    *target_id* cannot be found in the section-scoped graphs.
+
     Returns ``(colour_values, triggers)`` where *triggers* is the NFO trigger
     byte from a RandomNode (0 when the source is not random).
     """
@@ -138,6 +144,8 @@ def _extract_colour_values(
     node = resolve_graph.get(target_id)
     if node is None:
         node = final_graph.get(target_id)
+    if node is None and global_graph is not None:
+        node = global_graph.get(target_id)
     if node is None:
         return [], 0
 
@@ -160,6 +168,39 @@ def _extract_colour_values(
             if is_callback_result(rng.result_id):
                 colours.append(cb_result_value(rng.result_id))
         return colours, 0
+
+    # Type-81/85 self-scope variational (e.g. animation_frame-dependent colour).
+    # Recursively follow all reachable branches (ranges + default) to collect
+    # colour values from nested RandomNodes or callback results.
+    if isinstance(node, VariationalNode) and node.var_type in (0x81, 0x85):
+        colours = []
+        triggers = 0
+        seen_targets: set[int] = set()
+        for rng in node.ranges:
+            tid = rng.result_id
+            if tid not in seen_targets and not is_callback_result(tid):
+                seen_targets.add(tid)
+                sub_colours, sub_triggers = _extract_colour_values(
+                    tid, resolve_graph, final_graph,
+                    global_graph=global_graph,
+                )
+                colours.extend(sub_colours)
+                if sub_triggers and not triggers:
+                    triggers = sub_triggers
+            elif is_callback_result(tid):
+                colours.append(cb_result_value(tid))
+        if node.default not in seen_targets:
+            if is_callback_result(node.default):
+                colours.append(cb_result_value(node.default))
+            else:
+                sub_colours, sub_triggers = _extract_colour_values(
+                    node.default, resolve_graph, final_graph,
+                    global_graph=global_graph,
+                )
+                colours.extend(sub_colours)
+                if sub_triggers and not triggers:
+                    triggers = sub_triggers
+        return colours, triggers
 
     return [], 0
 
@@ -276,6 +317,7 @@ def _traverse(
                     if not state.result.colour_values:
                         colours, col_triggers = _extract_colour_values(
                             rng.result_id, node_snapshot, final_graph,
+                            global_graph=state.global_graph,
                         )
                         if colours:
                             state.result.colour_values = colours
@@ -986,6 +1028,7 @@ def build_house_tile_graphics(
     root_id: int,
     graph: Action2Graph,
     snapshots: dict[int, Action2Graph] | None = None,
+    global_graph: Action2Graph | None = None,
 ) -> HouseTileGraphics:
     """
     Traverse the Action 2 graph starting from *root_id* and return a fully
@@ -994,9 +1037,11 @@ def build_house_tile_graphics(
     *root_id* is typically the group ID read from the house's Action 3 entry.
     *snapshots* provides position-aware graph views for each non-terminal node;
     pass ``None`` (or omit) to use the global graph for all lookups.
+    *global_graph* is an optional cross-section fallback graph for colour
+    callback extraction when the target node lives outside the house section.
     """
     result = HouseTileGraphics()
-    state  = _TraversalState(result=result)
+    state  = _TraversalState(result=result, global_graph=global_graph)
     snaps  = snapshots if snapshots is not None else {}
     _traverse(
         root_id, graph, snaps, graph, state,
@@ -1032,13 +1077,20 @@ def build_all_house_graphics(
     """
     sections = collect_house_section_ranges(lines)
 
+    # Build a global graph from all action 2 sprites across all sections.
+    # This is used as a fallback for cross-section colour callback extraction
+    # (e.g. house 0x8C referencing a RandomNode defined in house 0x88's section).
+    all_sprites = collect_action2_in_range(lines, 0, len(lines))
+    global_graph, _ = _build_graph_positional(all_sprites)
+
     house_graphics: dict[int, HouseTileGraphics] = {}
     house_graphs:   dict[int, Action2Graph]       = {}
 
     for house_id, start_idx, end_idx, root_id in sections:
         sec_sprites = collect_action2_in_range(lines, start_idx, end_idx + 1)
         sec_graph, snapshots = _build_graph_positional(sec_sprites)
-        htg = build_house_tile_graphics(root_id, sec_graph, snapshots)
+        htg = build_house_tile_graphics(root_id, sec_graph, snapshots,
+                                        global_graph=global_graph)
         house_graphics[house_id] = htg
         house_graphs[house_id]   = sec_graph
 

@@ -328,6 +328,54 @@ def parse_token_value(token: str) -> Optional[int]:
     return None
 
 
+def _is_word_token(token: str) -> bool:
+    """Return True if *token* encodes a full word value (\\w### or \\wx###)."""
+    return token.startswith("\\w")
+
+
+def _skip_word(tokens: list[str], p: int) -> int:
+    """Return the number of tokens that encode one word (W) value at position *p*.
+
+    A word can be encoded as a single \\w### / \\wx### token (1 token) or as
+    two consecutive hex-byte tokens (2 tokens).
+    """
+    if p < len(tokens) and _is_word_token(tokens[p]):
+        return 1
+    return 2
+
+
+def _skip_variable_prop(key_int: int, tokens: list[str], p: int) -> int:
+    """Return the number of tokens to skip for a variable-length property.
+
+    Handles:
+      0x20  Cargo acceptance watch list (V): count_B + count * B
+      0x23  Tile acceptance list (V): numinput_B + numinput * 2 * B
+      0x24  List of badges (W + n*W): count_W + count * W
+    """
+    if p >= len(tokens):
+        return 0
+    if key_int == 0x20:
+        count = parse_token_value(tokens[p])
+        if count is None:
+            count = 0
+        return 1 + count  # 1 count-byte + count cargo-bytes
+    if key_int == 0x23:
+        numinput = parse_token_value(tokens[p])
+        if numinput is None:
+            numinput = 0
+        return 1 + numinput * 2  # 1 count-byte + numinput * (cargotype_B + acceptance_B)
+    if key_int == 0x24:
+        w_len = _skip_word(tokens, p)
+        count = parse_token_value(tokens[p])
+        if count is None:
+            count = 0
+        total = w_len  # the count word itself
+        for i in range(count):
+            total += _skip_word(tokens, p + total)
+        return total
+    return 1  # fallback
+
+
 def tokenize_line(line: str) -> list[str]:
     """Extract tokens from an NFO line."""
     # Remove comments
@@ -651,23 +699,35 @@ def parse_action0_properties(lines: list[str]) -> dict[int, dict[str, object]]:
                             props["1F"] = f"{val:02X}"
                         p += 1
 
-                # Unknown property — use size lookup table to skip correctly.
-                # Action0/Houses property sizes (tokens per value):
-                #   08:1  09:1  0A:2  0B:1  0C:1  0D:1  0E:1  0F:1
-                #   10:2  11:1  12:2  13:2  14:1  15:1  16:1  17:4
-                #   18:1  19:1  1A:1  1B:1  1C:1  1D:1  1E:4  1F:1
-                #   20:4  21:2  22:4  23:1  24:1
+                # Unhandled property — skip the correct number of tokens.
+                #
+                # NFO Action0/Houses property formats (from spec):
+                #   B  = 1 byte  → 1 token
+                #   W  = 1 word  → 1 token (\w/\wx) or 2 tokens (hex bytes)
+                #   D  = 1 dword → up to 4 tokens
+                #   V  = variable-length (leading count byte/word)
+                #
+                # Fixed-size entries (08-1F) are listed for completeness;
+                # they have explicit handlers above but the table is the
+                # safety net if a branch is unreachable.
+                #
+                #   08:B  09:B  0A:W   0B:B  0C:B  0D:B  0E:B  0F:B
+                #   10:W  11:B  12:W   13:W  14:B  15:B  16:B  17:4*B
+                #   18:B  19:B  1A:B   1B:B  1C:B  1D:B  1E:D  1F:B
+                #   20:V  21:W  22:W   23:V  24:V
                 else:
-                    _PROP_SIZES: dict[int, int] = {
-                        0x08: 1, 0x09: 1, 0x0A: 2, 0x0B: 1, 0x0C: 1,
-                        0x0D: 1, 0x0E: 1, 0x0F: 1, 0x10: 2, 0x11: 1,
-                        0x12: 2, 0x13: 2, 0x14: 1, 0x15: 1, 0x16: 1,
-                        0x17: 4, 0x18: 1, 0x19: 1, 0x1A: 1, 0x1B: 1,
-                        0x1C: 1, 0x1D: 1, 0x1E: 4, 0x1F: 1,
-                        0x20: 4, 0x21: 2, 0x22: 4, 0x23: 1, 0x24: 1,
-                    }
-                    skip = _PROP_SIZES.get(key_int, 1)
-                    p += skip
+                    _VARIABLE_PROPS = {0x20, 0x23, 0x24}
+                    _WORD_PROPS = {0x0A, 0x10, 0x12, 0x13, 0x21, 0x22}
+                    if key_int in _VARIABLE_PROPS:
+                        p += _skip_variable_prop(key_int, tokens, p)
+                    elif key_int in _WORD_PROPS:
+                        p += _skip_word(tokens, p)
+                    elif key_int == 0x17:
+                        p += 4  # four random colour bytes
+                    elif key_int == 0x1E:
+                        p += 4  # dword (4 hex-byte tokens)
+                    else:
+                        p += 1  # default: single byte
 
         line_num += 1
 

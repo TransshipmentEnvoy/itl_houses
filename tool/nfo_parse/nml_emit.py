@@ -135,12 +135,15 @@ def _emit_climate_variant(
     sprite_table: dict[int, Any],
     pcx_path: str,
     out: list[str],
-) -> str:
+    fallback_frame_layouts: dict[int, str] | None = None,
+) -> tuple[str, dict[int, str]]:
     """
     Emit spriteset / spritelayout / switch blocks for *cg* (one climate).
 
-    Returns the top-level NML identifier that routes into this climate's
-    construction_state / animation switch.
+    Returns ``(top_name, frame_layouts)`` where *top_name* is the top-level
+    NML identifier that routes into this climate's construction_state /
+    animation switch, and *frame_layouts* maps animation frame indices to
+    emitted spritelayout names (empty for non-animated variants).
     """
     # ------------------------------------------------------------------
     # Construction stages
@@ -182,6 +185,7 @@ def _emit_climate_variant(
             prefix, ss_prefix, cg, constr_sprites, constr_bsprite,
             constr_ground_expr, constr_ground_sprite, constr_bbox,
             sprite_table, pcx_path, out,
+            fallback_frame_layouts=fallback_frame_layouts,
         )
 
     # ------------------------------------------------------------------
@@ -285,7 +289,7 @@ def _emit_climate_variant(
         # Note: done_ground_expr == "0" means the sprite table lookup also failed;
         # in that case there is nothing useful to emit.
 
-    return prefix
+    return prefix, {}
 
 
 def _emit_animated_variant(
@@ -300,7 +304,8 @@ def _emit_animated_variant(
     sprite_table: dict[int, Any],
     pcx_path: str,
     out: list[str],
-) -> str:
+    fallback_frame_layouts: dict[int, str] | None = None,
+) -> tuple[str, dict[int, str]]:
     """
     Emit blocks for an animated climate variant (cg.animation_frames non-empty).
 
@@ -308,6 +313,14 @@ def _emit_animated_variant(
     *default* branch of that switch (= frame N when no range matches) is
     stored in ``cg.completed``.  We append it to the frame list so all
     frames are included in the ``animation_frame`` switch.
+
+    *fallback_frame_layouts* provides layout names from another climate variant
+    (typically temperate) for frames that are ``None`` in the current variant.
+    This fills gaps in the animation switch when the NFO uses the same sprite
+    regardless of terrain for certain frames.
+
+    Returns ``(top_name, frame_layouts)`` where *frame_layouts* maps frame
+    indices to emitted spritelayout names for use as fallback by other variants.
     """
     # Merge explicit frames + default frame (cg.completed)
     all_frames: list[Optional[FrameLayout]] = list(cg.animation_frames)
@@ -401,13 +414,23 @@ def _emit_animated_variant(
         out.append(f"spritelayout {prefix} {{")
         out.append(f"\tground {{ sprite: 0; }}")
         out.append("}")
-        return prefix
+        return prefix, {}
+
+    # Build frame→layout mapping for this variant (used as fallback by other variants)
+    own_frame_layouts: dict[int, str] = {}
+    for idx, layout_name in enumerate(frame_layout_names):
+        if layout_name is not None:
+            own_frame_layouts[idx] = layout_name
 
     # ---- Animation frame switch ----------------------------------------
     anim_cases: list[str] = []
     for idx, layout_name in enumerate(frame_layout_names):
         if layout_name is not None:
             anim_cases.append(f"{idx}: {layout_name}")
+        elif fallback_frame_layouts and idx in fallback_frame_layouts:
+            # Frame missing in this variant but available from another climate
+            # (e.g. temperate) — reuse that layout to avoid incorrect default.
+            anim_cases.append(f"{idx}: {fallback_frame_layouts[idx]}")
     cases_str = "; ".join(anim_cases)
     out.append(
         f"switch (FEAT_HOUSES, SELF, {prefix}_anim, animation_frame) {{"
@@ -436,7 +459,7 @@ def _emit_animated_variant(
         f"switch (FEAT_HOUSES, SELF, {prefix}, construction_state) {{"
         f" 3: {prefix}_anim; return {fallback}; }}"
     )
-    return prefix
+    return prefix, own_frame_layouts
 
 
 # ---------------------------------------------------------------------------
@@ -489,24 +512,28 @@ def emit_house_tile_nml(
     # at the entry_name level or it will collide with the random_switch block.
     random_replaces_base = has_random and not needs_terrain_switch
 
+    temp_frame_layouts: dict[int, str] = {}
+
     if has_temp and not random_replaces_base:
         prefix   = f"sl_ttrs_{house_id_hex}{climate_suffix_temp}"
         ss_pref  = f"ss_ttrs_{house_id_hex}{climate_suffix_temp}"
-        _emit_climate_variant(prefix, ss_pref, htg.temperate, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+        _, temp_frame_layouts = _emit_climate_variant(prefix, ss_pref, htg.temperate, sprite_table, pcx_path, out)  # type: ignore[arg-type]
         out.append("")
         top_temp_name = prefix
 
     if has_snow:
         prefix  = f"sl_ttrs_{house_id_hex}_snow"
         ss_pref = f"ss_ttrs_{house_id_hex}_snow"
-        _emit_climate_variant(prefix, ss_pref, htg.snow, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+        _emit_climate_variant(prefix, ss_pref, htg.snow, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                              fallback_frame_layouts=temp_frame_layouts or None)
         out.append("")
         top_snow_name = prefix
 
     if has_tropic:
         prefix  = f"sl_ttrs_{house_id_hex}_tropic"
         ss_pref = f"ss_ttrs_{house_id_hex}_tropic"
-        _emit_climate_variant(prefix, ss_pref, htg.tropic, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+        _emit_climate_variant(prefix, ss_pref, htg.tropic, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                              fallback_frame_layouts=temp_frame_layouts or None)
         out.append("")
         top_tropic_name = prefix
 
@@ -516,14 +543,16 @@ def emit_house_tile_nml(
         # No snow variant — arctic_v2 fills the snow slot
         prefix  = f"sl_ttrs_{house_id_hex}_snow"
         ss_pref = f"ss_ttrs_{house_id_hex}_snow"
-        _emit_climate_variant(prefix, ss_pref, htg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+        _emit_climate_variant(prefix, ss_pref, htg.arctic_v2, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                              fallback_frame_layouts=temp_frame_layouts or None)
         out.append("")
         top_snow_name = prefix
     elif has_arctic_v2 and has_snow:
         # Both snow AND arctic_v2 exist — emit arctic_v2 as a separate variant
         prefix  = f"sl_ttrs_{house_id_hex}_arctic"
         ss_pref = f"ss_ttrs_{house_id_hex}_arctic"
-        _emit_climate_variant(prefix, ss_pref, htg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+        _emit_climate_variant(prefix, ss_pref, htg.arctic_v2, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                              fallback_frame_layouts=temp_frame_layouts or None)
         out.append("")
         top_arctic_v2_name = prefix
 
@@ -625,25 +654,28 @@ def _emit_random_switch(
             top_temp: str | None    = None
             top_snow: str | None    = None
             top_tropic: str | None  = None
+            rv_temp_frame_layouts: dict[int, str] = {}
 
             if has_temp:
                 prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_nosnow"
                 ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_nosnow"
-                _emit_climate_variant(prefix, ss_pref, rvg.temperate, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                _, rv_temp_frame_layouts = _emit_climate_variant(prefix, ss_pref, rvg.temperate, sprite_table, pcx_path, out)  # type: ignore[arg-type]
                 out.append("")
                 top_temp = prefix
 
             if has_snow:
                 prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_snow"
                 ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_snow"
-                _emit_climate_variant(prefix, ss_pref, rvg.snow, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                _emit_climate_variant(prefix, ss_pref, rvg.snow, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                                      fallback_frame_layouts=rv_temp_frame_layouts or None)
                 out.append("")
                 top_snow = prefix
 
             if has_arctic and not has_snow:
                 prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_snow"
                 ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_snow"
-                _emit_climate_variant(prefix, ss_pref, rvg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                _emit_climate_variant(prefix, ss_pref, rvg.arctic_v2, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                                      fallback_frame_layouts=rv_temp_frame_layouts or None)
                 out.append("")
                 top_snow = prefix
 
@@ -651,14 +683,16 @@ def _emit_random_switch(
             if has_arctic and has_snow:
                 prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_arctic"
                 ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_arctic"
-                _emit_climate_variant(prefix, ss_pref, rvg.arctic_v2, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                _emit_climate_variant(prefix, ss_pref, rvg.arctic_v2, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                                      fallback_frame_layouts=rv_temp_frame_layouts or None)
                 out.append("")
                 top_arctic = prefix
 
             if has_tropic:
                 prefix  = f"sl_ttrs_{house_id_hex}_rv{i}_tropic"
                 ss_pref = f"ss_ttrs_{house_id_hex}_rv{i}_tropic"
-                _emit_climate_variant(prefix, ss_pref, rvg.tropic, sprite_table, pcx_path, out)  # type: ignore[arg-type]
+                _emit_climate_variant(prefix, ss_pref, rvg.tropic, sprite_table, pcx_path, out,  # type: ignore[arg-type]
+                                      fallback_frame_layouts=rv_temp_frame_layouts or None)
                 out.append("")
                 top_tropic = prefix
 
@@ -701,7 +735,7 @@ def _emit_random_switch(
             if cg is not None and _cg_has_content(cg):
                 vprefix  = v_entry
                 vss_pref = f"ss_ttrs_{house_id_hex}_rv{i}"
-                _emit_climate_variant(vprefix, vss_pref, cg, sprite_table, pcx_path, out)
+                _emit_climate_variant(vprefix, vss_pref, cg, sprite_table, pcx_path, out)  # return value unused
                 out.append("")
                 variant_names.append(vprefix)
 

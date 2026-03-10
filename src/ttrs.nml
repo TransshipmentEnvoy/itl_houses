@@ -10602,7 +10602,7 @@ spritelayout sl_ttrs_88_snow_frame24 {
 	ground   { sprite: ss_ttrs_88_snow_gf24(0); }
 	building { sprite: ss_ttrs_88_snow_f24(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 55; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_88_snow_anim, animation_frame) { 5: sl_ttrs_88_snow_frame5; 6: sl_ttrs_88_snow_frame6; 23: sl_ttrs_88_snow_frame23; 24: sl_ttrs_88_snow_frame24; return sl_ttrs_88_snow_frame24; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_88_snow_anim, animation_frame) { 2: sl_ttrs_88_nosnow_frame2; 3: sl_ttrs_88_nosnow_frame3; 4: sl_ttrs_88_nosnow_frame4; 5: sl_ttrs_88_snow_frame5; 6: sl_ttrs_88_snow_frame6; 7: sl_ttrs_88_nosnow_frame7; 8: sl_ttrs_88_nosnow_frame8; 9: sl_ttrs_88_nosnow_frame9; 10: sl_ttrs_88_nosnow_frame10; 11: sl_ttrs_88_nosnow_frame11; 12: sl_ttrs_88_nosnow_frame12; 13: sl_ttrs_88_nosnow_frame13; 14: sl_ttrs_88_nosnow_frame14; 15: sl_ttrs_88_nosnow_frame15; 16: sl_ttrs_88_nosnow_frame16; 17: sl_ttrs_88_nosnow_frame17; 18: sl_ttrs_88_nosnow_frame18; 19: sl_ttrs_88_nosnow_frame19; 20: sl_ttrs_88_nosnow_frame20; 21: sl_ttrs_88_nosnow_frame21; 22: sl_ttrs_88_nosnow_frame22; 23: sl_ttrs_88_snow_frame23; 24: sl_ttrs_88_snow_frame24; return sl_ttrs_88_snow_frame24; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_88_snow, construction_state) { 3: sl_ttrs_88_snow_anim; return sl_ttrs_88_snow_anim; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_88, terrain_type) { TILETYPE_SNOW: sl_ttrs_88_snow; return sl_ttrs_88_nosnow; }
@@ -10816,7 +10816,7 @@ spritelayout sl_ttrs_89_snow_frame24 {
 	ground   { sprite: ss_ttrs_89_snow_gf24(0); }
 	building { sprite: ss_ttrs_89_snow_f24(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_89_snow_anim, animation_frame) { 5: sl_ttrs_89_snow_frame5; 6: sl_ttrs_89_snow_frame6; 23: sl_ttrs_89_snow_frame23; 24: sl_ttrs_89_snow_frame24; return sl_ttrs_89_snow_frame24; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_89_snow_anim, animation_frame) { 2: sl_ttrs_89_nosnow_frame2; 3: sl_ttrs_89_nosnow_frame3; 4: sl_ttrs_89_nosnow_frame4; 5: sl_ttrs_89_snow_frame5; 6: sl_ttrs_89_snow_frame6; 7: sl_ttrs_89_nosnow_frame7; 8: sl_ttrs_89_nosnow_frame8; 9: sl_ttrs_89_nosnow_frame9; 10: sl_ttrs_89_nosnow_frame10; 11: sl_ttrs_89_nosnow_frame11; 12: sl_ttrs_89_nosnow_frame12; 13: sl_ttrs_89_nosnow_frame13; 14: sl_ttrs_89_nosnow_frame14; 15: sl_ttrs_89_nosnow_frame15; 16: sl_ttrs_89_nosnow_frame16; 17: sl_ttrs_89_nosnow_frame17; 18: sl_ttrs_89_nosnow_frame18; 19: sl_ttrs_89_nosnow_frame19; 20: sl_ttrs_89_nosnow_frame20; 21: sl_ttrs_89_nosnow_frame21; 22: sl_ttrs_89_nosnow_frame22; 23: sl_ttrs_89_snow_frame23; 24: sl_ttrs_89_snow_frame24; return sl_ttrs_89_snow_frame24; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_89_snow, construction_state) { 3: sl_ttrs_89_snow_anim; return sl_ttrs_89_snow_anim; }
 
 spriteset(ss_ttrs_89_arctic_gf2, "src/sprites/pcx/ttrs3w.pcx") { [642, 19144, 64, 31, -31, 0] }
@@ -10847,7 +10847,7 @@ spritelayout sl_ttrs_89_arctic_frame7 {
 	ground   { sprite: ss_ttrs_89_arctic_gf7(0); }
 	building { sprite: ss_ttrs_89_arctic_f7(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_89_arctic_anim, animation_frame) { 2: sl_ttrs_89_arctic_frame2; 3: sl_ttrs_89_arctic_frame3; 5: sl_ttrs_89_arctic_frame5; 6: sl_ttrs_89_arctic_frame6; 7: sl_ttrs_89_arctic_frame7; return sl_ttrs_89_arctic_frame7; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_89_arctic_anim, animation_frame) { 2: sl_ttrs_89_arctic_frame2; 3: sl_ttrs_89_arctic_frame3; 4: sl_ttrs_89_nosnow_frame4; 5: sl_ttrs_89_arctic_frame5; 6: sl_ttrs_89_arctic_frame6; 7: sl_ttrs_89_arctic_frame7; return sl_ttrs_89_arctic_frame7; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_89_arctic, construction_state) { 3: sl_ttrs_89_arctic_anim; return sl_ttrs_89_arctic_anim; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_89_clisw, var[0x03, 0, 0xFF]) { 1: sl_ttrs_89_arctic; return sl_ttrs_89_nosnow; }
@@ -10996,7 +10996,7 @@ spritelayout sl_ttrs_8A_snow_frame24 {
 	ground   { sprite: ss_ttrs_8A_snow_gf24(0); }
 	building { sprite: ss_ttrs_8A_snow_f24(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 53; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_8A_snow_anim, animation_frame) { 5: sl_ttrs_8A_snow_frame5; 6: sl_ttrs_8A_snow_frame6; 23: sl_ttrs_8A_snow_frame23; 24: sl_ttrs_8A_snow_frame24; return sl_ttrs_8A_snow_frame24; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_8A_snow_anim, animation_frame) { 2: sl_ttrs_8A_nosnow_frame2; 3: sl_ttrs_8A_nosnow_frame3; 4: sl_ttrs_8A_nosnow_frame4; 5: sl_ttrs_8A_snow_frame5; 6: sl_ttrs_8A_snow_frame6; 7: sl_ttrs_8A_nosnow_frame7; 8: sl_ttrs_8A_nosnow_frame8; 9: sl_ttrs_8A_nosnow_frame9; 10: sl_ttrs_8A_nosnow_frame10; 11: sl_ttrs_8A_nosnow_frame11; 12: sl_ttrs_8A_nosnow_frame12; 13: sl_ttrs_8A_nosnow_frame13; 14: sl_ttrs_8A_nosnow_frame14; 15: sl_ttrs_8A_nosnow_frame15; 16: sl_ttrs_8A_nosnow_frame16; 17: sl_ttrs_8A_nosnow_frame17; 18: sl_ttrs_8A_nosnow_frame18; 19: sl_ttrs_8A_nosnow_frame19; 20: sl_ttrs_8A_nosnow_frame20; 21: sl_ttrs_8A_nosnow_frame21; 22: sl_ttrs_8A_nosnow_frame22; 23: sl_ttrs_8A_snow_frame23; 24: sl_ttrs_8A_snow_frame24; return sl_ttrs_8A_snow_frame24; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_8A_snow, construction_state) { 3: sl_ttrs_8A_snow_anim; return sl_ttrs_8A_snow_anim; }
 
 spriteset(ss_ttrs_8A_arctic_gf2, "src/sprites/pcx/ttrs3w.pcx") { [162, 19240, 64, 31, -31, 0] }
@@ -11164,7 +11164,7 @@ spritelayout sl_ttrs_8B_snow_frame24 {
 	ground   { sprite: ss_ttrs_8B_snow_gf24(0); }
 	building { sprite: ss_ttrs_8B_snow_f24(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 32; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_8B_snow_anim, animation_frame) { 5: sl_ttrs_8B_snow_frame5; 6: sl_ttrs_8B_snow_frame6; 23: sl_ttrs_8B_snow_frame23; 24: sl_ttrs_8B_snow_frame24; return sl_ttrs_8B_snow_frame24; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_8B_snow_anim, animation_frame) { 2: sl_ttrs_8B_nosnow_frame2; 3: sl_ttrs_8B_nosnow_frame3; 4: sl_ttrs_8B_nosnow_frame4; 5: sl_ttrs_8B_snow_frame5; 6: sl_ttrs_8B_snow_frame6; 7: sl_ttrs_8B_nosnow_frame7; 8: sl_ttrs_8B_nosnow_frame8; 9: sl_ttrs_8B_nosnow_frame9; 10: sl_ttrs_8B_nosnow_frame10; 11: sl_ttrs_8B_nosnow_frame11; 12: sl_ttrs_8B_nosnow_frame12; 13: sl_ttrs_8B_nosnow_frame13; 14: sl_ttrs_8B_nosnow_frame14; 15: sl_ttrs_8B_nosnow_frame15; 16: sl_ttrs_8B_nosnow_frame16; 17: sl_ttrs_8B_nosnow_frame17; 18: sl_ttrs_8B_nosnow_frame18; 19: sl_ttrs_8B_nosnow_frame19; 20: sl_ttrs_8B_nosnow_frame20; 21: sl_ttrs_8B_nosnow_frame21; 22: sl_ttrs_8B_nosnow_frame22; 23: sl_ttrs_8B_snow_frame23; 24: sl_ttrs_8B_snow_frame24; return sl_ttrs_8B_snow_frame24; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_8B_snow, construction_state) { 3: sl_ttrs_8B_snow_anim; return sl_ttrs_8B_snow_anim; }
 
 spriteset(ss_ttrs_8B_arctic_gf2, "src/sprites/pcx/ttrs3w.pcx") { [322, 19240, 64, 31, -31, 0] }
@@ -11207,6 +11207,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_8B_arctic, construction_state) { 3: sl_ttrs_8
 switch (FEAT_HOUSES, SELF, sl_ttrs_8B_clisw, var[0x03, 0, 0xFF]) { 1: sl_ttrs_8B_arctic; return sl_ttrs_8B_nosnow; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_8B, terrain_type) { TILETYPE_SNOW: sl_ttrs_8B_snow; return sl_ttrs_8B_clisw; }
 
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_88_colour) { 4: return 775; 4: return 776; 3: return 782; 3: return 784; 3: return 785; 3: return 788; 3: return 789; 1: return 777; 1: return 778; 1: return 779; 1: return 780; 1: return 781; 1: return 783; 1: return 786; 1: return 787; 1: return 790; }
 item (FEAT_HOUSES, item_ttrs_88_hospital, 336, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
@@ -11239,6 +11240,7 @@ item (FEAT_HOUSES, item_ttrs_88_hospital, 336, HOUSE_SIZE_2X2) {
 		cargo_amount_accept: switch_ttrs_88_cargo_amount_accept_0;
 		construction_anim: switch_ttrs_88_construction_anim_0;
 		destruction: switch_ttrs_88_destruction_0;
+		colour: switch_ttrs_88_colour;
 	}
 }
 
@@ -11410,6 +11412,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_8F_snow, construction_state) { 3: sl_ttrs_8F_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_8F, terrain_type) { TILETYPE_SNOW: sl_ttrs_8F_snow; return sl_ttrs_8F_nosnow; }
 
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_8c_colour) { 3: return 775; 3: return 776; 2: return 782; 2: return 784; 2: return 785; 2: return 788; 2: return 789; }
 item (FEAT_HOUSES, item_ttrs_8c_hospital, 340, HOUSE_SIZE_2X2) {
 	property {
 		substitute: 40;
@@ -11431,6 +11434,7 @@ item (FEAT_HOUSES, item_ttrs_8c_hospital, 340, HOUSE_SIZE_2X2) {
 		graphics_south: sl_ttrs_8F;
 		construction_check: switch_ttrs_landmark;
 		/* classification: landmark */
+		colour: switch_ttrs_8c_colour;
 	}
 }
 
@@ -11528,6 +11532,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_92_snow, construction_state) { 3: sl_ttrs_92_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_92, terrain_type) { TILETYPE_SNOW: sl_ttrs_92_snow; return sl_ttrs_92_nosnow; }
 
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_91_colour) { 1: return 777; 1: return 778; 1: return 779; 1: return 780; 1: return 781; 1: return 786; 1: return 787; 1: return 790; }
 item (FEAT_HOUSES, item_ttrs_91_petrol_station, 345, HOUSE_SIZE_2X1) {
 	property {
 		substitute: 74;
@@ -11550,6 +11555,7 @@ item (FEAT_HOUSES, item_ttrs_91_petrol_station, 345, HOUSE_SIZE_2X1) {
 		graphics_west: sl_ttrs_92;
 		construction_check: switch_ttrs_utility;
 		/* classification: utility */
+		colour: switch_ttrs_91_colour;
 	}
 }
 
@@ -11597,6 +11603,7 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_94_snow, construction_state) { 3: sl_ttrs_94_
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_94, terrain_type) { TILETYPE_SNOW: sl_ttrs_94_snow; return sl_ttrs_94_nosnow; }
 
+random_switch (FEAT_HOUSES, SELF, switch_ttrs_93_colour) { 1: return 777; 1: return 778; 1: return 779; 1: return 780; 1: return 781; 1: return 786; 1: return 787; 1: return 790; }
 item (FEAT_HOUSES, item_ttrs_93_petrol_station, 347, HOUSE_SIZE_1X2) {
 	property {
 		substitute: 66;
@@ -11619,6 +11626,7 @@ item (FEAT_HOUSES, item_ttrs_93_petrol_station, 347, HOUSE_SIZE_1X2) {
 		graphics_east: sl_ttrs_94;
 		construction_check: switch_ttrs_utility;
 		/* classification: utility */
+		colour: switch_ttrs_93_colour;
 	}
 }
 
