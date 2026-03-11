@@ -155,13 +155,26 @@ def _emit_climate_variant(
 
     constr_ground_sprite: Optional[LayoutSprite] = None
 
+    # Track which construction stages (0-2) have no building sprite (ground-only)
+    ground_only_stages: set[int] = set()
+    first_building_stage: int = 0
+
     valid_constr = [fl for fl in cg.construction_stages if fl is not None]
     if valid_constr:
-        constr_bbox = valid_constr[0].bbox
+        # Pick bbox from the first stage that HAS a building sprite
+        constr_bbox = next(
+            (fl.bbox for fl in valid_constr if fl.building.is_action1), None
+        )
         seen_indices: list[int] = []
-        for fl in valid_constr:
-            bs = fl.building
+        found_first_building = False
+        for i, fl_raw in enumerate(cg.construction_stages):
+            if fl_raw is None or i > 2:
+                continue
+            bs = fl_raw.building
             if bs.is_action1:
+                if not found_first_building:
+                    first_building_stage = i
+                    found_first_building = True
                 idx = bs.index
                 if idx not in seen_indices:
                     sc = sprite_table.get(idx)
@@ -170,6 +183,8 @@ def _emit_climate_variant(
                         seen_indices.append(idx)
                         if bs.has_recolour and constr_bsprite is None:
                             constr_bsprite = bs
+            else:
+                ground_only_stages.add(i)
         # Ground for construction (use first valid stage's ground)
         constr_ground_expr, constr_ground_sprite = _ground_expr(
             valid_constr[0].ground,
@@ -186,6 +201,8 @@ def _emit_climate_variant(
             constr_ground_expr, constr_ground_sprite, constr_bbox,
             sprite_table, pcx_path, out,
             fallback_frame_layouts=fallback_frame_layouts,
+            ground_only_stages=ground_only_stages,
+            first_building_stage=first_building_stage,
         )
 
     # ------------------------------------------------------------------
@@ -224,8 +241,15 @@ def _emit_climate_variant(
         g_c = constr_ground_expr or "0"
         out.append(f"spritelayout {prefix}_constr {{")
         out.append(f"\tground   {{ sprite: {g_c};{grc} }}")
-        expr = _build_layout_expr(len(constr_sprites))
+        expr = _build_layout_expr(len(constr_sprites), first_building_stage)
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
+        out.append("}")
+
+    # Ground-only construction layout (for stages with no building sprite)
+    if ground_only_stages and constr_ground_expr is not None:
+        grc_go = _recolour_clause(constr_ground_sprite) if constr_ground_sprite is not None else ""
+        out.append(f"spritelayout {prefix}_constr_g {{")
+        out.append(f"\tground   {{ sprite: {constr_ground_expr};{grc_go} }}")
         out.append("}")
 
     # Done spriteset
@@ -253,7 +277,7 @@ def _emit_climate_variant(
         grc = _recolour_clause(constr_ground_sprite) if constr_ground_sprite is not None else ""
         out.append(f"spritelayout {prefix}_done {{")
         out.append(f"\tground   {{ sprite: {g_c};{grc} }}")
-        expr = _build_layout_expr(len(constr_sprites))
+        expr = _build_layout_expr(len(constr_sprites), first_building_stage)
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
 
@@ -261,17 +285,28 @@ def _emit_climate_variant(
     # Construction_state routing switch
     # ------------------------------------------------------------------
     has_constr = bool(constr_sprites)
+    has_ground_only = bool(ground_only_stages) and constr_ground_expr is not None
     has_done   = bool(
         done_sprite_sc
         or (done_ground_expr is not None and done_ground_expr != "0")
         or constr_sprites
     )
 
-    if has_done:
-        fallback = f"{prefix}_constr" if has_constr else f"{prefix}_done"
+    if has_done or has_ground_only:
+        # Build explicit routing cases
+        cases: list[str] = []
+        if has_ground_only:
+            for stage in sorted(ground_only_stages):
+                cases.append(f"{stage}: {prefix}_constr_g")
+        done_target = f"{prefix}_done" if has_done else (
+            f"{prefix}_constr" if has_constr else f"{prefix}_constr_g"
+        )
+        cases.append(f"3: {done_target}")
+        cases_str = "; ".join(cases)
+        fallback = f"{prefix}_constr" if has_constr else done_target
         out.append(
             f"switch (FEAT_HOUSES, SELF, {prefix}, construction_state) {{"
-            f" 3: {prefix}_done; return {fallback}; }}"
+            f" {cases_str}; return {fallback}; }}"
         )
     elif has_constr:
         # No proper completed sprite — emit plain spritelayout as top-level
@@ -305,6 +340,8 @@ def _emit_animated_variant(
     pcx_path: str,
     out: list[str],
     fallback_frame_layouts: dict[int, str] | None = None,
+    ground_only_stages: set[int] | None = None,
+    first_building_stage: int = 0,
 ) -> tuple[str, dict[int, str]]:
     """
     Emit blocks for an animated climate variant (cg.animation_frames non-empty).
@@ -438,6 +475,10 @@ def _emit_animated_variant(
     )
 
     # ---- Construction spriteset ----------------------------------------
+    if ground_only_stages is None:
+        ground_only_stages = set()
+    has_ground_only = bool(ground_only_stages) and constr_ground_expr is not None
+
     if constr_sprites:
         rc = _recolour_clause(constr_bsprite) if constr_bsprite is not None else ""
         grc = _recolour_clause(constr_ground_sprite) if constr_ground_sprite is not None else ""
@@ -448,17 +489,37 @@ def _emit_animated_variant(
         out.append("}")
         out.append(f"spritelayout {prefix}_constr {{")
         out.append(f"\tground   {{ sprite: {g_c};{grc} }}")
-        expr = _build_layout_expr(len(constr_sprites))
+        expr = _build_layout_expr(len(constr_sprites), first_building_stage)
         out.append(f"\tbuilding {{ sprite: {ss_prefix}_c({expr});{rc}{_bbox_clause(constr_bbox)} }}")
         out.append("}")
         fallback = f"{prefix}_constr"
     else:
         fallback = f"{prefix}_anim"
 
-    out.append(
-        f"switch (FEAT_HOUSES, SELF, {prefix}, construction_state) {{"
-        f" 3: {prefix}_anim; return {fallback}; }}"
-    )
+    # Ground-only construction layout (for stages with no building sprite)
+    if has_ground_only:
+        grc_go = _recolour_clause(constr_ground_sprite) if constr_ground_sprite is not None else ""
+        g_c_go = constr_ground_expr or "0"
+        out.append(f"spritelayout {prefix}_constr_g {{")
+        out.append(f"\tground   {{ sprite: {g_c_go};{grc_go} }}")
+        out.append("}")
+
+    if has_ground_only:
+        # Explicit routing for ground-only stages
+        cases: list[str] = []
+        for stage in sorted(ground_only_stages):
+            cases.append(f"{stage}: {prefix}_constr_g")
+        cases.append(f"3: {prefix}_anim")
+        cases_str = "; ".join(cases)
+        out.append(
+            f"switch (FEAT_HOUSES, SELF, {prefix}, construction_state) {{"
+            f" {cases_str}; return {fallback}; }}"
+        )
+    else:
+        out.append(
+            f"switch (FEAT_HOUSES, SELF, {prefix}, construction_state) {{"
+            f" 3: {prefix}_anim; return {fallback}; }}"
+        )
     return prefix, own_frame_layouts
 
 
@@ -811,12 +872,14 @@ def _rvg_has_content(rvg: RandomVariantGraphics) -> bool:
     return False
 
 
-def _build_layout_expr(n: int) -> str:
-    """NML expression: map construction_state → spriteset index [0, n-1]."""
+def _build_layout_expr(n: int, offset: int = 0) -> str:
+    """NML expression: map construction_state → spriteset index [0, n-1].
+
+    When *offset* > 0 the first building stage is at construction_state==offset,
+    so the expression subtracts the offset before indexing into the spriteset.
+    """
     if n <= 1:
         return "0"
-    if n == 2:
-        return "construction_state < 2 ? construction_state : 1"
-    if n == 3:
-        return "construction_state < 3 ? construction_state : 2"
-    return "construction_state"
+    base = f"(construction_state - {offset})" if offset > 0 else "construction_state"
+    max_idx = n - 1
+    return f"{base} < {n} ? {base} : {max_idx}"

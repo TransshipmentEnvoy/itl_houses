@@ -244,10 +244,12 @@ def _traverse(
     if is_callback_result(node_id):
         return
 
-    # Look up node: try resolve_graph first, then final_graph
+    # Look up node: try resolve_graph first, then final_graph, then global_graph
     node = resolve_graph.get(node_id)
     if node is None:
         node = final_graph.get(node_id)
+    if node is None and state.global_graph is not None:
+        node = state.global_graph.get(node_id)
     if node is None:
         return
 
@@ -663,6 +665,46 @@ def _fixup_snow_construction_fallback(result: HouseTileGraphics) -> None:
                     cg.construction_stages = list(rvg.temperate.construction_stages)  # type: ignore[union-attr]
 
 
+def _fixup_base_constr_into_random(result: HouseTileGraphics) -> None:
+    """Merge base (non-random) construction stages into random variant slots.
+
+    When the NFO construction_state switch routes some stages to a non-random
+    layout (recorded in ``result.{climate}``) and other stages to a random
+    node (recorded in ``result.random_variants[i].{climate}``), the random
+    variants end up with gaps in their construction_stages lists.
+
+    This fixup fills those gaps by copying the corresponding stage from the
+    base climate into each random variant that is missing it.
+    """
+    if not result.random_variants:
+        return
+    for attr in ("temperate", "snow", "tropic", "arctic_v2"):
+        base_cg: ClimateGraphics | None = getattr(result, attr)
+        if base_cg is None:
+            continue
+        base_stages = base_cg.construction_stages
+        if not any(fl is not None for fl in base_stages):
+            continue
+        for rvg in result.random_variants:
+            rv_cg: ClimateGraphics | None = getattr(rvg, attr)
+            if rv_cg is None:
+                continue
+            # Only merge if this variant has some construction content already
+            # (or has completed/animation content that would use a constr switch)
+            has_rv_constr = any(fl is not None for fl in rv_cg.construction_stages)
+            has_rv_content = (rv_cg.completed is not None
+                              or any(fl is not None for fl in rv_cg.animation_frames))
+            if not has_rv_constr and not has_rv_content:
+                continue
+            # Extend rv_cg.construction_stages to at least the base length
+            while len(rv_cg.construction_stages) < len(base_stages):
+                rv_cg.construction_stages.append(None)
+            # Fill in missing stages from base
+            for i, fl in enumerate(base_stages):
+                if fl is not None and rv_cg.construction_stages[i] is None:
+                    rv_cg.construction_stages[i] = fl
+
+
 # ============================================================================
 # Callback sub-graph traversal
 # ============================================================================
@@ -1052,6 +1094,7 @@ def build_house_tile_graphics(
         depth=0,
     )
     _fixup_construction_replication(result)
+    _fixup_base_constr_into_random(result)
     _fixup_snow_construction_fallback(result)
     return result
 

@@ -16,7 +16,10 @@ spriteset(ss_ttrs_00_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 }
 spritelayout sl_ttrs_00_nosnow_constr {
 	ground   { sprite: 3924; }
-	building { sprite: ss_ttrs_00_nosnow_c(construction_state < 2 ? construction_state : 1); xoffset: 0; yoffset: 0; xextent: 0; yextent: 0; zextent: 0; }
+	building { sprite: ss_ttrs_00_nosnow_c((construction_state - 1) < 2 ? (construction_state - 1) : 1); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
+}
+spritelayout sl_ttrs_00_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_00_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[82, 152, 64, 65, -31, -34]  /* completed */
@@ -25,7 +28,7 @@ spritelayout sl_ttrs_00_nosnow_done {
 	ground   { sprite: ss_ttrs_00_nosnow_gd(0); }
 	building { sprite: ss_ttrs_00_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_00_nosnow, construction_state) { 3: sl_ttrs_00_nosnow_done; return sl_ttrs_00_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_00_nosnow, construction_state) { 0: sl_ttrs_00_nosnow_constr_g; 3: sl_ttrs_00_nosnow_done; return sl_ttrs_00_nosnow_constr; }
 
 spriteset(ss_ttrs_00_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [242, 1384, 64, 31, -31, 0] }
 spriteset(ss_ttrs_00_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
@@ -34,7 +37,10 @@ spriteset(ss_ttrs_00_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
 }
 spritelayout sl_ttrs_00_snow_constr {
 	ground   { sprite: 3924; }
-	building { sprite: ss_ttrs_00_snow_c(construction_state < 2 ? construction_state : 1); xoffset: 0; yoffset: 0; xextent: 0; yextent: 0; zextent: 0; }
+	building { sprite: ss_ttrs_00_snow_c((construction_state - 1) < 2 ? (construction_state - 1) : 1); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
+}
+spritelayout sl_ttrs_00_snow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_00_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[322, 1384, 64, 65, -31, -34]  /* completed */
@@ -43,7 +49,7 @@ spritelayout sl_ttrs_00_snow_done {
 	ground   { sprite: ss_ttrs_00_snow_gd(0); }
 	building { sprite: ss_ttrs_00_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_00_snow, construction_state) { 3: sl_ttrs_00_snow_done; return sl_ttrs_00_snow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_00_snow, construction_state) { 0: sl_ttrs_00_snow_constr_g; 3: sl_ttrs_00_snow_done; return sl_ttrs_00_snow_constr; }
 
 spriteset(ss_ttrs_00_arctic_gd, "src/sprites/pcx/ttrs3w.pcx") { [594, 2216, 64, 31, -31, 0] }
 spriteset(ss_ttrs_00_arctic_c, "src/sprites/pcx/ttrs3w.pcx") {
@@ -52,7 +58,10 @@ spriteset(ss_ttrs_00_arctic_c, "src/sprites/pcx/ttrs3w.pcx") {
 }
 spritelayout sl_ttrs_00_arctic_constr {
 	ground   { sprite: 3924; }
-	building { sprite: ss_ttrs_00_arctic_c(construction_state < 2 ? construction_state : 1); xoffset: 0; yoffset: 0; xextent: 0; yextent: 0; zextent: 0; }
+	building { sprite: ss_ttrs_00_arctic_c((construction_state - 1) < 2 ? (construction_state - 1) : 1); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
+}
+spritelayout sl_ttrs_00_arctic_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_00_arctic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[82, 152, 64, 65, -31, -34]  /* completed */
@@ -61,7 +70,7 @@ spritelayout sl_ttrs_00_arctic_done {
 	ground   { sprite: ss_ttrs_00_arctic_gd(0); }
 	building { sprite: ss_ttrs_00_arctic_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_00_arctic, construction_state) { 3: sl_ttrs_00_arctic_done; return sl_ttrs_00_arctic_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_00_arctic, construction_state) { 0: sl_ttrs_00_arctic_constr_g; 3: sl_ttrs_00_arctic_done; return sl_ttrs_00_arctic_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_00_clisw, var[0x03, 0, 0xFF]) { 1: sl_ttrs_00_arctic; return sl_ttrs_00_nosnow; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_00, terrain_type) { TILETYPE_SNOW: sl_ttrs_00_snow; return sl_ttrs_00_clisw; }
@@ -143,14 +152,16 @@ item (FEAT_HOUSES, item_ttrs_01_house_01, 201) {
 	}
 }
 
-spriteset(ss_ttrs_02_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [642, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 232, 34, 54, -9, -28]  /* constr 0 */
 }
 spritelayout sl_ttrs_02_rv0_nosnow_constr {
-	ground   { sprite: ss_ttrs_02_rv0_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_02_rv0_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 58; }
+}
+spritelayout sl_ttrs_02_rv0_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_02_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 232, 34, 54, -9, -28]  /* completed */
@@ -159,7 +170,7 @@ spritelayout sl_ttrs_02_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_02_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_02_rv0_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 58; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv0_nosnow, construction_state) { 3: sl_ttrs_02_rv0_nosnow_done; return sl_ttrs_02_rv0_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv0_nosnow, construction_state) { 0: sl_ttrs_02_rv0_nosnow_constr_g; 3: sl_ttrs_02_rv0_nosnow_done; return sl_ttrs_02_rv0_nosnow_constr; }
 
 spriteset(ss_ttrs_02_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [562, 1384, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [562, 1384, 64, 31, -31, 0] }
@@ -181,14 +192,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv0_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_02_rv0_snow; return sl_ttrs_02_rv0_nosnow; }
 
-spriteset(ss_ttrs_02_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [642, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 232, 34, 54, -9, -28]  /* constr 0 */
 }
 spritelayout sl_ttrs_02_rv1_nosnow_constr {
-	ground   { sprite: ss_ttrs_02_rv1_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_02_rv1_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 58; }
+}
+spritelayout sl_ttrs_02_rv1_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_02_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[50, 232, 34, 59, -9, -28]  /* completed */
@@ -197,7 +210,7 @@ spritelayout sl_ttrs_02_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_02_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_02_rv1_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 58; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv1_nosnow, construction_state) { 3: sl_ttrs_02_rv1_nosnow_done; return sl_ttrs_02_rv1_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv1_nosnow, construction_state) { 0: sl_ttrs_02_rv1_nosnow_constr_g; 3: sl_ttrs_02_rv1_nosnow_done; return sl_ttrs_02_rv1_nosnow_constr; }
 
 spriteset(ss_ttrs_02_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [562, 1384, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [562, 1384, 64, 31, -31, 0] }
@@ -219,14 +232,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv1_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_02_rv1_snow; return sl_ttrs_02_rv1_nosnow; }
 
-spriteset(ss_ttrs_02_rv2_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [722, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv2_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [722, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv2_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[98, 232, 33, 72, -9, -46]  /* constr 0 */
 }
 spritelayout sl_ttrs_02_rv2_nosnow_constr {
-	ground   { sprite: ss_ttrs_02_rv2_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_02_rv2_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
+}
+spritelayout sl_ttrs_02_rv2_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_02_rv2_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[98, 232, 33, 72, -9, -46]  /* completed */
@@ -235,7 +250,7 @@ spritelayout sl_ttrs_02_rv2_nosnow_done {
 	ground   { sprite: ss_ttrs_02_rv2_nosnow_gd(0); }
 	building { sprite: ss_ttrs_02_rv2_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv2_nosnow, construction_state) { 3: sl_ttrs_02_rv2_nosnow_done; return sl_ttrs_02_rv2_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv2_nosnow, construction_state) { 0: sl_ttrs_02_rv2_nosnow_constr_g; 3: sl_ttrs_02_rv2_nosnow_done; return sl_ttrs_02_rv2_nosnow_constr; }
 
 spriteset(ss_ttrs_02_rv2_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [642, 1384, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv2_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 1384, 64, 31, -31, 0] }
@@ -257,14 +272,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_02_rv2_snow; return sl_ttrs_02_rv2_nosnow; }
 
-spriteset(ss_ttrs_02_rv3_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [722, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv3_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [722, 152, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv3_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[98, 232, 33, 72, -9, -46]  /* constr 0 */
 }
 spritelayout sl_ttrs_02_rv3_nosnow_constr {
-	ground   { sprite: ss_ttrs_02_rv3_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_02_rv3_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
+}
+spritelayout sl_ttrs_02_rv3_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_02_rv3_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[146, 232, 33, 78, -9, -46]  /* completed */
@@ -273,7 +290,7 @@ spritelayout sl_ttrs_02_rv3_nosnow_done {
 	ground   { sprite: ss_ttrs_02_rv3_nosnow_gd(0); }
 	building { sprite: ss_ttrs_02_rv3_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv3_nosnow, construction_state) { 3: sl_ttrs_02_rv3_nosnow_done; return sl_ttrs_02_rv3_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv3_nosnow, construction_state) { 0: sl_ttrs_02_rv3_nosnow_constr_g; 3: sl_ttrs_02_rv3_nosnow_done; return sl_ttrs_02_rv3_nosnow_constr; }
 
 spriteset(ss_ttrs_02_rv3_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [642, 1384, 64, 31, -31, 0] }
 spriteset(ss_ttrs_02_rv3_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 1384, 64, 31, -31, 0] }
@@ -297,14 +314,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_02_rv3, terrain_type) { TILETYPE_SNOW: sl_ttr
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_02) { 1: sl_ttrs_02_rv0; 1: sl_ttrs_02_rv1; 1: sl_ttrs_02_rv2; 1: sl_ttrs_02_rv3; }
 
-spriteset(ss_ttrs_03_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[274, 232, 53, 68, -30, -39]  /* constr 0 */
 }
 spritelayout sl_ttrs_03_rv0_nosnow_constr {
-	ground   { sprite: ss_ttrs_03_rv0_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_03_rv0_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
+}
+spritelayout sl_ttrs_03_rv0_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_03_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[274, 232, 53, 68, -30, -39]  /* completed */
@@ -313,7 +332,7 @@ spritelayout sl_ttrs_03_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_03_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_03_rv0_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv0_nosnow, construction_state) { 3: sl_ttrs_03_rv0_nosnow_done; return sl_ttrs_03_rv0_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv0_nosnow, construction_state) { 0: sl_ttrs_03_rv0_nosnow_constr_g; 3: sl_ttrs_03_rv0_nosnow_done; return sl_ttrs_03_rv0_nosnow_constr; }
 
 spriteset(ss_ttrs_03_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
@@ -335,14 +354,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv0_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_03_rv0_snow; return sl_ttrs_03_rv0_nosnow; }
 
-spriteset(ss_ttrs_03_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[274, 232, 53, 68, -30, -39]  /* constr 0 */
 }
 spritelayout sl_ttrs_03_rv1_nosnow_constr {
-	ground   { sprite: ss_ttrs_03_rv1_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_03_rv1_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
+}
+spritelayout sl_ttrs_03_rv1_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_03_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[338, 232, 61, 68, -30, -39]  /* completed */
@@ -351,7 +372,7 @@ spritelayout sl_ttrs_03_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_03_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_03_rv1_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv1_nosnow, construction_state) { 3: sl_ttrs_03_rv1_nosnow_done; return sl_ttrs_03_rv1_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv1_nosnow, construction_state) { 0: sl_ttrs_03_rv1_nosnow_constr_g; 3: sl_ttrs_03_rv1_nosnow_done; return sl_ttrs_03_rv1_nosnow_constr; }
 
 spriteset(ss_ttrs_03_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
@@ -373,14 +394,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv1_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_03_rv1_snow; return sl_ttrs_03_rv1_nosnow; }
 
-spriteset(ss_ttrs_03_rv2_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv2_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv2_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[418, 232, 53, 74, -30, -45]  /* constr 0 */
 }
 spritelayout sl_ttrs_03_rv2_nosnow_constr {
-	ground   { sprite: ss_ttrs_03_rv2_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_03_rv2_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
+}
+spritelayout sl_ttrs_03_rv2_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_03_rv2_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[418, 232, 53, 74, -30, -45]  /* completed */
@@ -389,7 +412,7 @@ spritelayout sl_ttrs_03_rv2_nosnow_done {
 	ground   { sprite: ss_ttrs_03_rv2_nosnow_gd(0); }
 	building { sprite: ss_ttrs_03_rv2_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv2_nosnow, construction_state) { 3: sl_ttrs_03_rv2_nosnow_done; return sl_ttrs_03_rv2_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv2_nosnow, construction_state) { 0: sl_ttrs_03_rv2_nosnow_constr_g; 3: sl_ttrs_03_rv2_nosnow_done; return sl_ttrs_03_rv2_nosnow_constr; }
 
 spriteset(ss_ttrs_03_rv2_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv2_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
@@ -411,14 +434,16 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv2_snow, construction_state) { 3: sl_ttrs
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_03_rv2_snow; return sl_ttrs_03_rv2_nosnow; }
 
-spriteset(ss_ttrs_03_rv3_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv3_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 232, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv3_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[418, 232, 53, 74, -30, -45]  /* constr 0 */
 }
 spritelayout sl_ttrs_03_rv3_nosnow_constr {
-	ground   { sprite: ss_ttrs_03_rv3_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_03_rv3_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
+}
+spritelayout sl_ttrs_03_rv3_nosnow_constr_g {
+	ground   { sprite: 3924; }
 }
 spriteset(ss_ttrs_03_rv3_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[482, 232, 63, 74, -30, -45]  /* completed */
@@ -427,7 +452,7 @@ spritelayout sl_ttrs_03_rv3_nosnow_done {
 	ground   { sprite: ss_ttrs_03_rv3_nosnow_gd(0); }
 	building { sprite: ss_ttrs_03_rv3_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv3_nosnow, construction_state) { 3: sl_ttrs_03_rv3_nosnow_done; return sl_ttrs_03_rv3_nosnow_constr; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_03_rv3_nosnow, construction_state) { 0: sl_ttrs_03_rv3_nosnow_constr_g; 3: sl_ttrs_03_rv3_nosnow_done; return sl_ttrs_03_rv3_nosnow_constr; }
 
 spriteset(ss_ttrs_03_rv3_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
 spriteset(ss_ttrs_03_rv3_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [146, 1464, 64, 31, -31, 0] }
@@ -532,6 +557,9 @@ item (FEAT_HOUSES, item_ttrs_04_house_04, 204) {
 	}
 }
 
+spritelayout sl_ttrs_05_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_05_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[162, 328, 34, 42, -19, -25]  /* completed */
 }
@@ -539,8 +567,11 @@ spritelayout sl_ttrs_05_nosnow_done {
 	ground   { sprite: 1420; }
 	building { sprite: ss_ttrs_05_nosnow_done(0); xoffset: 3; yoffset: 3; xextent: 9; yextent: 9; zextent: 8; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_05_nosnow, construction_state) { 3: sl_ttrs_05_nosnow_done; return sl_ttrs_05_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_05_nosnow, construction_state) { 0: sl_ttrs_05_nosnow_constr_g; 1: sl_ttrs_05_nosnow_constr_g; 3: sl_ttrs_05_nosnow_done; return sl_ttrs_05_nosnow_done; }
 
+spritelayout sl_ttrs_05_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_05_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[674, 1464, 34, 42, -19, -25]  /* completed */
 }
@@ -548,7 +579,7 @@ spritelayout sl_ttrs_05_snow_done {
 	ground   { sprite: 4550; }
 	building { sprite: ss_ttrs_05_snow_done(0); xoffset: 3; yoffset: 3; xextent: 9; yextent: 9; zextent: 8; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_05_snow, construction_state) { 3: sl_ttrs_05_snow_done; return sl_ttrs_05_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_05_snow, construction_state) { 0: sl_ttrs_05_snow_constr_g; 1: sl_ttrs_05_snow_constr_g; 3: sl_ttrs_05_snow_done; return sl_ttrs_05_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_05, terrain_type) { TILETYPE_SNOW: sl_ttrs_05_snow; return sl_ttrs_05_nosnow; }
 
@@ -1194,6 +1225,9 @@ item (FEAT_HOUSES, item_ttrs_0d_library_planetarium, 213) {
 }
 
 spriteset(ss_ttrs_0E_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [130, 680, 64, 31, -31, 0] }
+spritelayout sl_ttrs_0E_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_0E_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[210, 680, 64, 71, -31, -40]  /* completed */
 }
@@ -1201,9 +1235,12 @@ spritelayout sl_ttrs_0E_nosnow_done {
 	ground   { sprite: ss_ttrs_0E_nosnow_gd(0); }
 	building { sprite: ss_ttrs_0E_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_0E_nosnow, construction_state) { 3: sl_ttrs_0E_nosnow_done; return sl_ttrs_0E_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_0E_nosnow, construction_state) { 0: sl_ttrs_0E_nosnow_constr_g; 3: sl_ttrs_0E_nosnow_done; return sl_ttrs_0E_nosnow_done; }
 
 spriteset(ss_ttrs_0E_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [498, 1736, 64, 31, -31, 0] }
+spritelayout sl_ttrs_0E_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_0E_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[578, 1736, 64, 71, -31, -40]  /* completed */
 }
@@ -1211,7 +1248,7 @@ spritelayout sl_ttrs_0E_snow_done {
 	ground   { sprite: ss_ttrs_0E_snow_gd(0); }
 	building { sprite: ss_ttrs_0E_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 70; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_0E_snow, construction_state) { 3: sl_ttrs_0E_snow_done; return sl_ttrs_0E_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_0E_snow, construction_state) { 0: sl_ttrs_0E_snow_constr_g; 3: sl_ttrs_0E_snow_done; return sl_ttrs_0E_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_0E, terrain_type) { TILETYPE_SNOW: sl_ttrs_0E_snow; return sl_ttrs_0E_nosnow; }
 
@@ -1430,6 +1467,9 @@ item (FEAT_HOUSES, item_ttrs_0f_prison, 215, HOUSE_SIZE_2X2) {
 }
 
 spriteset(ss_ttrs_13_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [610, 856, 64, 31, -31, 0] }
+spritelayout sl_ttrs_13_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_13_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[690, 856, 60, 59, -30, -29]  /* completed */
 }
@@ -1437,9 +1477,12 @@ spritelayout sl_ttrs_13_nosnow_done {
 	ground   { sprite: ss_ttrs_13_nosnow_gd(0); }
 	building { sprite: ss_ttrs_13_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_13_nosnow, construction_state) { 3: sl_ttrs_13_nosnow_done; return sl_ttrs_13_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_13_nosnow, construction_state) { 0: sl_ttrs_13_nosnow_constr_g; 3: sl_ttrs_13_nosnow_done; return sl_ttrs_13_nosnow_done; }
 
 spriteset(ss_ttrs_13_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [562, 1832, 64, 31, -31, 0] }
+spritelayout sl_ttrs_13_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_13_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[642, 1832, 60, 59, -30, -29]  /* completed */
 }
@@ -1447,7 +1490,7 @@ spritelayout sl_ttrs_13_snow_done {
 	ground   { sprite: ss_ttrs_13_snow_gd(0); }
 	building { sprite: ss_ttrs_13_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_13_snow, construction_state) { 3: sl_ttrs_13_snow_done; return sl_ttrs_13_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_13_snow, construction_state) { 0: sl_ttrs_13_snow_constr_g; 3: sl_ttrs_13_snow_done; return sl_ttrs_13_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_13, terrain_type) { TILETYPE_SNOW: sl_ttrs_13_snow; return sl_ttrs_13_nosnow; }
 
@@ -1670,6 +1713,14 @@ item (FEAT_HOUSES, item_ttrs_15_house_15, 221) {
 }
 
 spriteset(ss_ttrs_16_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [258, 1016, 64, 31, -31, 0] }
+spriteset(ss_ttrs_16_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[338, 1016, 64, 38, -31, -7]  /* constr 0 */
+	[418, 1016, 64, 69, -31, -38]  /* constr 1 */
+}
+spritelayout sl_ttrs_16_rv0_nosnow_constr {
+	ground   { sprite: 3924; }
+	building { sprite: ss_ttrs_16_rv0_nosnow_c(construction_state < 2 ? construction_state : 1); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
+}
 spriteset(ss_ttrs_16_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[498, 1016, 40, 92, -18, -71]  /* completed */
 }
@@ -1677,9 +1728,17 @@ spritelayout sl_ttrs_16_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_16_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_16_rv0_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv0_nosnow, construction_state) { 3: sl_ttrs_16_rv0_nosnow_done; return sl_ttrs_16_rv0_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv0_nosnow, construction_state) { 3: sl_ttrs_16_rv0_nosnow_done; return sl_ttrs_16_rv0_nosnow_constr; }
 
 spriteset(ss_ttrs_16_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [354, 1912, 64, 31, -31, 0] }
+spriteset(ss_ttrs_16_rv0_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[338, 1016, 64, 38, -31, -7]  /* constr 0 */
+	[418, 1016, 64, 69, -31, -38]  /* constr 1 */
+}
+spritelayout sl_ttrs_16_rv0_snow_constr {
+	ground   { sprite: 3924; }
+	building { sprite: ss_ttrs_16_rv0_snow_c(construction_state < 2 ? construction_state : 1); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
+}
 spriteset(ss_ttrs_16_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[434, 1912, 40, 92, -18, -71]  /* completed */
 }
@@ -1687,11 +1746,19 @@ spritelayout sl_ttrs_16_rv0_snow_done {
 	ground   { sprite: ss_ttrs_16_rv0_snow_gd(0); }
 	building { sprite: ss_ttrs_16_rv0_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv0_snow, construction_state) { 3: sl_ttrs_16_rv0_snow_done; return sl_ttrs_16_rv0_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv0_snow, construction_state) { 3: sl_ttrs_16_rv0_snow_done; return sl_ttrs_16_rv0_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_16_rv0_snow; return sl_ttrs_16_rv0_nosnow; }
 
 spriteset(ss_ttrs_16_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [258, 1016, 64, 31, -31, 0] }
+spriteset(ss_ttrs_16_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[338, 1016, 64, 38, -31, -7]  /* constr 0 */
+	[418, 1016, 64, 69, -31, -38]  /* constr 1 */
+}
+spritelayout sl_ttrs_16_rv1_nosnow_constr {
+	ground   { sprite: 3924; }
+	building { sprite: ss_ttrs_16_rv1_nosnow_c(construction_state < 2 ? construction_state : 1); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
+}
 spriteset(ss_ttrs_16_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[546, 1016, 49, 78, -18, -55]  /* completed */
 }
@@ -1699,9 +1766,17 @@ spritelayout sl_ttrs_16_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_16_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_16_rv1_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv1_nosnow, construction_state) { 3: sl_ttrs_16_rv1_nosnow_done; return sl_ttrs_16_rv1_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv1_nosnow, construction_state) { 3: sl_ttrs_16_rv1_nosnow_done; return sl_ttrs_16_rv1_nosnow_constr; }
 
 spriteset(ss_ttrs_16_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [354, 1912, 64, 31, -31, 0] }
+spriteset(ss_ttrs_16_rv1_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[338, 1016, 64, 38, -31, -7]  /* constr 0 */
+	[418, 1016, 64, 69, -31, -38]  /* constr 1 */
+}
+spritelayout sl_ttrs_16_rv1_snow_constr {
+	ground   { sprite: 3924; }
+	building { sprite: ss_ttrs_16_rv1_snow_c(construction_state < 2 ? construction_state : 1); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
+}
 spriteset(ss_ttrs_16_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[482, 1912, 49, 78, -18, -55]  /* completed */
 }
@@ -1709,7 +1784,7 @@ spritelayout sl_ttrs_16_rv1_snow_done {
 	ground   { sprite: ss_ttrs_16_rv1_snow_gd(0); }
 	building { sprite: ss_ttrs_16_rv1_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 90; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv1_snow, construction_state) { 3: sl_ttrs_16_rv1_snow_done; return sl_ttrs_16_rv1_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv1_snow, construction_state) { 3: sl_ttrs_16_rv1_snow_done; return sl_ttrs_16_rv1_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_16_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_16_rv1_snow; return sl_ttrs_16_rv1_nosnow; }
 
@@ -1915,6 +1990,9 @@ item (FEAT_HOUSES, item_ttrs_19_house_19, 225) {
 }
 
 spriteset(ss_ttrs_1A_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [322, 1288, 64, 31, -31, 0] }
+spritelayout sl_ttrs_1A_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_1A_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[402, 1288, 61, 60, -30, -30]  /* completed */
 }
@@ -1922,9 +2000,12 @@ spritelayout sl_ttrs_1A_nosnow_done {
 	ground   { sprite: ss_ttrs_1A_nosnow_gd(0); }
 	building { sprite: ss_ttrs_1A_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_1A_nosnow, construction_state) { 3: sl_ttrs_1A_nosnow_done; return sl_ttrs_1A_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_1A_nosnow, construction_state) { 0: sl_ttrs_1A_nosnow_constr_g; 3: sl_ttrs_1A_nosnow_done; return sl_ttrs_1A_nosnow_done; }
 
 spriteset(ss_ttrs_1A_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [226, 2072, 64, 31, -31, 0] }
+spritelayout sl_ttrs_1A_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_1A_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[306, 2072, 61, 60, -30, -30]  /* completed */
 }
@@ -1932,7 +2013,7 @@ spritelayout sl_ttrs_1A_snow_done {
 	ground   { sprite: ss_ttrs_1A_snow_gd(0); }
 	building { sprite: ss_ttrs_1A_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_1A_snow, construction_state) { 3: sl_ttrs_1A_snow_done; return sl_ttrs_1A_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_1A_snow, construction_state) { 0: sl_ttrs_1A_snow_constr_g; 3: sl_ttrs_1A_snow_done; return sl_ttrs_1A_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1A, terrain_type) { TILETYPE_SNOW: sl_ttrs_1A_snow; return sl_ttrs_1A_nosnow; }
 
@@ -1954,6 +2035,9 @@ item (FEAT_HOUSES, item_ttrs_1a_house_1a, 226) {
 }
 
 spriteset(ss_ttrs_1B_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [482, 1288, 64, 31, -31, 0] }
+spritelayout sl_ttrs_1B_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_1B_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[562, 1288, 58, 67, -28, -37]  /* completed */
 }
@@ -1961,9 +2045,12 @@ spritelayout sl_ttrs_1B_nosnow_done {
 	ground   { sprite: ss_ttrs_1B_nosnow_gd(0); }
 	building { sprite: ss_ttrs_1B_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 67; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_1B_nosnow, construction_state) { 3: sl_ttrs_1B_nosnow_done; return sl_ttrs_1B_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_1B_nosnow, construction_state) { 0: sl_ttrs_1B_nosnow_constr_g; 3: sl_ttrs_1B_nosnow_done; return sl_ttrs_1B_nosnow_done; }
 
 spriteset(ss_ttrs_1B_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [386, 2072, 64, 31, -31, 0] }
+spritelayout sl_ttrs_1B_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_1B_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[466, 2072, 58, 67, -28, -37]  /* completed */
 }
@@ -1971,7 +2058,7 @@ spritelayout sl_ttrs_1B_snow_done {
 	ground   { sprite: ss_ttrs_1B_snow_gd(0); }
 	building { sprite: ss_ttrs_1B_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 67; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_1B_snow, construction_state) { 3: sl_ttrs_1B_snow_done; return sl_ttrs_1B_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_1B_snow, construction_state) { 0: sl_ttrs_1B_snow_constr_g; 3: sl_ttrs_1B_snow_done; return sl_ttrs_1B_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1B, terrain_type) { TILETYPE_SNOW: sl_ttrs_1B_snow; return sl_ttrs_1B_nosnow; }
 
@@ -2051,6 +2138,9 @@ item (FEAT_HOUSES, item_ttrs_1c_house_1c, 228) {
 }
 
 spriteset(ss_ttrs_1D_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [130, 1384, 64, 31, -31, 0] }
+spritelayout sl_ttrs_1D_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_1D_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[210, 1384, 24, 59, -11, -38]  /* completed */
 }
@@ -2058,9 +2148,12 @@ spritelayout sl_ttrs_1D_nosnow_done {
 	ground   { sprite: ss_ttrs_1D_nosnow_gd(0); }
 	building { sprite: ss_ttrs_1D_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_1D_nosnow, construction_state) { 3: sl_ttrs_1D_nosnow_done; return sl_ttrs_1D_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_1D_nosnow, construction_state) { 0: sl_ttrs_1D_nosnow_constr_g; 3: sl_ttrs_1D_nosnow_done; return sl_ttrs_1D_nosnow_done; }
 
 spriteset(ss_ttrs_1D_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [674, 2072, 64, 31, -31, 0] }
+spritelayout sl_ttrs_1D_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_1D_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[754, 2072, 24, 59, -11, -38]  /* completed */
 }
@@ -2068,9 +2161,12 @@ spritelayout sl_ttrs_1D_snow_done {
 	ground   { sprite: ss_ttrs_1D_snow_gd(0); }
 	building { sprite: ss_ttrs_1D_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_1D_snow, construction_state) { 3: sl_ttrs_1D_snow_done; return sl_ttrs_1D_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_1D_snow, construction_state) { 0: sl_ttrs_1D_snow_constr_g; 3: sl_ttrs_1D_snow_done; return sl_ttrs_1D_snow_done; }
 
 spriteset(ss_ttrs_1D_arctic_gd, "src/sprites/pcx/ttrs3w.pcx") { [82, 2296, 64, 31, -31, 0] }
+spritelayout sl_ttrs_1D_arctic_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_1D_arctic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[210, 1384, 24, 59, -11, -38]  /* completed */
 }
@@ -2078,7 +2174,7 @@ spritelayout sl_ttrs_1D_arctic_done {
 	ground   { sprite: ss_ttrs_1D_arctic_gd(0); }
 	building { sprite: ss_ttrs_1D_arctic_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_1D_arctic, construction_state) { 3: sl_ttrs_1D_arctic_done; return sl_ttrs_1D_arctic_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_1D_arctic, construction_state) { 0: sl_ttrs_1D_arctic_constr_g; 3: sl_ttrs_1D_arctic_done; return sl_ttrs_1D_arctic_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_1D_clisw, var[0x03, 0, 0xFF]) { 1: sl_ttrs_1D_arctic; return sl_ttrs_1D_nosnow; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_1D, terrain_type) { TILETYPE_SNOW: sl_ttrs_1D_snow; return sl_ttrs_1D_clisw; }
@@ -3191,6 +3287,9 @@ item (FEAT_HOUSES, item_ttrs_2c_house_2c, 244) {
 }
 
 spriteset(ss_ttrs_2D_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [562, 3240, 64, 31, -31, 0] }
+spritelayout sl_ttrs_2D_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_2D_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[642, 3240, 59, 83, -29, -60]  /* completed */
 }
@@ -3198,9 +3297,12 @@ spritelayout sl_ttrs_2D_nosnow_done {
 	ground   { sprite: ss_ttrs_2D_nosnow_gd(0); }
 	building { sprite: ss_ttrs_2D_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 80; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_2D_nosnow, construction_state) { 3: sl_ttrs_2D_nosnow_done; return sl_ttrs_2D_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_2D_nosnow, construction_state) { 0: sl_ttrs_2D_nosnow_constr_g; 3: sl_ttrs_2D_nosnow_done; return sl_ttrs_2D_nosnow_done; }
 
 spriteset(ss_ttrs_2D_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [66, 4520, 64, 31, -31, 0] }
+spritelayout sl_ttrs_2D_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_2D_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[146, 4520, 59, 83, -29, -60]  /* completed */
 }
@@ -3208,9 +3310,12 @@ spritelayout sl_ttrs_2D_snow_done {
 	ground   { sprite: ss_ttrs_2D_snow_gd(0); }
 	building { sprite: ss_ttrs_2D_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 80; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_2D_snow, construction_state) { 3: sl_ttrs_2D_snow_done; return sl_ttrs_2D_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_2D_snow, construction_state) { 0: sl_ttrs_2D_snow_constr_g; 3: sl_ttrs_2D_snow_done; return sl_ttrs_2D_snow_done; }
 
 spriteset(ss_ttrs_2D_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [562, 4904, 64, 31, -31, 0] }
+spritelayout sl_ttrs_2D_tropic_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_2D_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[642, 4904, 59, 83, -29, -60]  /* completed */
 }
@@ -3218,7 +3323,7 @@ spritelayout sl_ttrs_2D_tropic_done {
 	ground   { sprite: ss_ttrs_2D_tropic_gd(0); }
 	building { sprite: ss_ttrs_2D_tropic_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 80; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_2D_tropic, construction_state) { 3: sl_ttrs_2D_tropic_done; return sl_ttrs_2D_tropic_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_2D_tropic, construction_state) { 0: sl_ttrs_2D_tropic_constr_g; 3: sl_ttrs_2D_tropic_done; return sl_ttrs_2D_tropic_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_2D, terrain_type) { TILETYPE_SNOW: sl_ttrs_2D_snow; TILETYPE_DESERT: sl_ttrs_2D_tropic; return sl_ttrs_2D_nosnow; }
 
@@ -3245,11 +3350,13 @@ item (FEAT_HOUSES, item_ttrs_2d_park_avenue_1457, 245) {
 spriteset(ss_ttrs_2E_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 3240, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[162, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[162, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv0_nosnow_constr {
 	ground   { sprite: ss_ttrs_2E_rv0_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv0_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv0_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[482, 3400, 60, 56, -29, -25]  /* completed */
@@ -3263,11 +3370,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv0_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2E_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [210, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv0_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[162, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[162, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv0_snow_constr {
 	ground   { sprite: ss_ttrs_2E_rv0_snow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv0_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv0_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[290, 4520, 60, 56, -29, -25]  /* completed */
@@ -3281,11 +3390,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv0_snow, construction_state) { 3: sl_ttrs
 spriteset(ss_ttrs_2E_rv0_tropic_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv0_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 4904, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv0_tropic_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[162, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[162, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv0_tropic_constr {
 	ground   { sprite: ss_ttrs_2E_rv0_tropic_gc(0); }
-	building { sprite: ss_ttrs_2E_rv0_tropic_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv0_tropic_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv0_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[482, 3400, 60, 56, -29, -25]  /* completed */
@@ -3301,11 +3412,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv0, terrain_type) { TILETYPE_SNOW: sl_ttr
 spriteset(ss_ttrs_2E_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 3240, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[242, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[242, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv1_nosnow_constr {
 	ground   { sprite: ss_ttrs_2E_rv1_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv1_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv1_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[562, 3400, 60, 55, -29, -25]  /* completed */
@@ -3319,11 +3432,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv1_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2E_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [210, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv1_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[242, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[242, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv1_snow_constr {
 	ground   { sprite: ss_ttrs_2E_rv1_snow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv1_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv1_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[370, 4520, 60, 55, -29, -25]  /* completed */
@@ -3337,11 +3452,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv1_snow, construction_state) { 3: sl_ttrs
 spriteset(ss_ttrs_2E_rv1_tropic_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv1_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 4904, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv1_tropic_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[242, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[242, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv1_tropic_constr {
 	ground   { sprite: ss_ttrs_2E_rv1_tropic_gc(0); }
-	building { sprite: ss_ttrs_2E_rv1_tropic_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv1_tropic_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv1_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[562, 3400, 60, 55, -29, -25]  /* completed */
@@ -3357,11 +3474,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 spriteset(ss_ttrs_2E_rv2_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv2_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 3240, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv2_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[322, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[322, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv2_nosnow_constr {
 	ground   { sprite: ss_ttrs_2E_rv2_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv2_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv2_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv2_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[642, 3400, 60, 56, -29, -25]  /* completed */
@@ -3375,11 +3494,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv2_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2E_rv2_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv2_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [210, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv2_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[322, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[322, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv2_snow_constr {
 	ground   { sprite: ss_ttrs_2E_rv2_snow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv2_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv2_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv2_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[450, 4520, 60, 56, -29, -25]  /* completed */
@@ -3393,11 +3514,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv2_snow, construction_state) { 3: sl_ttrs
 spriteset(ss_ttrs_2E_rv2_tropic_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv2_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 4904, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv2_tropic_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[322, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[322, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv2_tropic_constr {
 	ground   { sprite: ss_ttrs_2E_rv2_tropic_gc(0); }
-	building { sprite: ss_ttrs_2E_rv2_tropic_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv2_tropic_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv2_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[642, 3400, 60, 56, -29, -25]  /* completed */
@@ -3413,11 +3536,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv2, terrain_type) { TILETYPE_SNOW: sl_ttr
 spriteset(ss_ttrs_2E_rv3_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv3_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 3240, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv3_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[402, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[402, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv3_nosnow_constr {
 	ground   { sprite: ss_ttrs_2E_rv3_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv3_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv3_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv3_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[722, 3400, 60, 56, -29, -25]  /* completed */
@@ -3431,11 +3556,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv3_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2E_rv3_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv3_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [210, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv3_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[402, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[402, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv3_snow_constr {
 	ground   { sprite: ss_ttrs_2E_rv3_snow_gc(0); }
-	building { sprite: ss_ttrs_2E_rv3_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv3_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv3_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[530, 4520, 60, 56, -29, -25]  /* completed */
@@ -3449,11 +3576,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2E_rv3_snow, construction_state) { 3: sl_ttrs
 spriteset(ss_ttrs_2E_rv3_tropic_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv3_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 4904, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2E_rv3_tropic_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[402, 3400, 60, 75, -29, -44]  /* constr 0 */
+	[2, 3400, 62, 75, -31, -44]  /* constr 0 */
+	[82, 3400, 60, 75, -29, -44]  /* constr 1 */
+	[402, 3400, 60, 75, -29, -44]  /* constr 2 */
 }
 spritelayout sl_ttrs_2E_rv3_tropic_constr {
 	ground   { sprite: ss_ttrs_2E_rv3_tropic_gc(0); }
-	building { sprite: ss_ttrs_2E_rv3_tropic_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
+	building { sprite: ss_ttrs_2E_rv3_tropic_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
 spriteset(ss_ttrs_2E_rv3_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[722, 3400, 60, 56, -29, -25]  /* completed */
@@ -3471,11 +3600,13 @@ random_switch (FEAT_HOUSES, SELF, sl_ttrs_2E) { 1: sl_ttrs_2E_rv0; 1: sl_ttrs_2E
 spriteset(ss_ttrs_2F_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [2, 3496, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[226, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[226, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv0_nosnow_constr {
 	ground   { sprite: ss_ttrs_2F_rv0_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv0_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv0_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[546, 3496, 60, 59, -30, -30]  /* completed */
@@ -3489,11 +3620,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv0_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2F_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [610, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv0_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[226, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[226, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv0_snow_constr {
 	ground   { sprite: ss_ttrs_2F_rv0_snow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv0_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv0_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[690, 4520, 60, 59, -30, -30]  /* completed */
@@ -3509,11 +3642,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv0, terrain_type) { TILETYPE_SNOW: sl_ttr
 spriteset(ss_ttrs_2F_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [2, 3496, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[306, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[306, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv1_nosnow_constr {
 	ground   { sprite: ss_ttrs_2F_rv1_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv1_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv1_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[626, 3496, 60, 59, -30, -30]  /* completed */
@@ -3527,11 +3662,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv1_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2F_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [610, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv1_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[306, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[306, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv1_snow_constr {
 	ground   { sprite: ss_ttrs_2F_rv1_snow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv1_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv1_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 4616, 60, 59, -30, -30]  /* completed */
@@ -3547,11 +3684,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv1, terrain_type) { TILETYPE_SNOW: sl_ttr
 spriteset(ss_ttrs_2F_rv2_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv2_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [2, 3496, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv2_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[386, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[386, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv2_nosnow_constr {
 	ground   { sprite: ss_ttrs_2F_rv2_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv2_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv2_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv2_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[706, 3496, 60, 59, -30, -30]  /* completed */
@@ -3565,11 +3704,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv2_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2F_rv2_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv2_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [610, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv2_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[386, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[386, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv2_snow_constr {
 	ground   { sprite: ss_ttrs_2F_rv2_snow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv2_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv2_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv2_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[82, 4616, 60, 59, -30, -30]  /* completed */
@@ -3585,11 +3726,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv2, terrain_type) { TILETYPE_SNOW: sl_ttr
 spriteset(ss_ttrs_2F_rv3_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv3_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [2, 3496, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv3_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[466, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[466, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv3_nosnow_constr {
 	ground   { sprite: ss_ttrs_2F_rv3_nosnow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv3_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv3_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv3_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 3576, 60, 59, -30, -30]  /* completed */
@@ -3603,11 +3746,13 @@ switch (FEAT_HOUSES, SELF, sl_ttrs_2F_rv3_nosnow, construction_state) { 3: sl_tt
 spriteset(ss_ttrs_2F_rv3_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv3_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [610, 4520, 64, 31, -31, 0] }
 spriteset(ss_ttrs_2F_rv3_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
-	[466, 3496, 61, 64, -31, -37]  /* constr 0 */
+	[82, 3496, 55, 66, -31, -37]  /* constr 0 */
+	[146, 3496, 61, 64, -31, -37]  /* constr 1 */
+	[466, 3496, 61, 64, -31, -37]  /* constr 2 */
 }
 spritelayout sl_ttrs_2F_rv3_snow_constr {
 	ground   { sprite: ss_ttrs_2F_rv3_snow_gc(0); }
-	building { sprite: ss_ttrs_2F_rv3_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
+	building { sprite: ss_ttrs_2F_rv3_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 66; }
 }
 spriteset(ss_ttrs_2F_rv3_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[162, 4616, 60, 59, -30, -30]  /* completed */
@@ -3819,7 +3964,16 @@ item (FEAT_HOUSES, item_ttrs_32_house_32, 250) {
 	}
 }
 
+spriteset(ss_ttrs_33_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_33_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [530, 3720, 64, 31, -31, 0] }
+spriteset(ss_ttrs_33_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 3720, 64, 38, -31, -7]  /* constr 0 */
+	[690, 3720, 64, 85, -31, -54]  /* constr 1 */
+}
+spritelayout sl_ttrs_33_rv0_nosnow_constr {
+	ground   { sprite: ss_ttrs_33_rv0_nosnow_gc(0); }
+	building { sprite: ss_ttrs_33_rv0_nosnow_c(construction_state < 2 ? construction_state : 1); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_33_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 3816, 46, 105, -21, -84]  /* completed */
 }
@@ -3827,9 +3981,18 @@ spritelayout sl_ttrs_33_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_33_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_33_rv0_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 105; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv0_nosnow, construction_state) { 3: sl_ttrs_33_rv0_nosnow_done; return sl_ttrs_33_rv0_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv0_nosnow, construction_state) { 3: sl_ttrs_33_rv0_nosnow_done; return sl_ttrs_33_rv0_nosnow_constr; }
 
+spriteset(ss_ttrs_33_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_33_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [690, 4616, 64, 31, -31, 0] }
+spriteset(ss_ttrs_33_rv0_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 3720, 64, 38, -31, -7]  /* constr 0 */
+	[690, 3720, 64, 85, -31, -54]  /* constr 1 */
+}
+spritelayout sl_ttrs_33_rv0_snow_constr {
+	ground   { sprite: ss_ttrs_33_rv0_snow_gc(0); }
+	building { sprite: ss_ttrs_33_rv0_snow_c(construction_state < 2 ? construction_state : 1); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_33_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 4760, 46, 105, -21, -84]  /* completed */
 }
@@ -3837,11 +4000,20 @@ spritelayout sl_ttrs_33_rv0_snow_done {
 	ground   { sprite: ss_ttrs_33_rv0_snow_gd(0); }
 	building { sprite: ss_ttrs_33_rv0_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 105; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv0_snow, construction_state) { 3: sl_ttrs_33_rv0_snow_done; return sl_ttrs_33_rv0_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv0_snow, construction_state) { 3: sl_ttrs_33_rv0_snow_done; return sl_ttrs_33_rv0_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_33_rv0_snow; return sl_ttrs_33_rv0_nosnow; }
 
+spriteset(ss_ttrs_33_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_33_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [530, 3720, 64, 31, -31, 0] }
+spriteset(ss_ttrs_33_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 3720, 64, 38, -31, -7]  /* constr 0 */
+	[690, 3720, 64, 85, -31, -54]  /* constr 1 */
+}
+spritelayout sl_ttrs_33_rv1_nosnow_constr {
+	ground   { sprite: ss_ttrs_33_rv1_nosnow_gc(0); }
+	building { sprite: ss_ttrs_33_rv1_nosnow_c(construction_state < 2 ? construction_state : 1); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_33_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[66, 3816, 40, 92, -18, -71]  /* completed */
 }
@@ -3849,9 +4021,18 @@ spritelayout sl_ttrs_33_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_33_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_33_rv1_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 95; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv1_nosnow, construction_state) { 3: sl_ttrs_33_rv1_nosnow_done; return sl_ttrs_33_rv1_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv1_nosnow, construction_state) { 3: sl_ttrs_33_rv1_nosnow_done; return sl_ttrs_33_rv1_nosnow_constr; }
 
+spriteset(ss_ttrs_33_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [530, 2440, 64, 31, -31, 0] }
 spriteset(ss_ttrs_33_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [690, 4616, 64, 31, -31, 0] }
+spriteset(ss_ttrs_33_rv1_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 3720, 64, 38, -31, -7]  /* constr 0 */
+	[690, 3720, 64, 85, -31, -54]  /* constr 1 */
+}
+spritelayout sl_ttrs_33_rv1_snow_constr {
+	ground   { sprite: ss_ttrs_33_rv1_snow_gc(0); }
+	building { sprite: ss_ttrs_33_rv1_snow_c(construction_state < 2 ? construction_state : 1); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_33_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[66, 4760, 40, 92, -18, -71]  /* completed */
 }
@@ -3859,7 +4040,7 @@ spritelayout sl_ttrs_33_rv1_snow_done {
 	ground   { sprite: ss_ttrs_33_rv1_snow_gd(0); }
 	building { sprite: ss_ttrs_33_rv1_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 95; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv1_snow, construction_state) { 3: sl_ttrs_33_rv1_snow_done; return sl_ttrs_33_rv1_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv1_snow, construction_state) { 3: sl_ttrs_33_rv1_snow_done; return sl_ttrs_33_rv1_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_33_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_33_rv1_snow; return sl_ttrs_33_rv1_nosnow; }
 
@@ -3944,6 +4125,9 @@ item (FEAT_HOUSES, item_ttrs_34_house_34, 252) {
 }
 
 spriteset(ss_ttrs_35_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [482, 3816, 64, 31, -31, 0] }
+spritelayout sl_ttrs_35_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_35_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[562, 3816, 64, 60, -31, -29]  /* completed */
 }
@@ -3951,9 +4135,12 @@ spritelayout sl_ttrs_35_nosnow_done {
 	ground   { sprite: ss_ttrs_35_nosnow_gd(0); }
 	building { sprite: ss_ttrs_35_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_35_nosnow, construction_state) { 3: sl_ttrs_35_nosnow_done; return sl_ttrs_35_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_35_nosnow, construction_state) { 0: sl_ttrs_35_nosnow_constr_g; 3: sl_ttrs_35_nosnow_done; return sl_ttrs_35_nosnow_done; }
 
 spriteset(ss_ttrs_35_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [258, 4760, 64, 31, -31, 0] }
+spritelayout sl_ttrs_35_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_35_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[338, 4760, 64, 60, -31, -29]  /* completed */
 }
@@ -3961,9 +4148,12 @@ spritelayout sl_ttrs_35_snow_done {
 	ground   { sprite: ss_ttrs_35_snow_gd(0); }
 	building { sprite: ss_ttrs_35_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_35_snow, construction_state) { 3: sl_ttrs_35_snow_done; return sl_ttrs_35_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_35_snow, construction_state) { 0: sl_ttrs_35_snow_constr_g; 3: sl_ttrs_35_snow_done; return sl_ttrs_35_snow_done; }
 
 spriteset(ss_ttrs_35_arctic_gd, "src/sprites/pcx/ttrs3w.pcx") { [82, 5000, 64, 31, -31, 0] }
+spritelayout sl_ttrs_35_arctic_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_35_arctic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[562, 3816, 64, 60, -31, -29]  /* completed */
 }
@@ -3971,7 +4161,7 @@ spritelayout sl_ttrs_35_arctic_done {
 	ground   { sprite: ss_ttrs_35_arctic_gd(0); }
 	building { sprite: ss_ttrs_35_arctic_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_35_arctic, construction_state) { 3: sl_ttrs_35_arctic_done; return sl_ttrs_35_arctic_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_35_arctic, construction_state) { 0: sl_ttrs_35_arctic_constr_g; 3: sl_ttrs_35_arctic_done; return sl_ttrs_35_arctic_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_35_clisw, var[0x03, 0, 0xFF]) { 1: sl_ttrs_35_arctic; return sl_ttrs_35_nosnow; }
 switch (FEAT_HOUSES, SELF, sl_ttrs_35, terrain_type) { TILETYPE_SNOW: sl_ttrs_35_snow; return sl_ttrs_35_clisw; }
@@ -4166,6 +4356,9 @@ item (FEAT_HOUSES, item_ttrs_37_house_37, 255) {
 }
 
 spriteset(ss_ttrs_38_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [482, 5144, 64, 31, -31, 0] }
+spritelayout sl_ttrs_38_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_38_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[562, 5144, 63, 58, -30, -29]  /* completed */
 }
@@ -4173,9 +4366,12 @@ spritelayout sl_ttrs_38_nosnow_done {
 	ground   { sprite: ss_ttrs_38_nosnow_gd(0); }
 	building { sprite: ss_ttrs_38_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_38_nosnow, construction_state) { 3: sl_ttrs_38_nosnow_done; return sl_ttrs_38_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_38_nosnow, construction_state) { 0: sl_ttrs_38_nosnow_constr_g; 3: sl_ttrs_38_nosnow_done; return sl_ttrs_38_nosnow_done; }
 
 spriteset(ss_ttrs_38_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [546, 7048, 64, 31, -31, 0] }
+spritelayout sl_ttrs_38_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_38_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[626, 7048, 63, 58, -30, -29]  /* completed */
 }
@@ -4183,7 +4379,7 @@ spritelayout sl_ttrs_38_snow_done {
 	ground   { sprite: ss_ttrs_38_snow_gd(0); }
 	building { sprite: ss_ttrs_38_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_38_snow, construction_state) { 3: sl_ttrs_38_snow_done; return sl_ttrs_38_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_38_snow, construction_state) { 0: sl_ttrs_38_snow_constr_g; 3: sl_ttrs_38_snow_done; return sl_ttrs_38_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_38, terrain_type) { TILETYPE_SNOW: sl_ttrs_38_snow; return sl_ttrs_38_nosnow; }
 
@@ -4203,7 +4399,17 @@ item (FEAT_HOUSES, item_ttrs_38_house_38, 256) {
 	}
 }
 
+spriteset(ss_ttrs_39_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 5144, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv0_nosnow_constr {
+	ground   { sprite: ss_ttrs_39_rv0_nosnow_gc(0); }
+	building { sprite: ss_ttrs_39_rv0_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[146, 5224, 42, 70, -13, -37]  /* completed */
 }
@@ -4211,9 +4417,19 @@ spritelayout sl_ttrs_39_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_39_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_39_rv0_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv0_nosnow, construction_state) { 3: sl_ttrs_39_rv0_nosnow_done; return sl_ttrs_39_rv0_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv0_nosnow, construction_state) { 3: sl_ttrs_39_rv0_nosnow_done; return sl_ttrs_39_rv0_nosnow_constr; }
 
+spriteset(ss_ttrs_39_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 7048, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv0_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv0_snow_constr {
+	ground   { sprite: ss_ttrs_39_rv0_snow_gc(0); }
+	building { sprite: ss_ttrs_39_rv0_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 7224, 42, 70, -13, -37]  /* completed */
 }
@@ -4221,11 +4437,21 @@ spritelayout sl_ttrs_39_rv0_snow_done {
 	ground   { sprite: ss_ttrs_39_rv0_snow_gd(0); }
 	building { sprite: ss_ttrs_39_rv0_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv0_snow, construction_state) { 3: sl_ttrs_39_rv0_snow_done; return sl_ttrs_39_rv0_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv0_snow, construction_state) { 3: sl_ttrs_39_rv0_snow_done; return sl_ttrs_39_rv0_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_39_rv0_snow; return sl_ttrs_39_rv0_nosnow; }
 
+spriteset(ss_ttrs_39_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 5144, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv1_nosnow_constr {
+	ground   { sprite: ss_ttrs_39_rv1_nosnow_gc(0); }
+	building { sprite: ss_ttrs_39_rv1_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[194, 5224, 42, 61, -13, -37]  /* completed */
 }
@@ -4233,9 +4459,19 @@ spritelayout sl_ttrs_39_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_39_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_39_rv1_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv1_nosnow, construction_state) { 3: sl_ttrs_39_rv1_nosnow_done; return sl_ttrs_39_rv1_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv1_nosnow, construction_state) { 3: sl_ttrs_39_rv1_nosnow_done; return sl_ttrs_39_rv1_nosnow_constr; }
 
+spriteset(ss_ttrs_39_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 7048, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv1_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv1_snow_constr {
+	ground   { sprite: ss_ttrs_39_rv1_snow_gc(0); }
+	building { sprite: ss_ttrs_39_rv1_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[50, 7224, 42, 61, -13, -37]  /* completed */
 }
@@ -4243,11 +4479,21 @@ spritelayout sl_ttrs_39_rv1_snow_done {
 	ground   { sprite: ss_ttrs_39_rv1_snow_gd(0); }
 	building { sprite: ss_ttrs_39_rv1_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv1_snow, construction_state) { 3: sl_ttrs_39_rv1_snow_done; return sl_ttrs_39_rv1_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv1_snow, construction_state) { 3: sl_ttrs_39_rv1_snow_done; return sl_ttrs_39_rv1_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_39_rv1_snow; return sl_ttrs_39_rv1_nosnow; }
 
+spriteset(ss_ttrs_39_rv2_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv2_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 5144, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv2_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv2_nosnow_constr {
+	ground   { sprite: ss_ttrs_39_rv2_nosnow_gc(0); }
+	building { sprite: ss_ttrs_39_rv2_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv2_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[242, 5224, 42, 70, -13, -37]  /* completed */
 }
@@ -4255,9 +4501,19 @@ spritelayout sl_ttrs_39_rv2_nosnow_done {
 	ground   { sprite: ss_ttrs_39_rv2_nosnow_gd(0); }
 	building { sprite: ss_ttrs_39_rv2_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv2_nosnow, construction_state) { 3: sl_ttrs_39_rv2_nosnow_done; return sl_ttrs_39_rv2_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv2_nosnow, construction_state) { 3: sl_ttrs_39_rv2_nosnow_done; return sl_ttrs_39_rv2_nosnow_constr; }
 
+spriteset(ss_ttrs_39_rv2_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv2_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 7048, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv2_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv2_snow_constr {
+	ground   { sprite: ss_ttrs_39_rv2_snow_gc(0); }
+	building { sprite: ss_ttrs_39_rv2_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv2_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[98, 7224, 42, 70, -13, -37]  /* completed */
 }
@@ -4265,11 +4521,21 @@ spritelayout sl_ttrs_39_rv2_snow_done {
 	ground   { sprite: ss_ttrs_39_rv2_snow_gd(0); }
 	building { sprite: ss_ttrs_39_rv2_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv2_snow, construction_state) { 3: sl_ttrs_39_rv2_snow_done; return sl_ttrs_39_rv2_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv2_snow, construction_state) { 3: sl_ttrs_39_rv2_snow_done; return sl_ttrs_39_rv2_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_39_rv2_snow; return sl_ttrs_39_rv2_nosnow; }
 
+spriteset(ss_ttrs_39_rv3_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv3_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [642, 5144, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv3_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv3_nosnow_constr {
+	ground   { sprite: ss_ttrs_39_rv3_nosnow_gc(0); }
+	building { sprite: ss_ttrs_39_rv3_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv3_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[290, 5224, 42, 68, -13, -37]  /* completed */
 }
@@ -4277,9 +4543,19 @@ spritelayout sl_ttrs_39_rv3_nosnow_done {
 	ground   { sprite: ss_ttrs_39_rv3_nosnow_gd(0); }
 	building { sprite: ss_ttrs_39_rv3_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3_nosnow, construction_state) { 3: sl_ttrs_39_rv3_nosnow_done; return sl_ttrs_39_rv3_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3_nosnow, construction_state) { 3: sl_ttrs_39_rv3_nosnow_done; return sl_ttrs_39_rv3_nosnow_constr; }
 
+spriteset(ss_ttrs_39_rv3_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_39_rv3_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 7048, 64, 31, -31, 0] }
+spriteset(ss_ttrs_39_rv3_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[722, 5144, 60, 38, -31, -8]  /* constr 0 */
+	[2, 5224, 60, 54, -31, -22]  /* constr 1 */
+	[82, 5224, 58, 77, -29, -43]  /* constr 2 */
+}
+spritelayout sl_ttrs_39_rv3_snow_constr {
+	ground   { sprite: ss_ttrs_39_rv3_snow_gc(0); }
+	building { sprite: ss_ttrs_39_rv3_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
+}
 spriteset(ss_ttrs_39_rv3_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[146, 7224, 42, 68, -13, -37]  /* completed */
 }
@@ -4287,13 +4563,23 @@ spritelayout sl_ttrs_39_rv3_snow_done {
 	ground   { sprite: ss_ttrs_39_rv3_snow_gd(0); }
 	building { sprite: ss_ttrs_39_rv3_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 65; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3_snow, construction_state) { 3: sl_ttrs_39_rv3_snow_done; return sl_ttrs_39_rv3_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3_snow, construction_state) { 3: sl_ttrs_39_rv3_snow_done; return sl_ttrs_39_rv3_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_39_rv3, terrain_type) { TILETYPE_SNOW: sl_ttrs_39_rv3_snow; return sl_ttrs_39_rv3_nosnow; }
 
 random_switch (FEAT_HOUSES, SELF, sl_ttrs_39, TRIGGER_HOUSE_TOP_TILELOOP) { 1: sl_ttrs_39_rv0; 1: sl_ttrs_39_rv1; 1: sl_ttrs_39_rv2; 1: sl_ttrs_39_rv3; }
 
+spriteset(ss_ttrs_3A_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [338, 5224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv0_nosnow_constr {
+	ground   { sprite: ss_ttrs_3A_rv0_nosnow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv0_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[626, 5224, 47, 47, -28, -25]  /* completed */
 }
@@ -4301,9 +4587,19 @@ spritelayout sl_ttrs_3A_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_3A_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv0_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv0_nosnow, construction_state) { 3: sl_ttrs_3A_rv0_nosnow_done; return sl_ttrs_3A_rv0_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv0_nosnow, construction_state) { 3: sl_ttrs_3A_rv0_nosnow_done; return sl_ttrs_3A_rv0_nosnow_constr; }
 
+spriteset(ss_ttrs_3A_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 7224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv0_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv0_snow_constr {
+	ground   { sprite: ss_ttrs_3A_rv0_snow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv0_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[274, 7224, 47, 47, -28, -25]  /* completed */
 }
@@ -4311,11 +4607,21 @@ spritelayout sl_ttrs_3A_rv0_snow_done {
 	ground   { sprite: ss_ttrs_3A_rv0_snow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv0_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv0_snow, construction_state) { 3: sl_ttrs_3A_rv0_snow_done; return sl_ttrs_3A_rv0_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv0_snow, construction_state) { 3: sl_ttrs_3A_rv0_snow_done; return sl_ttrs_3A_rv0_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_3A_rv0_snow; return sl_ttrs_3A_rv0_nosnow; }
 
+spriteset(ss_ttrs_3A_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [338, 5224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv1_nosnow_constr {
+	ground   { sprite: ss_ttrs_3A_rv1_nosnow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv1_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[690, 5224, 45, 49, -26, -25]  /* completed */
 }
@@ -4323,9 +4629,19 @@ spritelayout sl_ttrs_3A_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_3A_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv1_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv1_nosnow, construction_state) { 3: sl_ttrs_3A_rv1_nosnow_done; return sl_ttrs_3A_rv1_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv1_nosnow, construction_state) { 3: sl_ttrs_3A_rv1_nosnow_done; return sl_ttrs_3A_rv1_nosnow_constr; }
 
+spriteset(ss_ttrs_3A_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 7224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv1_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv1_snow_constr {
+	ground   { sprite: ss_ttrs_3A_rv1_snow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv1_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[338, 7224, 45, 49, -26, -25]  /* completed */
 }
@@ -4333,11 +4649,21 @@ spritelayout sl_ttrs_3A_rv1_snow_done {
 	ground   { sprite: ss_ttrs_3A_rv1_snow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv1_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv1_snow, construction_state) { 3: sl_ttrs_3A_rv1_snow_done; return sl_ttrs_3A_rv1_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv1_snow, construction_state) { 3: sl_ttrs_3A_rv1_snow_done; return sl_ttrs_3A_rv1_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_3A_rv1_snow; return sl_ttrs_3A_rv1_nosnow; }
 
+spriteset(ss_ttrs_3A_rv2_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv2_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [338, 5224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv2_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv2_nosnow_constr {
+	ground   { sprite: ss_ttrs_3A_rv2_nosnow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv2_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv2_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[754, 5224, 40, 44, -21, -25]  /* completed */
 }
@@ -4345,9 +4671,19 @@ spritelayout sl_ttrs_3A_rv2_nosnow_done {
 	ground   { sprite: ss_ttrs_3A_rv2_nosnow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv2_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv2_nosnow, construction_state) { 3: sl_ttrs_3A_rv2_nosnow_done; return sl_ttrs_3A_rv2_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv2_nosnow, construction_state) { 3: sl_ttrs_3A_rv2_nosnow_done; return sl_ttrs_3A_rv2_nosnow_constr; }
 
+spriteset(ss_ttrs_3A_rv2_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv2_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 7224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv2_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv2_snow_constr {
+	ground   { sprite: ss_ttrs_3A_rv2_snow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv2_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv2_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[402, 7224, 40, 44, -21, -25]  /* completed */
 }
@@ -4355,11 +4691,21 @@ spritelayout sl_ttrs_3A_rv2_snow_done {
 	ground   { sprite: ss_ttrs_3A_rv2_snow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv2_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv2_snow, construction_state) { 3: sl_ttrs_3A_rv2_snow_done; return sl_ttrs_3A_rv2_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv2_snow, construction_state) { 3: sl_ttrs_3A_rv2_snow_done; return sl_ttrs_3A_rv2_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_3A_rv2_snow; return sl_ttrs_3A_rv2_nosnow; }
 
+spriteset(ss_ttrs_3A_rv3_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv3_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [338, 5224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv3_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv3_nosnow_constr {
+	ground   { sprite: ss_ttrs_3A_rv3_nosnow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv3_nosnow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv3_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 5320, 40, 44, -21, -25]  /* completed */
 }
@@ -4367,9 +4713,19 @@ spritelayout sl_ttrs_3A_rv3_nosnow_done {
 	ground   { sprite: ss_ttrs_3A_rv3_nosnow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv3_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3_nosnow, construction_state) { 3: sl_ttrs_3A_rv3_nosnow_done; return sl_ttrs_3A_rv3_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3_nosnow, construction_state) { 3: sl_ttrs_3A_rv3_nosnow_done; return sl_ttrs_3A_rv3_nosnow_constr; }
 
+spriteset(ss_ttrs_3A_rv3_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_3A_rv3_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 7224, 64, 31, -31, 0] }
+spriteset(ss_ttrs_3A_rv3_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[418, 5224, 47, 22, -21, -1]  /* constr 0 */
+	[482, 5224, 51, 31, -19, -11]  /* constr 1 */
+	[546, 5224, 61, 37, -25, -16]  /* constr 2 */
+}
+spritelayout sl_ttrs_3A_rv3_snow_constr {
+	ground   { sprite: ss_ttrs_3A_rv3_snow_gc(0); }
+	building { sprite: ss_ttrs_3A_rv3_snow_c(construction_state < 3 ? construction_state : 2); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 25; }
+}
 spriteset(ss_ttrs_3A_rv3_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[450, 7224, 40, 44, -21, -25]  /* completed */
 }
@@ -4377,7 +4733,7 @@ spritelayout sl_ttrs_3A_rv3_snow_done {
 	ground   { sprite: ss_ttrs_3A_rv3_snow_gd(0); }
 	building { sprite: ss_ttrs_3A_rv3_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3_snow, construction_state) { 3: sl_ttrs_3A_rv3_snow_done; return sl_ttrs_3A_rv3_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3_snow, construction_state) { 3: sl_ttrs_3A_rv3_snow_done; return sl_ttrs_3A_rv3_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_3A_rv3, terrain_type) { TILETYPE_SNOW: sl_ttrs_3A_rv3_snow; return sl_ttrs_3A_rv3_nosnow; }
 
@@ -4482,6 +4838,9 @@ item (FEAT_HOUSES, item_ttrs_3b_house_3b, 259) {
 	}
 }
 
+spritelayout sl_ttrs_3C_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_3C_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[482, 5320, 35, 34, -19, -17]  /* completed */
 }
@@ -4489,8 +4848,11 @@ spritelayout sl_ttrs_3C_nosnow_done {
 	ground   { sprite: 1420; }
 	building { sprite: ss_ttrs_3C_nosnow_done(0); xoffset: 3; yoffset: 3; xextent: 9; yextent: 9; zextent: 8; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3C_nosnow, construction_state) { 3: sl_ttrs_3C_nosnow_done; return sl_ttrs_3C_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3C_nosnow, construction_state) { 0: sl_ttrs_3C_nosnow_constr_g; 1: sl_ttrs_3C_nosnow_constr_g; 3: sl_ttrs_3C_nosnow_done; return sl_ttrs_3C_nosnow_done; }
 
+spritelayout sl_ttrs_3C_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_3C_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[658, 7224, 35, 34, -19, -17]  /* completed */
 }
@@ -4498,7 +4860,7 @@ spritelayout sl_ttrs_3C_snow_done {
 	ground   { sprite: 4550; }
 	building { sprite: ss_ttrs_3C_snow_done(0); xoffset: 3; yoffset: 3; xextent: 9; yextent: 9; zextent: 8; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_3C_snow, construction_state) { 3: sl_ttrs_3C_snow_done; return sl_ttrs_3C_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_3C_snow, construction_state) { 0: sl_ttrs_3C_snow_constr_g; 1: sl_ttrs_3C_snow_constr_g; 3: sl_ttrs_3C_snow_done; return sl_ttrs_3C_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_3C, terrain_type) { TILETYPE_SNOW: sl_ttrs_3C_snow; return sl_ttrs_3C_nosnow; }
 
@@ -4775,6 +5137,9 @@ item (FEAT_HOUSES, item_ttrs_40_zimmlocks_house, 264) {
 }
 
 spriteset(ss_ttrs_41_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [498, 5656, 64, 31, -31, 0] }
+spritelayout sl_ttrs_41_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_41_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[578, 5656, 64, 46, -31, -17]  /* completed */
 }
@@ -4782,9 +5147,12 @@ spritelayout sl_ttrs_41_nosnow_done {
 	ground   { sprite: ss_ttrs_41_nosnow_gd(0); }
 	building { sprite: ss_ttrs_41_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 46; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_41_nosnow, construction_state) { 3: sl_ttrs_41_nosnow_done; return sl_ttrs_41_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_41_nosnow, construction_state) { 0: sl_ttrs_41_nosnow_constr_g; 3: sl_ttrs_41_nosnow_done; return sl_ttrs_41_nosnow_done; }
 
 spriteset(ss_ttrs_41_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [498, 7304, 64, 31, -31, 0] }
+spritelayout sl_ttrs_41_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_41_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[578, 7304, 64, 46, -31, -17]  /* completed */
 }
@@ -4792,9 +5160,12 @@ spritelayout sl_ttrs_41_snow_done {
 	ground   { sprite: ss_ttrs_41_snow_gd(0); }
 	building { sprite: ss_ttrs_41_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 46; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_41_snow, construction_state) { 3: sl_ttrs_41_snow_done; return sl_ttrs_41_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_41_snow, construction_state) { 0: sl_ttrs_41_snow_constr_g; 3: sl_ttrs_41_snow_done; return sl_ttrs_41_snow_done; }
 
 spriteset(ss_ttrs_41_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [82, 8152, 64, 31, -31, 0] }
+spritelayout sl_ttrs_41_tropic_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_41_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[162, 8152, 64, 46, -31, -17]  /* completed */
 }
@@ -4802,7 +5173,7 @@ spritelayout sl_ttrs_41_tropic_done {
 	ground   { sprite: ss_ttrs_41_tropic_gd(0); }
 	building { sprite: ss_ttrs_41_tropic_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 46; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_41_tropic, construction_state) { 3: sl_ttrs_41_tropic_done; return sl_ttrs_41_tropic_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_41_tropic, construction_state) { 0: sl_ttrs_41_tropic_constr_g; 3: sl_ttrs_41_tropic_done; return sl_ttrs_41_tropic_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_41, terrain_type) { TILETYPE_SNOW: sl_ttrs_41_snow; TILETYPE_DESERT: sl_ttrs_41_tropic; return sl_ttrs_41_nosnow; }
 
@@ -4928,7 +5299,17 @@ item (FEAT_HOUSES, item_ttrs_42_large_block_of_flats, 266, HOUSE_SIZE_1X2) {
 	}
 }
 
+spriteset(ss_ttrs_44_rv0_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_44_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [530, 5832, 64, 31, -31, 0] }
+spriteset(ss_ttrs_44_rv0_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 5832, 52, 35, -28, -4]  /* constr 0 */
+	[674, 5832, 72, 110, -39, -79]  /* constr 1 */
+	[2, 6040, 72, 110, -39, -79]  /* constr 2 */
+}
+spritelayout sl_ttrs_44_rv0_nosnow_constr {
+	ground   { sprite: ss_ttrs_44_rv0_nosnow_gc(0); }
+	building { sprite: ss_ttrs_44_rv0_nosnow_c(construction_state < 3 ? construction_state : 2); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_44_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[82, 6040, 58, 72, -28, -44]  /* completed */
 }
@@ -4936,9 +5317,19 @@ spritelayout sl_ttrs_44_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_44_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_44_rv0_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv0_nosnow, construction_state) { 3: sl_ttrs_44_rv0_nosnow_done; return sl_ttrs_44_rv0_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv0_nosnow, construction_state) { 3: sl_ttrs_44_rv0_nosnow_done; return sl_ttrs_44_rv0_nosnow_constr; }
 
+spriteset(ss_ttrs_44_rv0_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_44_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [146, 7480, 64, 31, -31, 0] }
+spriteset(ss_ttrs_44_rv0_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 5832, 52, 35, -28, -4]  /* constr 0 */
+	[674, 5832, 72, 110, -39, -79]  /* constr 1 */
+	[2, 6040, 72, 110, -39, -79]  /* constr 2 */
+}
+spritelayout sl_ttrs_44_rv0_snow_constr {
+	ground   { sprite: ss_ttrs_44_rv0_snow_gc(0); }
+	building { sprite: ss_ttrs_44_rv0_snow_c(construction_state < 3 ? construction_state : 2); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_44_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[226, 7480, 58, 72, -28, -44]  /* completed */
 }
@@ -4946,11 +5337,21 @@ spritelayout sl_ttrs_44_rv0_snow_done {
 	ground   { sprite: ss_ttrs_44_rv0_snow_gd(0); }
 	building { sprite: ss_ttrs_44_rv0_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv0_snow, construction_state) { 3: sl_ttrs_44_rv0_snow_done; return sl_ttrs_44_rv0_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv0_snow, construction_state) { 3: sl_ttrs_44_rv0_snow_done; return sl_ttrs_44_rv0_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_44_rv0_snow; return sl_ttrs_44_rv0_nosnow; }
 
+spriteset(ss_ttrs_44_rv1_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_44_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [530, 5832, 64, 31, -31, 0] }
+spriteset(ss_ttrs_44_rv1_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 5832, 52, 35, -28, -4]  /* constr 0 */
+	[674, 5832, 72, 110, -39, -79]  /* constr 1 */
+	[2, 6040, 72, 110, -39, -79]  /* constr 2 */
+}
+spritelayout sl_ttrs_44_rv1_nosnow_constr {
+	ground   { sprite: ss_ttrs_44_rv1_nosnow_gc(0); }
+	building { sprite: ss_ttrs_44_rv1_nosnow_c(construction_state < 3 ? construction_state : 2); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_44_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[146, 6040, 58, 72, -28, -44]  /* completed */
 }
@@ -4958,9 +5359,19 @@ spritelayout sl_ttrs_44_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_44_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_44_rv1_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv1_nosnow, construction_state) { 3: sl_ttrs_44_rv1_nosnow_done; return sl_ttrs_44_rv1_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv1_nosnow, construction_state) { 3: sl_ttrs_44_rv1_nosnow_done; return sl_ttrs_44_rv1_nosnow_constr; }
 
+spriteset(ss_ttrs_44_rv1_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_44_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [146, 7480, 64, 31, -31, 0] }
+spriteset(ss_ttrs_44_rv1_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 5832, 52, 35, -28, -4]  /* constr 0 */
+	[674, 5832, 72, 110, -39, -79]  /* constr 1 */
+	[2, 6040, 72, 110, -39, -79]  /* constr 2 */
+}
+spritelayout sl_ttrs_44_rv1_snow_constr {
+	ground   { sprite: ss_ttrs_44_rv1_snow_gc(0); }
+	building { sprite: ss_ttrs_44_rv1_snow_c(construction_state < 3 ? construction_state : 2); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_44_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[290, 7480, 58, 72, -28, -44]  /* completed */
 }
@@ -4968,11 +5379,21 @@ spritelayout sl_ttrs_44_rv1_snow_done {
 	ground   { sprite: ss_ttrs_44_rv1_snow_gd(0); }
 	building { sprite: ss_ttrs_44_rv1_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv1_snow, construction_state) { 3: sl_ttrs_44_rv1_snow_done; return sl_ttrs_44_rv1_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv1_snow, construction_state) { 3: sl_ttrs_44_rv1_snow_done; return sl_ttrs_44_rv1_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_44_rv1_snow; return sl_ttrs_44_rv1_nosnow; }
 
+spriteset(ss_ttrs_44_rv2_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_44_rv2_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [530, 5832, 64, 31, -31, 0] }
+spriteset(ss_ttrs_44_rv2_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 5832, 52, 35, -28, -4]  /* constr 0 */
+	[674, 5832, 72, 110, -39, -79]  /* constr 1 */
+	[2, 6040, 72, 110, -39, -79]  /* constr 2 */
+}
+spritelayout sl_ttrs_44_rv2_nosnow_constr {
+	ground   { sprite: ss_ttrs_44_rv2_nosnow_gc(0); }
+	building { sprite: ss_ttrs_44_rv2_nosnow_c(construction_state < 3 ? construction_state : 2); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_44_rv2_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[210, 6040, 58, 92, -28, -64]  /* completed */
 }
@@ -4980,9 +5401,19 @@ spritelayout sl_ttrs_44_rv2_nosnow_done {
 	ground   { sprite: ss_ttrs_44_rv2_nosnow_gd(0); }
 	building { sprite: ss_ttrs_44_rv2_nosnow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 95; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv2_nosnow, construction_state) { 3: sl_ttrs_44_rv2_nosnow_done; return sl_ttrs_44_rv2_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv2_nosnow, construction_state) { 3: sl_ttrs_44_rv2_nosnow_done; return sl_ttrs_44_rv2_nosnow_constr; }
 
+spriteset(ss_ttrs_44_rv2_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [82, 5144, 64, 31, -31, 0] }
 spriteset(ss_ttrs_44_rv2_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [146, 7480, 64, 31, -31, 0] }
+spriteset(ss_ttrs_44_rv2_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
+	[610, 5832, 52, 35, -28, -4]  /* constr 0 */
+	[674, 5832, 72, 110, -39, -79]  /* constr 1 */
+	[2, 6040, 72, 110, -39, -79]  /* constr 2 */
+}
+spritelayout sl_ttrs_44_rv2_snow_constr {
+	ground   { sprite: ss_ttrs_44_rv2_snow_gc(0); }
+	building { sprite: ss_ttrs_44_rv2_snow_c(construction_state < 3 ? construction_state : 2); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 10; }
+}
 spriteset(ss_ttrs_44_rv2_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[354, 7480, 58, 92, -28, -64]  /* completed */
 }
@@ -4990,7 +5421,7 @@ spritelayout sl_ttrs_44_rv2_snow_done {
 	ground   { sprite: ss_ttrs_44_rv2_snow_gd(0); }
 	building { sprite: ss_ttrs_44_rv2_snow_done(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 95; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv2_snow, construction_state) { 3: sl_ttrs_44_rv2_snow_done; return sl_ttrs_44_rv2_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv2_snow, construction_state) { 3: sl_ttrs_44_rv2_snow_done; return sl_ttrs_44_rv2_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_44_rv2, terrain_type) { TILETYPE_SNOW: sl_ttrs_44_rv2_snow; return sl_ttrs_44_rv2_nosnow; }
 
@@ -5425,6 +5856,9 @@ item (FEAT_HOUSES, item_ttrs_4b_house_4b, 275) {
 }
 
 spriteset(ss_ttrs_4C_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [306, 6536, 64, 31, -31, 0] }
+spritelayout sl_ttrs_4C_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_4C_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[386, 6536, 60, 82, -29, -51]  /* completed */
 }
@@ -5432,9 +5866,12 @@ spritelayout sl_ttrs_4C_nosnow_done {
 	ground   { sprite: ss_ttrs_4C_nosnow_gd(0); }
 	building { sprite: ss_ttrs_4C_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 80; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_4C_nosnow, construction_state) { 3: sl_ttrs_4C_nosnow_done; return sl_ttrs_4C_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_4C_nosnow, construction_state) { 0: sl_ttrs_4C_nosnow_constr_g; 3: sl_ttrs_4C_nosnow_done; return sl_ttrs_4C_nosnow_done; }
 
 spriteset(ss_ttrs_4C_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [466, 7864, 64, 31, -31, 0] }
+spritelayout sl_ttrs_4C_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_4C_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[546, 7864, 60, 82, -29, -51]  /* completed */
 }
@@ -5442,7 +5879,7 @@ spritelayout sl_ttrs_4C_snow_done {
 	ground   { sprite: ss_ttrs_4C_snow_gd(0); }
 	building { sprite: ss_ttrs_4C_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 80; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_4C_snow, construction_state) { 3: sl_ttrs_4C_snow_done; return sl_ttrs_4C_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_4C_snow, construction_state) { 0: sl_ttrs_4C_snow_constr_g; 3: sl_ttrs_4C_snow_done; return sl_ttrs_4C_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_4C, terrain_type) { TILETYPE_SNOW: sl_ttrs_4C_snow; return sl_ttrs_4C_nosnow; }
 
@@ -5964,6 +6401,9 @@ item (FEAT_HOUSES, item_ttrs_56_house_56, 286) {
 }
 
 spriteset(ss_ttrs_57_rv0_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [66, 8584, 64, 31, -31, 0] }
+spritelayout sl_ttrs_57_rv0_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_57_rv0_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[146, 8584, 62, 106, -30, -76]  /* completed */
 }
@@ -5971,9 +6411,12 @@ spritelayout sl_ttrs_57_rv0_nosnow_done {
 	ground   { sprite: ss_ttrs_57_rv0_nosnow_gd(0); }
 	building { sprite: ss_ttrs_57_rv0_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 106; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv0_nosnow, construction_state) { 3: sl_ttrs_57_rv0_nosnow_done; return sl_ttrs_57_rv0_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv0_nosnow, construction_state) { 0: sl_ttrs_57_rv0_nosnow_constr_g; 3: sl_ttrs_57_rv0_nosnow_done; return sl_ttrs_57_rv0_nosnow_done; }
 
 spriteset(ss_ttrs_57_rv0_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 9784, 64, 31, -31, 0] }
+spritelayout sl_ttrs_57_rv0_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_57_rv0_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[274, 9784, 62, 106, -30, -76]  /* completed */
 }
@@ -5981,11 +6424,14 @@ spritelayout sl_ttrs_57_rv0_snow_done {
 	ground   { sprite: ss_ttrs_57_rv0_snow_gd(0); }
 	building { sprite: ss_ttrs_57_rv0_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 106; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv0_snow, construction_state) { 3: sl_ttrs_57_rv0_snow_done; return sl_ttrs_57_rv0_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv0_snow, construction_state) { 0: sl_ttrs_57_rv0_snow_constr_g; 3: sl_ttrs_57_rv0_snow_done; return sl_ttrs_57_rv0_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv0, terrain_type) { TILETYPE_SNOW: sl_ttrs_57_rv0_snow; return sl_ttrs_57_rv0_nosnow; }
 
 spriteset(ss_ttrs_57_rv1_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [66, 8584, 64, 31, -31, 0] }
+spritelayout sl_ttrs_57_rv1_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_57_rv1_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[226, 8584, 62, 130, -30, -100]  /* completed */
 }
@@ -5993,9 +6439,12 @@ spritelayout sl_ttrs_57_rv1_nosnow_done {
 	ground   { sprite: ss_ttrs_57_rv1_nosnow_gd(0); }
 	building { sprite: ss_ttrs_57_rv1_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 130; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv1_nosnow, construction_state) { 3: sl_ttrs_57_rv1_nosnow_done; return sl_ttrs_57_rv1_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv1_nosnow, construction_state) { 0: sl_ttrs_57_rv1_nosnow_constr_g; 3: sl_ttrs_57_rv1_nosnow_done; return sl_ttrs_57_rv1_nosnow_done; }
 
 spriteset(ss_ttrs_57_rv1_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [194, 9784, 64, 31, -31, 0] }
+spritelayout sl_ttrs_57_rv1_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_57_rv1_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[354, 9784, 62, 130, -30, -100]  /* completed */
 }
@@ -6003,7 +6452,7 @@ spritelayout sl_ttrs_57_rv1_snow_done {
 	ground   { sprite: ss_ttrs_57_rv1_snow_gd(0); }
 	building { sprite: ss_ttrs_57_rv1_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 130; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv1_snow, construction_state) { 3: sl_ttrs_57_rv1_snow_done; return sl_ttrs_57_rv1_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv1_snow, construction_state) { 0: sl_ttrs_57_rv1_snow_constr_g; 3: sl_ttrs_57_rv1_snow_done; return sl_ttrs_57_rv1_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_57_rv1, terrain_type) { TILETYPE_SNOW: sl_ttrs_57_rv1_snow; return sl_ttrs_57_rv1_nosnow; }
 
@@ -6146,7 +6595,6 @@ item (FEAT_HOUSES, item_ttrs_59_house_59, 289) {
 	}
 }
 
-spriteset(ss_ttrs_5A_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [322, 8760, 64, 31, -31, 0] }
 spriteset(ss_ttrs_5A_nosnow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [322, 8760, 64, 31, -31, 0] }
 spriteset(ss_ttrs_5A_nosnow_f0, "src/sprites/pcx/ttrs3w.pcx") { [402, 8760, 67, 60, -31, -30] }
 spriteset(ss_ttrs_5A_nosnow_f2, "src/sprites/pcx/ttrs3w.pcx") { [482, 8760, 67, 60, -31, -30] }
@@ -6276,12 +6724,14 @@ spriteset(ss_ttrs_5A_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[322, 9000, 67, 60, -31, -30]  /* constr 0 */
 }
 spritelayout sl_ttrs_5A_nosnow_constr {
-	ground   { sprite: ss_ttrs_5A_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_5A_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_5A_nosnow, construction_state) { 3: sl_ttrs_5A_nosnow_anim; return sl_ttrs_5A_nosnow_constr; }
+spritelayout sl_ttrs_5A_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
+switch (FEAT_HOUSES, SELF, sl_ttrs_5A_nosnow, construction_state) { 0: sl_ttrs_5A_nosnow_constr_g; 3: sl_ttrs_5A_nosnow_anim; return sl_ttrs_5A_nosnow_constr; }
 
-spriteset(ss_ttrs_5A_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [2, 9960, 64, 31, -31, 0] }
 spriteset(ss_ttrs_5A_snow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [2, 9960, 64, 31, -31, 0] }
 spriteset(ss_ttrs_5A_snow_f0, "src/sprites/pcx/ttrs3w.pcx") { [82, 9960, 67, 60, -31, -30] }
 spriteset(ss_ttrs_5A_snow_f2, "src/sprites/pcx/ttrs3w.pcx") { [162, 9960, 67, 60, -31, -30] }
@@ -6411,10 +6861,13 @@ spriteset(ss_ttrs_5A_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 10120, 67, 60, -31, -30]  /* constr 0 */
 }
 spritelayout sl_ttrs_5A_snow_constr {
-	ground   { sprite: ss_ttrs_5A_snow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_5A_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_5A_snow, construction_state) { 3: sl_ttrs_5A_snow_anim; return sl_ttrs_5A_snow_constr; }
+spritelayout sl_ttrs_5A_snow_constr_g {
+	ground   { sprite: 3924; }
+}
+switch (FEAT_HOUSES, SELF, sl_ttrs_5A_snow, construction_state) { 0: sl_ttrs_5A_snow_constr_g; 3: sl_ttrs_5A_snow_anim; return sl_ttrs_5A_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_5A, terrain_type) { TILETYPE_SNOW: sl_ttrs_5A_snow; return sl_ttrs_5A_nosnow; }
 
@@ -6501,6 +6954,9 @@ item (FEAT_HOUSES, item_ttrs_5b_house_5b, 291) {
 }
 
 spriteset(ss_ttrs_5C_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [242, 9080, 64, 31, -31, 0] }
+spritelayout sl_ttrs_5C_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_5C_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[322, 9080, 62, 45, -31, -21]  /* completed */
 }
@@ -6508,9 +6964,12 @@ spritelayout sl_ttrs_5C_nosnow_done {
 	ground   { sprite: ss_ttrs_5C_nosnow_gd(0); }
 	building { sprite: ss_ttrs_5C_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_5C_nosnow, construction_state) { 3: sl_ttrs_5C_nosnow_done; return sl_ttrs_5C_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_5C_nosnow, construction_state) { 0: sl_ttrs_5C_nosnow_constr_g; 3: sl_ttrs_5C_nosnow_done; return sl_ttrs_5C_nosnow_done; }
 
 spriteset(ss_ttrs_5C_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [482, 10120, 64, 31, -31, 0] }
+spritelayout sl_ttrs_5C_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_5C_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[562, 10120, 62, 45, -31, -21]  /* completed */
 }
@@ -6518,9 +6977,12 @@ spritelayout sl_ttrs_5C_snow_done {
 	ground   { sprite: ss_ttrs_5C_snow_gd(0); }
 	building { sprite: ss_ttrs_5C_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_5C_snow, construction_state) { 3: sl_ttrs_5C_snow_done; return sl_ttrs_5C_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_5C_snow, construction_state) { 0: sl_ttrs_5C_snow_constr_g; 3: sl_ttrs_5C_snow_done; return sl_ttrs_5C_snow_done; }
 
 spriteset(ss_ttrs_5C_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [2, 10488, 64, 31, -31, 0] }
+spritelayout sl_ttrs_5C_tropic_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_5C_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[322, 9080, 62, 45, -31, -21]  /* completed */
 }
@@ -6528,7 +6990,7 @@ spritelayout sl_ttrs_5C_tropic_done {
 	ground   { sprite: ss_ttrs_5C_tropic_gd(0); }
 	building { sprite: ss_ttrs_5C_tropic_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 45; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_5C_tropic, construction_state) { 3: sl_ttrs_5C_tropic_done; return sl_ttrs_5C_tropic_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_5C_tropic, construction_state) { 0: sl_ttrs_5C_tropic_constr_g; 3: sl_ttrs_5C_tropic_done; return sl_ttrs_5C_tropic_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_5C, terrain_type) { TILETYPE_SNOW: sl_ttrs_5C_snow; TILETYPE_DESERT: sl_ttrs_5C_tropic; return sl_ttrs_5C_nosnow; }
 
@@ -6814,7 +7276,6 @@ item (FEAT_HOUSES, item_ttrs_61_house_61, 297) {
 	}
 }
 
-spriteset(ss_ttrs_62_nosnow_gc, "src/sprites/pcx/ttrs3w.pcx") { [66, 10664, 64, 31, -31, 0] }
 spriteset(ss_ttrs_62_nosnow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [66, 10664, 64, 31, -31, 0] }
 spriteset(ss_ttrs_62_nosnow_f0, "src/sprites/pcx/ttrs3w.pcx") { [146, 10664, 64, 71, -31, -41] }
 spriteset(ss_ttrs_62_nosnow_f1, "src/sprites/pcx/ttrs3w.pcx") { [226, 10664, 64, 71, -31, -41] }
@@ -6946,12 +7407,14 @@ spriteset(ss_ttrs_62_nosnow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[482, 10856, 64, 71, -31, -41]  /* constr 0 */
 }
 spritelayout sl_ttrs_62_nosnow_constr {
-	ground   { sprite: ss_ttrs_62_nosnow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_62_nosnow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 71; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_62_nosnow, construction_state) { 3: sl_ttrs_62_nosnow_anim; return sl_ttrs_62_nosnow_constr; }
+spritelayout sl_ttrs_62_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
+switch (FEAT_HOUSES, SELF, sl_ttrs_62_nosnow, construction_state) { 0: sl_ttrs_62_nosnow_constr_g; 3: sl_ttrs_62_nosnow_anim; return sl_ttrs_62_nosnow_constr; }
 
-spriteset(ss_ttrs_62_snow_gc, "src/sprites/pcx/ttrs3w.pcx") { [274, 12472, 64, 31, -31, 0] }
 spriteset(ss_ttrs_62_snow_gf0, "src/sprites/pcx/ttrs3w.pcx") { [274, 12472, 64, 31, -31, 0] }
 spriteset(ss_ttrs_62_snow_f0, "src/sprites/pcx/ttrs3w.pcx") { [354, 12472, 64, 71, -31, -41] }
 spriteset(ss_ttrs_62_snow_f1, "src/sprites/pcx/ttrs3w.pcx") { [434, 12472, 64, 71, -31, -41] }
@@ -7083,10 +7546,13 @@ spriteset(ss_ttrs_62_snow_c, "src/sprites/pcx/ttrs3w.pcx") {
 	[722, 12664, 64, 71, -31, -41]  /* constr 0 */
 }
 spritelayout sl_ttrs_62_snow_constr {
-	ground   { sprite: ss_ttrs_62_snow_gc(0); }
+	ground   { sprite: 3924; }
 	building { sprite: ss_ttrs_62_snow_c(0); xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 71; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_62_snow, construction_state) { 3: sl_ttrs_62_snow_anim; return sl_ttrs_62_snow_constr; }
+spritelayout sl_ttrs_62_snow_constr_g {
+	ground   { sprite: 3924; }
+}
+switch (FEAT_HOUSES, SELF, sl_ttrs_62_snow, construction_state) { 0: sl_ttrs_62_snow_constr_g; 3: sl_ttrs_62_snow_anim; return sl_ttrs_62_snow_constr; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_62, terrain_type) { TILETYPE_SNOW: sl_ttrs_62_snow; return sl_ttrs_62_nosnow; }
 
@@ -7408,6 +7874,9 @@ item (FEAT_HOUSES, item_ttrs_67_house_67, 303) {
 }
 
 spriteset(ss_ttrs_68_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [82, 11208, 64, 31, -31, 0] }
+spritelayout sl_ttrs_68_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_68_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[162, 11208, 64, 39, -31, -10]  /* completed */
 }
@@ -7415,9 +7884,12 @@ spritelayout sl_ttrs_68_nosnow_done {
 	ground   { sprite: ss_ttrs_68_nosnow_gd(0); }
 	building { sprite: ss_ttrs_68_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_68_nosnow, construction_state) { 3: sl_ttrs_68_nosnow_done; return sl_ttrs_68_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_68_nosnow, construction_state) { 0: sl_ttrs_68_nosnow_constr_g; 3: sl_ttrs_68_nosnow_done; return sl_ttrs_68_nosnow_done; }
 
 spriteset(ss_ttrs_68_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [402, 12936, 64, 31, -31, 0] }
+spritelayout sl_ttrs_68_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_68_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[482, 12936, 64, 39, -31, -10]  /* completed */
 }
@@ -7425,9 +7897,12 @@ spritelayout sl_ttrs_68_snow_done {
 	ground   { sprite: ss_ttrs_68_snow_gd(0); }
 	building { sprite: ss_ttrs_68_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_68_snow, construction_state) { 3: sl_ttrs_68_snow_done; return sl_ttrs_68_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_68_snow, construction_state) { 0: sl_ttrs_68_snow_constr_g; 3: sl_ttrs_68_snow_done; return sl_ttrs_68_snow_done; }
 
 spriteset(ss_ttrs_68_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [242, 13848, 64, 31, -31, 0] }
+spritelayout sl_ttrs_68_tropic_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_68_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[162, 11208, 64, 39, -31, -10]  /* completed */
 }
@@ -7435,7 +7910,7 @@ spritelayout sl_ttrs_68_tropic_done {
 	ground   { sprite: ss_ttrs_68_tropic_gd(0); }
 	building { sprite: ss_ttrs_68_tropic_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 40; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_68_tropic, construction_state) { 3: sl_ttrs_68_tropic_done; return sl_ttrs_68_tropic_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_68_tropic, construction_state) { 0: sl_ttrs_68_tropic_constr_g; 3: sl_ttrs_68_tropic_done; return sl_ttrs_68_tropic_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_68, terrain_type) { TILETYPE_SNOW: sl_ttrs_68_snow; TILETYPE_DESERT: sl_ttrs_68_tropic; return sl_ttrs_68_nosnow; }
 
@@ -7747,6 +8222,9 @@ item (FEAT_HOUSES, item_ttrs_6d_multimedia_offices, 309) {
 }
 
 spriteset(ss_ttrs_6E_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [386, 11560, 64, 31, -31, 0] }
+spritelayout sl_ttrs_6E_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_6E_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[466, 11560, 62, 59, -29, -35]  /* completed */
 }
@@ -7754,9 +8232,12 @@ spritelayout sl_ttrs_6E_nosnow_done {
 	ground   { sprite: ss_ttrs_6E_nosnow_gd(0); }
 	building { sprite: ss_ttrs_6E_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_6E_nosnow, construction_state) { 3: sl_ttrs_6E_nosnow_done; return sl_ttrs_6E_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_6E_nosnow, construction_state) { 0: sl_ttrs_6E_nosnow_constr_g; 3: sl_ttrs_6E_nosnow_done; return sl_ttrs_6E_nosnow_done; }
 
 spriteset(ss_ttrs_6E_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [226, 13096, 64, 31, -31, 0] }
+spritelayout sl_ttrs_6E_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_6E_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[306, 13096, 62, 59, -29, -35]  /* completed */
 }
@@ -7764,11 +8245,14 @@ spritelayout sl_ttrs_6E_snow_done {
 	ground   { sprite: ss_ttrs_6E_snow_gd(0); }
 	building { sprite: ss_ttrs_6E_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 60; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_6E_snow, construction_state) { 3: sl_ttrs_6E_snow_done; return sl_ttrs_6E_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_6E_snow, construction_state) { 0: sl_ttrs_6E_snow_constr_g; 3: sl_ttrs_6E_snow_done; return sl_ttrs_6E_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_6E, terrain_type) { TILETYPE_SNOW: sl_ttrs_6E_snow; return sl_ttrs_6E_nosnow; }
 
 spriteset(ss_ttrs_6F_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [546, 11560, 64, 31, -31, 0] }
+spritelayout sl_ttrs_6F_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_6F_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[626, 11560, 62, 75, -31, -51]  /* completed */
 }
@@ -7776,9 +8260,12 @@ spritelayout sl_ttrs_6F_nosnow_done {
 	ground   { sprite: ss_ttrs_6F_nosnow_gd(0); }
 	building { sprite: ss_ttrs_6F_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_6F_nosnow, construction_state) { 3: sl_ttrs_6F_nosnow_done; return sl_ttrs_6F_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_6F_nosnow, construction_state) { 0: sl_ttrs_6F_nosnow_constr_g; 3: sl_ttrs_6F_nosnow_done; return sl_ttrs_6F_nosnow_done; }
 
 spriteset(ss_ttrs_6F_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [386, 13096, 64, 31, -31, 0] }
+spritelayout sl_ttrs_6F_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_6F_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[466, 13096, 62, 75, -31, -51]  /* completed */
 }
@@ -7786,7 +8273,7 @@ spritelayout sl_ttrs_6F_snow_done {
 	ground   { sprite: ss_ttrs_6F_snow_gd(0); }
 	building { sprite: ss_ttrs_6F_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 75; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_6F_snow, construction_state) { 3: sl_ttrs_6F_snow_done; return sl_ttrs_6F_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_6F_snow, construction_state) { 0: sl_ttrs_6F_snow_constr_g; 3: sl_ttrs_6F_snow_done; return sl_ttrs_6F_snow_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_6F, terrain_type) { TILETYPE_SNOW: sl_ttrs_6F_snow; return sl_ttrs_6F_nosnow; }
 
@@ -7933,6 +8420,9 @@ item (FEAT_HOUSES, item_ttrs_71_house_71, 313) {
 }
 
 spriteset(ss_ttrs_72_nosnow_gd, "src/sprites/pcx/ttrs3w.pcx") { [706, 11784, 64, 31, -31, 0] }
+spritelayout sl_ttrs_72_nosnow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_72_nosnow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[2, 12008, 58, 99, -29, -70]  /* completed */
 }
@@ -7940,9 +8430,12 @@ spritelayout sl_ttrs_72_nosnow_done {
 	ground   { sprite: ss_ttrs_72_nosnow_gd(0); }
 	building { sprite: ss_ttrs_72_nosnow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 100; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_72_nosnow, construction_state) { 3: sl_ttrs_72_nosnow_done; return sl_ttrs_72_nosnow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_72_nosnow, construction_state) { 0: sl_ttrs_72_nosnow_constr_g; 3: sl_ttrs_72_nosnow_done; return sl_ttrs_72_nosnow_done; }
 
 spriteset(ss_ttrs_72_snow_gd, "src/sprites/pcx/ttrs3w.pcx") { [66, 13336, 64, 31, -31, 0] }
+spritelayout sl_ttrs_72_snow_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_72_snow_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[146, 13336, 58, 99, -29, -70]  /* completed */
 }
@@ -7950,9 +8443,12 @@ spritelayout sl_ttrs_72_snow_done {
 	ground   { sprite: ss_ttrs_72_snow_gd(0); }
 	building { sprite: ss_ttrs_72_snow_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 100; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_72_snow, construction_state) { 3: sl_ttrs_72_snow_done; return sl_ttrs_72_snow_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_72_snow, construction_state) { 0: sl_ttrs_72_snow_constr_g; 3: sl_ttrs_72_snow_done; return sl_ttrs_72_snow_done; }
 
 spriteset(ss_ttrs_72_tropic_gd, "src/sprites/pcx/ttrs3w.pcx") { [322, 13848, 64, 31, -31, 0] }
+spritelayout sl_ttrs_72_tropic_constr_g {
+	ground   { sprite: 3924; }
+}
 spriteset(ss_ttrs_72_tropic_done, "src/sprites/pcx/ttrs3w.pcx") {
 	[402, 13848, 58, 99, -29, -70]  /* completed */
 }
@@ -7960,7 +8456,7 @@ spritelayout sl_ttrs_72_tropic_done {
 	ground   { sprite: ss_ttrs_72_tropic_gd(0); }
 	building { sprite: ss_ttrs_72_tropic_done(0); recolour_mode: RECOLOUR_REMAP; palette: PALETTE_USE_DEFAULT; xoffset: 0; yoffset: 0; xextent: 16; yextent: 16; zextent: 100; }
 }
-switch (FEAT_HOUSES, SELF, sl_ttrs_72_tropic, construction_state) { 3: sl_ttrs_72_tropic_done; return sl_ttrs_72_tropic_done; }
+switch (FEAT_HOUSES, SELF, sl_ttrs_72_tropic, construction_state) { 0: sl_ttrs_72_tropic_constr_g; 3: sl_ttrs_72_tropic_done; return sl_ttrs_72_tropic_done; }
 
 switch (FEAT_HOUSES, SELF, sl_ttrs_72, terrain_type) { TILETYPE_SNOW: sl_ttrs_72_snow; TILETYPE_DESERT: sl_ttrs_72_tropic; return sl_ttrs_72_nosnow; }
 
